@@ -14,15 +14,16 @@ namespace LoveSeat
 {
 	public class CouchDatabase : CouchBase, IDocumentDatabase
 	{
-		private readonly string databaseBaseUri;
-		private readonly Plug databasePlug;
 		private string defaultDesignDoc = null;
-		public CouchDatabase(string baseUri, string databaseName, string username, string password)
-			: base(username, password)
+
+		public CouchDatabase(XUri baseUri, string databaseName)
+			: base(baseUri.At(XUri.EncodeFragment(databaseName)))
 		{
-			this.baseUri = baseUri;
-			this.databaseBaseUri = baseUri + databaseName;
-			this.databasePlug = Plug.New(baseUri).At(XUri.EncodeFragment(databaseName));
+		}
+
+		public CouchDatabase(XUri baseUri, string databaseName,string username,string password)
+			: base(baseUri.At(XUri.EncodeFragment(databaseName)),username,password)
+		{
 		}
 
 		/// <summary>
@@ -38,7 +39,7 @@ namespace LoveSeat
 			if (jobj.Value<object>("_rev") != null)
 				jobj.Remove("_rev");
 
-			databasePlug.At(id).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			Plug.At(id).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 					{
@@ -67,7 +68,7 @@ namespace LoveSeat
 		{
 			var json = JObject.Parse(jsonForDocument);
 
-			databasePlug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
+			Plug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 					{
@@ -88,7 +89,7 @@ namespace LoveSeat
 		public Result<JObject> DeleteDocument(string id, string rev, Result<JObject> result)
 		{
 			// GetRequest(databaseBaseUri + "/" + id + "?rev=" + rev).Delete().Form().GetResponse().GetJObject();
-			databasePlug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
+			Plug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
@@ -106,7 +107,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<Document> GetDocument(string id,Result<Document> result)
 		{
-			databasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			Plug.At(id).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
@@ -140,7 +141,7 @@ namespace LoveSeat
 		}
 		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer,Result<T> result)
 		{
-			databasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			Plug.At(id).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					switch(a.Status)
 					{
@@ -186,7 +187,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> AddAttachment(string id, string rev, byte[] attachment, string filename, string contentType, Result<JObject> result)
 		{
-			databasePlug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
+			Plug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 						result.Return(JObject.Parse(a.ToText()));
@@ -204,7 +205,7 @@ namespace LoveSeat
 		}
 		public Result<Stream> GetAttachmentStream(string docId, string rev, string attachmentName,Result<Stream> result)
 		{
-			databasePlug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
+			Plug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
@@ -231,7 +232,7 @@ namespace LoveSeat
 		}
 		public Result<JObject> DeleteAttachment(string id, string rev, string attachmentName, Result<JObject> result)
 		{
-			databasePlug.At(id, XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			Plug.At(id, XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
@@ -256,7 +257,7 @@ namespace LoveSeat
 			if (document.Rev == null)
 				return CreateDocument(document,result);
 
-			databasePlug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
+			Plug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 					{
@@ -309,7 +310,7 @@ namespace LoveSeat
 
 		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
 		{
-			databasePlug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
+			Plug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(a.ToText());
@@ -322,7 +323,7 @@ namespace LoveSeat
 		}
 		public Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result)
 		{
-			databasePlug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
+			Plug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
 				a => result.Return(new ListResult(a)),
 				e => result.Throw(e)
 			);
@@ -348,7 +349,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, Result<ViewResult<T>> result)
 		{
-			return ProcessGenericResults<T>(databasePlug.At("_design",designDoc,"_view",viewName), options, new ObjectSerializer<T>(),result);
+			return ProcessGenericResults<T>(Plug.At("_design",designDoc,"_view",viewName), options, new ObjectSerializer<T>(),result);
 		}
 		/// <summary>
 		/// Allows you to specify options and uses the defaultDesignDoc Specified.
@@ -387,7 +388,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
-			return ProcessGenericResults<T>(databasePlug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
+			return ProcessGenericResults<T>(Plug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
 		}
 		private Result<ViewResult<T>> ProcessGenericResults<T>(Plug uri, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
@@ -408,12 +409,12 @@ namespace LoveSeat
 			return result;
 		}
 
-		private CouchRequest GetRequest(ViewOptions options, string uri)
-		{
-			if (options != null)
-				uri += options.ToString();
-			return GetRequest(uri, options == null ? null : options.Etag).Get().Json();
-		}
+		//private CouchRequest GetRequest(ViewOptions options, string uri)
+		//{
+		//    if (options != null)
+		//        uri += options.ToString();
+		//    return GetRequest(uri, options == null ? null : options.Etag).Get().Json();
+		//}
 
 
 		/// <summary>

@@ -38,9 +38,8 @@ namespace LoveSeat
 		/// <param name="username">The username of the CouchDB instance</param>
 		/// <param name="password">The password of the CouchDB instance</param>
 		public CouchClient(string host, int port, string username, string password)
-			: base(username, password)
+			: base(new XUri(String.Format("http://{0}:{1}",host,port)), username, password)
 		{
-			baseUri = "http://" + host + ":" + port + "/";
 		}
 
 		/// <summary>
@@ -52,7 +51,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> TriggerReplication(string source, string target, bool continuous, Result<JObject> result)
 		{
-			Plug p = Plug.New(baseUri).At("_replicate");
+			Plug p = Plug.At("_replicate");
 			ReplicationOptions options = new ReplicationOptions(source, target, continuous);
 			p.Post(DreamMessage.Ok(MimeType.JSON, options.ToString()), new Result<DreamMessage>()).WhenDone(
 				a =>
@@ -84,7 +83,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<bool> HasDatabase(string databaseName, Result<bool> result)
 		{
-			Plug.New(baseUri).At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
+			Plug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -104,7 +103,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> CreateDatabase(string databaseName, Result<JObject> result)
 		{
-			Plug.New(baseUri).At(XUri.EncodeFragment(databaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			Plug.At(XUri.EncodeFragment(databaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -127,7 +126,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> DeleteDatabase(string databaseName, Result<JObject> result)
 		{
-			Plug.New(baseUri).At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
+			Plug.At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
@@ -151,39 +150,39 @@ namespace LoveSeat
 		/// <returns></returns>
 		public CouchDatabase GetDatabase(string databaseName)
 		{
-			return new CouchDatabase(baseUri, databaseName, username, password);
+			return new CouchDatabase(Plug, databaseName);
 		}
 
 		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
-		{
-			//Creates the user in the local.ini
-			var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(usernameToCreate))
-				.Put().Json().Data("\"" + passwordToCreate + "\"").GetResponse();
+        {
+//            //Creates the user in the local.ini
+//            var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(usernameToCreate))
+//                .Put().Json().Data("\"" + passwordToCreate + "\"").GetResponse();
 
-			var user = @"{ ""name"": ""%name%"",
-  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
-}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
-			var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
-				.Put().Json().Data(user).GetResponse().GetJObject();
-			return docResult;
-
-		}
+//            var user = @"{ ""name"": ""%name%"",
+//  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
+//}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
+//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
+//                .Put().Json().Data(user).GetResponse().GetJObject();
+//            return docResult;
+			return JObject.Parse("{}");
+        }
 		/// <summary>
 		/// Deletes user  (if you have permission)
 		/// </summary>
 		/// <param name="userToDelete"></param>
 		public void DeleteAdminUser(string userToDelete)
 		{
-			var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(userToDelete))
-				.Delete().Json().GetResponse();
+			//var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(userToDelete))
+			//    .Delete().Json().GetResponse();
 
-			var userDb = this.GetDatabase("_users");
-			var userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userToDelete);
-			var userDoc = userDb.GetDocument(userId,new  Result<Document>()).Wait();
-			if (userDoc != null)
-			{
-				userDb.DeleteDocument(userDoc.Id, userDoc.Rev, new Result<JObject>()).Wait();
-			}
+			//var userDb = this.GetDatabase("_users");
+			//var userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userToDelete);
+			//var userDoc = userDb.GetDocument(userId, new Result<Document>()).Wait();
+			//if (userDoc != null)
+			//{
+			//    userDb.DeleteDocument(userDoc.Id, userDoc.Rev, new Result<JObject>()).Wait();
+			//}
 		}
 		/// <summary>
 		/// Returns true/false depending on whether or not the user is contained in the _users database
@@ -201,7 +200,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Document GetUser(string userId)
 		{
-			var db = new CouchDatabase(baseUri, "_users", username, password);
+			var db = new CouchDatabase(Plug, "_users");
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
 			return db.GetDocument(userId,new Result<Document>()).Wait();
 		}
