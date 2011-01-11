@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using MindTouch.Dream;
 
 namespace LoveSeat.Interfaces
 {
@@ -11,14 +12,14 @@ namespace LoveSeat.Interfaces
         /// <summary>
         /// Typically won't be needed.  Provided for debuging assistance
         /// </summary>
-        HttpWebRequest Request { get; }
+        //HttpWebRequest Request { get; }
 
         /// <summary>
         /// Typically won't be needed.  Provided for debugging assistance
         /// </summary>
-        HttpWebResponse Response { get; }
+        //HttpWebResponse Response { get; }
 
-        HttpStatusCode StatusCode { get; }
+        DreamStatus StatusCode { get; }
         string Etag { get; }
         int TotalRows { get; }
         int OffSet { get; }

@@ -4,9 +4,49 @@ using LoveSeat.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using MindTouch.Dream;
 
 namespace LoveSeat
 {
+	public static class PlugExtensions
+	{
+		public static Plug With(this Plug plug, ViewOptions options)
+		{
+			if ((options.Key != null) && (options.Key.Count > 0))
+				plug.With("key", options.Key.ToString());
+			if ((options.StartKey != null) && (options.StartKey.Count > 0))
+				if ((options.StartKey.Count == 1) && (options.EndKey.Count > 1))
+					plug.With("startkey",String.Format("[{0}]",options.StartKey.ToString()));
+				else
+					plug.With("startkey", options.StartKey.ToString());
+			if ((options.EndKey != null) && (options.EndKey.Count > 0))
+				plug.With("endkey", options.EndKey.ToString());
+			if (options.Limit.HasValue)
+				plug.With("limit", options.Limit.Value);
+			if (options.Skip.HasValue)
+				plug.With("skip", options.Skip.ToString()); 
+			if (options.Reduce.HasValue)
+				plug.With("reduce",options.Reduce.Value);
+			if (options.Group.HasValue)
+				plug.With("group",options.Group.Value);
+			if (options.IncludeDocs.HasValue)
+				plug.With("include_docs",options.IncludeDocs.Value);
+			if (options.InclusiveEnd.HasValue)
+				plug.With("inclusive_end",options.InclusiveEnd.Value);
+			if (options.GroupLevel.HasValue)
+				plug.With("group_level",options.GroupLevel.Value);
+			if (options.Descending.HasValue)
+				plug.With("descending",options.Descending.Value);
+			if (options.Stale.HasValue && options.Stale.Value)
+				plug.With("stale", "ok");
+			if (!string.IsNullOrEmpty(options.StartKeyDocId))
+				plug.With("startkey_docid",options.StartKeyDocId);
+			if (!string.IsNullOrEmpty(options.EndKeyDocId))
+				plug.With("endkey_docid", options.EndKeyDocId);
+			return plug;
+		}
+	}
+
     public class ViewOptions : IViewOptions
     {
         public ViewOptions()

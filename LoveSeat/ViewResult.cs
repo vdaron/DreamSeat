@@ -7,14 +7,15 @@ using LoveSeat.Interfaces;
 using LoveSeat.Support;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using MindTouch.Dream;
 
 namespace LoveSeat
 {
     public class ViewResult<T> : ViewResult
     {
         private readonly IObjectSerializer<T> objectSerializer = null;
-        public ViewResult(HttpWebResponse response, HttpWebRequest request, IObjectSerializer<T> objectSerializer)
-            : base(response, request)
+        public ViewResult(DreamMessage message, IObjectSerializer<T> objectSerializer)
+            : base(message)
         {
             this.objectSerializer = objectSerializer;
         }
@@ -34,42 +35,32 @@ namespace LoveSeat
 
     public class ViewResult : IViewResult
     {
-        private readonly HttpWebResponse response;
-        private readonly HttpWebRequest request;
         private JObject json = null;
+		private DreamMessage message;
         private readonly string responseString;
 
         public JObject Json { get { return json ?? (json = JObject.Parse(responseString)); } }
-        public ViewResult(HttpWebResponse response, HttpWebRequest request)
+        public ViewResult(DreamMessage message)
         {
-            this.response = response;
-            this.request = request;
-            this.responseString = response.GetResponseString();
+			this.message = message;
+			this.responseString = message.ToText();
         }
-        /// <summary>
-        /// Typically won't be needed.  Provided for debuging assistance
-        /// </summary>
-        public HttpWebRequest Request { get { return request; } }
-        /// <summary>
-        /// Typically won't be needed.  Provided for debugging assistance
-        /// </summary>
-        public HttpWebResponse Response { get { return response; } }
-        public HttpStatusCode StatusCode { get { return response.StatusCode; } }
+        public DreamStatus StatusCode { get { return message.Status; } }
 
-        public string Etag { get { return response.Headers["ETag"]; } }
+        public string Etag { get { return message.Headers["ETag"]; } }
         public int TotalRows { get
         {
-            if (Json["total_rows"] == null) throw new CouchException(request, response, Json["reason"].Value<string>());
+            if (Json["total_rows"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
             return Json["total_rows"].Value<int>();
         } }
         public int OffSet { get
         {
-            if (Json["offset"] == null) throw new CouchException(request, response, Json["reason"].Value<string>());            
+            if (Json["offset"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
             return Json["offset"].Value<int>();
         } }
         public IEnumerable<JToken> Rows { get
         {
-            if (Json["rows"] == null) throw new CouchException(request, response, Json["reason"].Value<string>());
+            if (Json["rows"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
             return (JArray)Json["rows"];
         } }
         /// <summary>
@@ -83,7 +74,7 @@ namespace LoveSeat
             }
         }
         /// <summary>
-        /// An IEnumerable of strings insteda of the IEnumerable of JTokens
+        /// An IEnumerable of strings instead of the IEnumerable of JTokens
         /// </summary>
         public IEnumerable<string> RawRows
         {
@@ -93,7 +84,6 @@ namespace LoveSeat
                 return arry.Select(item => item.ToString());
             }
         }
-
         public IEnumerable<string> RawValues
         {
             get

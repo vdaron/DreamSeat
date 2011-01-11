@@ -2,43 +2,32 @@
 using System.Net;
 using LoveSeat.Interfaces;
 using LoveSeat.Support;
+using MindTouch.Dream;
 
 namespace LoveSeat
 {
     public class ListResult : IListResult
     {
-        private readonly HttpWebRequest request;
-        private readonly HttpWebResponse response;
+        private readonly DreamMessage message;
 
-        public ListResult(HttpWebRequest request , HttpWebResponse response)
+        public ListResult(DreamMessage message)
         {
-            this.request = request;
-            this.response = response;
-        }
-        
-        public HttpWebRequest Request
-        {
-            get { return request; }
+            this.message = message;
         }
 
-        public HttpWebResponse Response
+        public DreamStatus StatusCode
         {
-            get { return response; }
-        }
-
-        public HttpStatusCode StatusCode
-        {
-            get { return Response.StatusCode; }
+            get { return message.Status; }
         }
 
         public string Etag
         {
-            get { return Response.Headers["ETag"]; }
+            get { return message.Headers["ETag"]; }
         }
 
         public string RawString
         {
-            get { return Response.GetResponseString(); }
+            get { return message.ToText(); }
         }
 
         public bool Equals(IListResult other)

@@ -3,58 +3,77 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
-using NUnit.Framework;
 using LoveSeat;
+using MindTouch.Tasking;
+using Newtonsoft.Json.Linq;
+using System.Text;
+
+#if NUNIT
+using NUnit.Framework;
+#else
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using TestAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestFixtureAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using TestFixtureSetUpAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
+using TestFixtureTearDownAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute;
+#endif
 
 namespace LoveSeat.IntegrationTest
 {
-    [TestFixture]
+	[TestFixture]
 	public class CouchClientTest
 	{
-		private CouchClient client;
+		private static CouchClient client;
 		private const string baseDatabase = "love-seat-test-base";
-        private const string replicateDatabase = "love-seat-test-repli";
+		private const string replicateDatabase = "love-seat-test-repli";
 
-		private readonly string host = ConfigurationManager.AppSettings["Host"].ToString();
-		private readonly int port = int.Parse(ConfigurationManager.AppSettings["Port"].ToString());
-		private readonly string username = ConfigurationManager.AppSettings["UserName"].ToString();
-		private readonly string password = ConfigurationManager.AppSettings["Password"].ToString();
+		private static readonly string host = ConfigurationManager.AppSettings["Host"].ToString();
+		private static readonly int port = int.Parse(ConfigurationManager.AppSettings["Port"].ToString());
+		private static readonly string username = ConfigurationManager.AppSettings["UserName"].ToString();
+		private static readonly string password = ConfigurationManager.AppSettings["Password"].ToString();
 
 		[TestFixtureSetUp]
-		public void Setup()
+#if NUNIT
+		public static void Setup()
+#else
+		public static void Setup(TestContext o)
+#endif
 		{
 			client = new CouchClient(host, port, username, password);
-			if (!client.HasDatabase(baseDatabase))
+			if (client.HasDatabase(baseDatabase, new Result<bool>()).Wait())
 			{
-				client.CreateDatabase(baseDatabase);
+				client.DeleteDatabase(baseDatabase, new Result<JObject>()).Wait();
 			}
-            if (!client.HasDatabase(replicateDatabase))
-            {
-                client.CreateDatabase(replicateDatabase);
-            }
+			client.CreateDatabase(baseDatabase, new Result<JObject>()).Wait();
+
+			if (client.HasDatabase(replicateDatabase, new Result<bool>()).Wait())
+			{
+				client.DeleteDatabase(replicateDatabase, new Result<JObject>()).Wait();
+			}
+			client.CreateDatabase(replicateDatabase, new Result<JObject>()).Wait();
 		}
 		[TestFixtureTearDown]
-		public void TearDown()
+		public static void TearDown()
 		{
 			//delete the test database
-			if (client.HasDatabase(baseDatabase))
+			if (client.HasDatabase(baseDatabase, new Result<bool>()).Wait())
 			{
-				client.DeleteDatabase(baseDatabase);
+				client.DeleteDatabase(baseDatabase, new Result<JObject>()).Wait();
 			}
-            if (client.HasDatabase(replicateDatabase))
-            {
-                client.DeleteDatabase(replicateDatabase);
-            }
+			if (client.HasDatabase(replicateDatabase, new Result<bool>()).Wait())
+			{
+				client.DeleteDatabase(replicateDatabase, new Result<JObject>()).Wait();
+			}
 			if (client.HasUser("Leela"))
 			{
-				client.DeleteAdminUser("Leela");	
+				client.DeleteAdminUser("Leela");
 			}
 		}
 
 		[Test]
 		public void Should_Trigger_Replication()
 		{
-			var obj  = client.TriggerReplication("http://Professor:Farnsworth@"+ host+":5984/" +replicateDatabase, baseDatabase);
+			var obj = client.TriggerReplication("http://" + host + ":5984/" + replicateDatabase, baseDatabase, new MindTouch.Tasking.Result<Newtonsoft.Json.Linq.JObject>()).Wait();
 			Assert.IsTrue(obj != null);
 		}
 		[Test]
@@ -62,29 +81,33 @@ namespace LoveSeat.IntegrationTest
 		{
 			string obj = @"{""test"": ""prop""}";
 			var db = client.GetDatabase(baseDatabase);
-			var result = db.CreateDocument("fdas", obj);
-			Assert.IsNotNull(db.GetDocument("fdas"));
+			string id = Guid.NewGuid().ToString("N");
+			var result = db.CreateDocument(id, obj, new Result<Document>()).Wait();
+			Assert.IsNotNull(db.GetDocument(id,new Result<Document>()).Wait());
 		}
-        [Test]
-        public void Should_Save_Existing_Document()
-        {
-            string obj = @"{""test"": ""prop""}";
-            var db = client.GetDatabase(baseDatabase);
-            var result = db.CreateDocument("fdas", obj);
-            var doc = db.GetDocument("fdas");
-            doc["test"] = "newprop";
-            var newresult = db.SaveDocument(doc);
-            Assert.AreEqual(newresult.Value<string>("test"), "newprop");
-        }
+		[Test]
+		public void Should_Save_Existing_Document()
+		{
+			
+			string obj = @"{""test"": ""prop""}";
+			var db = client.GetDatabase(baseDatabase);
+			string id = Guid.NewGuid().ToString("N");
+			var result = db.CreateDocument(id, obj, new Result<Document>()).Wait();
+			var doc = db.GetDocument(id, new Result<Document>()).Wait();
+			doc["test"] = "newprop";
+			var newresult = db.SaveDocument(doc, new Result<Document>()).Wait();
+			Assert.AreEqual(newresult.Value<string>("test"), "newprop");
+		}
 
 		[Test]
 		public void Should_Delete_Document()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument("asdf", "{}");
-			var doc = db.GetDocument("asdf");
-			var result = 	db.DeleteDocument(doc.Id, doc.Rev);
-			Assert.IsNull(db.GetDocument("asdf"));
+			string id = Guid.NewGuid().ToString("N");
+			db.CreateDocument(id, "{}", new Result<Document>()).Wait();
+			var doc = db.GetDocument(id, new Result<Document>()).Wait();
+			var result = db.DeleteDocument(doc.Id, doc.Rev,new Result<JObject>()).Wait();
+			Assert.IsNull(db.GetDocument(id,new Result<Document>()).Wait());
 		}
 
 
@@ -92,30 +115,31 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Determine_If_Doc_Has_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""fdsa""}");
-			byte[] attachment = File.ReadAllBytes("../../Files/martin.jpg");
-			db.AddAttachment("fdsa" , attachment,"martin.jpg", "image/jpeg");
-			var doc = db.GetDocument("fdsa");
+			string id = Guid.NewGuid().ToString("N");
+			db.CreateDocument(id,"{}",new Result<Document>()).Wait();
+			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
+			db.AddAttachment(id, attachment, "martin.txt", "text/plain",new Result<JObject>()).Wait();
+			var doc = db.GetDocument(id, new Result<Document>()).Wait();
 			Assert.IsTrue(doc.HasAttachment);
 		}
 		[Test]
 		public void Should_Return_Attachment_Names()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""upload""}");
-			var attachment = File.ReadAllBytes("../../Files/martin.jpg");
-			db.AddAttachment("upload", attachment,  "martin.jpg", "image/jpeg");
-			var doc = db.GetDocument("upload");
-			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.jpg"));
+			db.CreateDocument(@"{""_id"":""upload""}", new Result<Document>()).Wait();
+			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
+			db.AddAttachment("upload", attachment, "martin.txt", "text/plain", new Result<JObject>()).Wait();
+			var doc = db.GetDocument("upload", new Result<Document>()).Wait();
+			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
 		}
 
-		[Test]
+		//[Test]
 		public void Should_Create_Admin_User()
-		{			
+		{
 			client.CreateAdminUser("Leela", "Turanga");
 		}
 
-		[Test]
+		//[Test]
 		public void Should_Delete_Admin_User()
 		{
 			client.DeleteAdminUser("Leela");
@@ -125,64 +149,64 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Get_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_upload""}");
-			var doc = db.GetDocument("test_upload");
-			var attachment = File.ReadAllBytes("../../Files/test_upload.txt");
-			db.AddAttachment("test_upload", attachment, "test_upload.txt", "text/html");
-			var stream = db.GetAttachmentStream(doc, "test_upload.txt");
+			db.CreateDocument(@"{""_id"":""test_upload""}", new Result<Document>()).Wait();
+			var doc = db.GetDocument("test_upload", new Result<Document>()).Wait();
+			var attachment = Encoding.UTF8.GetBytes("test");
+			db.AddAttachment("test_upload", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
+			using(var stream = db.GetAttachmentStream(doc, "test_upload.txt", new Result<Stream>()).Wait())
 			using (StreamReader sr = new StreamReader(stream))
 			{
 				string result = sr.ReadToEnd();
-				Assert.IsTrue(result == "test");	
-			}			
+				Assert.IsTrue(result == "test");
+			}
 		}
 		[Test]
 		public void Should_Delete_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_delete""}");
-			var doc = db.GetDocument("test_delete");
-			var attachment = File.ReadAllBytes("../../Files/test_upload.txt");
-			db.AddAttachment("test_delete", attachment, "test_upload.txt", "text/html");
-			db.DeleteAttachment("test_delete", "test_upload.txt");
-			var retrieved = db.GetDocument("test_delete");
+			db.CreateDocument(@"{""_id"":""test_delete""}", new Result<Document>()).Wait();
+			var doc = db.GetDocument("test_delete", new Result<Document>()).Wait();
+			var attachment = Encoding.UTF8.GetBytes("test");
+			db.AddAttachment("test_delete", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
+			db.DeleteAttachment("test_delete", "test_upload.txt", new Result<JObject>()).Wait();
+			var retrieved = db.GetDocument("test_delete", new Result<Document>()).Wait();
 			Assert.IsFalse(retrieved.HasAttachment);
 		}
-        [Test]
-        public void Should_Return_Etag_In_ViewResults()
-        {
-            var db = client.GetDatabase(baseDatabase);
-            db.CreateDocument(@"{""_id"":""test_eTag""}");
-            ViewResult result = db.GetAllDocuments();
-           Assert.IsTrue(!string.IsNullOrEmpty(result.Etag));
-        }
-	    [Test]
-	    public void Should_Get_304_If_ETag_Matches()
-	    {
-            var db = client.GetDatabase(baseDatabase);
-            db.CreateDocument(@"{""_id"":""test_eTag_exception""}");
-            ViewResult result = db.GetAllDocuments();
-	        ViewResult cachedResult = db.GetAllDocuments(new ViewOptions {Etag = result.Etag});
-            Assert.AreEqual(cachedResult.StatusCode, HttpStatusCode.NotModified);
-	    } 
+		[Test]
+		public void Should_Return_Etag_In_ViewResults()
+		{
+			var db = client.GetDatabase(baseDatabase);
+			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<Document>()).Wait();
+			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
+			Assert.IsTrue(!string.IsNullOrEmpty(result.Etag));
+		}
+		[Test]
+		public void Should_Get_304_If_ETag_Matches()
+		{
+			var db = client.GetDatabase(baseDatabase);
+			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<Document>()).Wait();
+			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
+			ViewResult cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.Etag }, new Result<ViewResult>()).Wait();
+			Assert.AreEqual(cachedResult.StatusCode, HttpStatusCode.NotModified);
+		}
 
-        [Test]
-        public void Should_Get_Results_Quickly()
-        {
-            var db = client.GetDatabase("accounting");
-            var startTime = DateTime.Now;
-            var options = new ViewOptions {Limit = 20};
-            var result= db.View<Company>("companies_by_name", options,"accounting");
-            foreach ( var item in result.Items)
-            {
-                Console.WriteLine(item.Name);
-            }
-            var endTime = DateTime.Now;
-            Assert.Less((endTime - startTime).TotalMilliseconds, 80);
-        }
+		[Test]
+		public void Should_Get_Results_Quickly()
+		{
+			var db = client.GetDatabase("accounting");
+			var startTime = DateTime.Now;
+			var options = new ViewOptions { Limit = 20 };
+			var result = db.View<Company>("companies_by_name", options, "accounting",new Result<ViewResult<Company>>()).Wait();
+			foreach (var item in result.Items)
+			{
+				Console.WriteLine(item.Name);
+			}
+			var endTime = DateTime.Now;
+			Assert.IsTrue((endTime - startTime).TotalMilliseconds < 80);
+		}
 	}
-    public class Company
-    {
-        public string Name { get; set; }
-    }
+	public class Company
+	{
+		public string Name { get; set; }
+	}
 }

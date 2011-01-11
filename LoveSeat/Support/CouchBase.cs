@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using MindTouch.Dream;
 
 namespace LoveSeat.Support
 {
@@ -8,6 +9,8 @@ namespace LoveSeat.Support
         protected readonly string username;
         protected readonly string password;
         protected string baseUri;
+
+		protected Plug Plug;
 
         protected CouchBase()
         {
