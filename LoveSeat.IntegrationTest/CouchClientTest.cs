@@ -7,6 +7,7 @@ using LoveSeat;
 using MindTouch.Tasking;
 using Newtonsoft.Json.Linq;
 using System.Text;
+using MindTouch.Dream;
 
 #if NUNIT
 using NUnit.Framework;
@@ -39,7 +40,8 @@ namespace LoveSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient(host, port, username, password);
+			client = new CouchClient();//, username, password);
+			client.Authenticate(username, password, new Result<bool>()).Wait();
 			if (client.HasDatabase(baseDatabase, new Result<bool>()).Wait())
 			{
 				client.DeleteDatabase(baseDatabase, new Result<JObject>()).Wait();
@@ -133,7 +135,7 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
 		}
 
-		//[Test]
+		[Test]
 		public void Should_Create_Admin_User()
 		{
 			client.CreateAdminUser("Leela", "Turanga");
@@ -187,7 +189,7 @@ namespace LoveSeat.IntegrationTest
 			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<Document>()).Wait();
 			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
 			ViewResult cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.Etag }, new Result<ViewResult>()).Wait();
-			Assert.AreEqual(cachedResult.StatusCode, HttpStatusCode.NotModified);
+			Assert.AreEqual(DreamStatus.NotModified, cachedResult.StatusCode);
 		}
 
 		[Test]
