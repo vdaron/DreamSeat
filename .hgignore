@@ -3,3 +3,5 @@ glob:obj/*
 glob:Local.testsettings
 glob:LoveSeat.vsmdi
 glob:TraceAndTestImpact.testsettings
+glob:TestResults/*
+glob:*.suo
