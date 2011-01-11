@@ -1,19 +1,20 @@
 ﻿using System.Net;
+using MindTouch.Dream;
 
 namespace LoveSeat
 {
    public  class CouchException : System.Exception
     {
-       private readonly HttpWebRequest request;
-       private readonly HttpWebResponse response;
+       private readonly DreamMessage message;
 
-       public CouchException(HttpWebRequest request, HttpWebResponse response, string mesg) : base(mesg)
+	   public CouchException(DreamMessage msg)
+		   :this(msg,msg.ToText())
+	   { }
+       public CouchException(DreamMessage msg, string mesg) : base(mesg)
        {
-           this.request = request;
-           this.response = response;
+           this.message = msg;
        }
-
-       public HttpWebRequest Request { get { return request; } }
-       public HttpWebResponse Response { get { return response; } }
+	   public DreamStatus Status {get{return message.Status;}}
+       public DreamMessage DreamMessage { get { return message; } }
     }
 }

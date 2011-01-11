@@ -50,17 +50,17 @@ namespace LoveSeat
         public string Etag { get { return message.Headers["ETag"]; } }
         public int TotalRows { get
         {
-            if (Json["total_rows"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
+            if (Json["total_rows"] == null) throw new CouchException(message, Json["reason"].Value<string>());
             return Json["total_rows"].Value<int>();
         } }
         public int OffSet { get
         {
-            if (Json["offset"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
+            if (Json["offset"] == null) throw new CouchException(message, Json["reason"].Value<string>());
             return Json["offset"].Value<int>();
         } }
         public IEnumerable<JToken> Rows { get
         {
-            if (Json["rows"] == null) throw new CouchException(null, null, Json["reason"].Value<string>());
+            if (Json["rows"] == null) throw new CouchException(message, Json["reason"].Value<string>());
             return (JArray)Json["rows"];
         } }
         /// <summary>

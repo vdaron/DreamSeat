@@ -63,7 +63,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -113,7 +113,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -135,7 +135,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)

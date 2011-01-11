@@ -46,7 +46,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -78,7 +78,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -93,7 +93,7 @@ namespace LoveSeat
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
 					else
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 				},
 				e => result.Throw(e)
 			);
@@ -118,7 +118,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -151,7 +151,7 @@ namespace LoveSeat
 							result.Return(default(T));
 							break;
 						default:
-							result.Throw(new Exception(""));
+							result.Throw(new CouchException(a));
 							break;
 					}
 				},
@@ -191,7 +191,7 @@ namespace LoveSeat
 					if (a.Status == DreamStatus.Created)
 						result.Return(JObject.Parse(a.ToText()));
 					else
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 				},
 				e => result.Throw(e)
 			);
@@ -212,7 +212,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -236,7 +236,7 @@ namespace LoveSeat
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
 					else
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 				},
 				e => result.Throw(e)
 			);
@@ -265,7 +265,7 @@ namespace LoveSeat
 					}
 					else
 					{
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 					}
 				},
 				e => result.Throw(e)
@@ -314,7 +314,7 @@ namespace LoveSeat
 					if (a.Status == DreamStatus.Ok)
 						result.Return(a.ToText());
 					else
-						result.Throw(new Exception(""));
+						result.Throw(new CouchException(a));
 				},
 				e => result.Throw(e)
 			);
