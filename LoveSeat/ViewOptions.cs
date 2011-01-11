@@ -12,6 +12,9 @@ namespace LoveSeat
 	{
 		public static Plug With(this Plug plug, ViewOptions options)
 		{
+			if (options == null)
+				return plug;
+
 			if ((options.Key != null) && (options.Key.Count > 0))
 				plug.With("key", options.Key.ToString());
 			if ((options.StartKey != null) && (options.StartKey.Count > 0))
@@ -43,6 +46,8 @@ namespace LoveSeat
 				plug.With("startkey_docid",options.StartKeyDocId);
 			if (!string.IsNullOrEmpty(options.EndKeyDocId))
 				plug.With("endkey_docid", options.EndKeyDocId);
+			if (!string.IsNullOrEmpty(options.Etag))
+				plug = plug.WithHeader(DreamHeaders.IF_NONE_MATCH,options.Etag);
 			return plug;
 		}
 	}
