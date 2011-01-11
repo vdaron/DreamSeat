@@ -70,10 +70,17 @@ namespace LoveSeat
 
 			return result;
 		}
-
+		public JObject TriggerReplication(string source, string target, bool continuous)
+		{
+			return TriggerReplication(source, target, continuous, new Result<JObject>()).Wait();
+		}
 		public Result<JObject> TriggerReplication(string source, string target, Result<JObject> result)
 		{
 			return TriggerReplication(source, target, false, result);
+		}
+		public JObject TriggerReplication(string source, string target)
+		{
+			return TriggerReplication(source, target, new Result<JObject>()).Wait();
 		}
 
 		/// <summary>
@@ -95,6 +102,10 @@ namespace LoveSeat
 			);
 
 			return result;
+		}
+		public bool HasDatabase(string databaseName)
+		{
+			return HasDatabase(databaseName, new Result<bool>()).Wait();
 		}
 		/// <summary>
 		/// Creates a database
@@ -119,6 +130,10 @@ namespace LoveSeat
 			);
 			return result;
 		}
+		public JObject CreateDatabase(string databaseName)
+		{
+			return CreateDatabase(databaseName, new Result<JObject>()).Wait();
+		}
 		/// <summary>
 		/// Deletes the specified database
 		/// </summary>
@@ -142,6 +157,10 @@ namespace LoveSeat
 
 			return result;
 		}
+		public JObject DeleteDatabase(string databaseName)
+		{
+			return DeleteDatabase(databaseName, new Result<JObject>()).Wait();
+		}
 
 		/// <summary>
 		/// Gets a Database object
@@ -153,20 +172,21 @@ namespace LoveSeat
 			return new CouchDatabase(Plug, databaseName);
 		}
 
+		#region User Management (disabled for now)
 		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
-        {
-//            //Creates the user in the local.ini
-//            var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(usernameToCreate))
-//                .Put().Json().Data("\"" + passwordToCreate + "\"").GetResponse();
+		{
+			//            //Creates the user in the local.ini
+			//            var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(usernameToCreate))
+			//                .Put().Json().Data("\"" + passwordToCreate + "\"").GetResponse();
 
-//            var user = @"{ ""name"": ""%name%"",
-//  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
-//}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
-//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
-//                .Put().Json().Data(user).GetResponse().GetJObject();
-//            return docResult;
+			//            var user = @"{ ""name"": ""%name%"",
+			//  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
+			//}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
+			//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
+			//                .Put().Json().Data(user).GetResponse().GetJObject();
+			//            return docResult;
 			return JObject.Parse("{}");
-        }
+		}
 		/// <summary>
 		/// Deletes user  (if you have permission)
 		/// </summary>
@@ -202,7 +222,8 @@ namespace LoveSeat
 		{
 			var db = new CouchDatabase(Plug, "_users");
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
-			return db.GetDocument(userId,new Result<Document>()).Wait();
-		}
+			return db.GetDocument(userId, new Result<Document>()).Wait();
+		} 
+		#endregion
 	}
 }

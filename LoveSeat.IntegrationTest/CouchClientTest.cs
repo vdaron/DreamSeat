@@ -42,29 +42,29 @@ namespace LoveSeat.IntegrationTest
 		{
 			client = new CouchClient();//, username, password);
 			client.Authenticate(username, password, new Result<bool>()).Wait();
-			if (client.HasDatabase(baseDatabase, new Result<bool>()).Wait())
+			if (client.HasDatabase(baseDatabase))
 			{
-				client.DeleteDatabase(baseDatabase, new Result<JObject>()).Wait();
+				client.DeleteDatabase(baseDatabase);
 			}
-			client.CreateDatabase(baseDatabase, new Result<JObject>()).Wait();
+			client.CreateDatabase(baseDatabase);
 
-			if (client.HasDatabase(replicateDatabase, new Result<bool>()).Wait())
+			if (client.HasDatabase(replicateDatabase))
 			{
-				client.DeleteDatabase(replicateDatabase, new Result<JObject>()).Wait();
+				client.DeleteDatabase(replicateDatabase);
 			}
-			client.CreateDatabase(replicateDatabase, new Result<JObject>()).Wait();
+			client.CreateDatabase(replicateDatabase);
 		}
 		[TestFixtureTearDown]
 		public static void TearDown()
 		{
 			//delete the test database
-			if (client.HasDatabase(baseDatabase, new Result<bool>()).Wait())
+			if (client.HasDatabase(baseDatabase))
 			{
-				client.DeleteDatabase(baseDatabase, new Result<JObject>()).Wait();
+				client.DeleteDatabase(baseDatabase);
 			}
-			if (client.HasDatabase(replicateDatabase, new Result<bool>()).Wait())
+			if (client.HasDatabase(replicateDatabase))
 			{
-				client.DeleteDatabase(replicateDatabase, new Result<JObject>()).Wait();
+				client.DeleteDatabase(replicateDatabase);
 			}
 			if (client.HasUser("Leela"))
 			{
@@ -75,7 +75,7 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void Should_Trigger_Replication()
 		{
-			var obj = client.TriggerReplication("http://" + host + ":5984/" + replicateDatabase, baseDatabase, new MindTouch.Tasking.Result<Newtonsoft.Json.Linq.JObject>()).Wait();
+			var obj = client.TriggerReplication("http://" + host + ":5984/" + replicateDatabase, baseDatabase);
 			Assert.IsTrue(obj != null);
 		}
 		[Test]
