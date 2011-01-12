@@ -126,8 +126,6 @@ namespace LoveSeat.Interfaces
 		/// <returns></returns>
 		Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result);
 
-		Result<T> GetDocument<T>(Guid id, IObjectSerializer<T> objectSerializer, Result<T> result);
-		Result<T> GetDocument<T>(Guid id, Result<T> result);
 		Result<string> Show(string showName, string docId,Result<string> result);
 		Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result);
 		Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result);

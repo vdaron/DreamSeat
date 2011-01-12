@@ -16,16 +16,17 @@ namespace LoveSeat
 	{
 		public string DefaultDesignDocId { get; set; }
 
-		public CouchDatabase(XUri baseUri, string databaseName)
-			: base(baseUri.At(XUri.EncodeFragment(databaseName)))
+		public CouchDatabase(XUri databaseUri)
+			: base(databaseUri)
 		{
 		}
 
-		public CouchDatabase(XUri baseUri, string databaseName,string username,string password)
-			: base(baseUri.At(XUri.EncodeFragment(databaseName)),username,password)
+		public CouchDatabase(XUri databaseUri,string username,string password)
+			: base(databaseUri,username,password)
 		{
 		}
 
+		#region Documents Management
 		/// <summary>
 		/// Creates a document using the json provided. 
 		/// No validation or smarts attempted here by design for simplicities sake
@@ -40,7 +41,8 @@ namespace LoveSeat
 				jobj.Remove("_rev");
 
 			BasePlug.At(id).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Created)
 					{
 						result.Return(new Document(JObject.Parse(a.ToText())));
@@ -63,19 +65,20 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<Document> CreateDocument(Document doc, Result<Document> result)
 		{
-			return CreateDocument(doc.Id, doc.ToString(),result);
+			return CreateDocument(doc.Id, doc.ToString(), result);
 		}
 		/// <summary>
 		/// Creates a document when you intend for Couch to generate the id for you.
 		/// </summary>
 		/// <param name="jsonForDocument">Json for creating the document</param>
 		/// <returns></returns>
-		public Result<Document> CreateDocument(string jsonForDocument,Result<Document> result)
+		public Result<Document> CreateDocument(string jsonForDocument, Result<Document> result)
 		{
 			var json = JObject.Parse(jsonForDocument);
 
 			BasePlug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Created)
 					{
 						JObject jobj = JObject.Parse(a.ToText());
@@ -101,8 +104,9 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> DeleteDocument(string id, string rev, Result<JObject> result)
 		{
-			BasePlug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
-				a => {
+			BasePlug.At(id).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
 					else
@@ -118,10 +122,11 @@ namespace LoveSeat
 		/// </summary>
 		/// <param name="id">id of the document</param>
 		/// <returns></returns>
-		public Result<Document> GetDocument(string id,Result<Document> result)
+		public Result<Document> GetDocument(string id, Result<Document> result)
 		{
 			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 					{
 						result.Return(new Document(JObject.Parse(a.ToText())));
@@ -140,23 +145,16 @@ namespace LoveSeat
 
 			return result;
 		}
-		public Result<T> GetDocument<T>(Guid id, IObjectSerializer<T> objectSerializer, Result<T> result)
+		public Result<T> GetDocument<T>(string id, Result<T> result)
 		{
-			return GetDocument(id.ToString(), objectSerializer,result);
+			return GetDocument(id, new ObjectSerializer<T>(), result);
 		}
-		public Result<T> GetDocument<T>(Guid id, Result<T> result)
-		{
-			return GetDocument<T>(id.ToString(),result);
-		}
-		public Result<T> GetDocument<T>(string id,Result<T> result)
-		{
-			return GetDocument(id, new ObjectSerializer<T>(),result);
-		}
-		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer,Result<T> result)
+		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer, Result<T> result)
 		{
 			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
-				a => {
-					switch(a.Status)
+				a =>
+				{
+					switch (a.Status)
 					{
 						case DreamStatus.Ok:
 							result.Return(objectSerializer.Deserialize(a.ToText()));
@@ -195,8 +193,10 @@ namespace LoveSeat
 				e => result.Throw(e)
 			);
 			return result;
-		}
+		} 
+		#endregion
 
+		#region Attachment Management
 		/// <summary>
 		/// Adds an attachment to a document.  If revision is not specified then the most recent will be fetched and used.  
 		/// Warning: if you need document update conflicts to occur please use the method that specifies the revision
@@ -204,7 +204,7 @@ namespace LoveSeat
 		/// <param name="id">id of the couch Document</param>
 		/// <param name="attachment">byte[] of of the attachment.  Use File.ReadAllBytes()</param>
 		/// <param name="contentType">Content Type must be specifed</param>	
-		public Result<JObject> AddAttachment(string id, byte[] attachment, string filename, string contentType,Result<JObject> result)
+		public Result<JObject> AddAttachment(string id, byte[] attachment, string filename, string contentType, Result<JObject> result)
 		{
 			GetDocument(id, new Result<Document>()).WhenDone(
 				a => AddAttachment(id, a.Rev, attachment, filename, contentType, result),
@@ -224,7 +224,8 @@ namespace LoveSeat
 		public Result<JObject> AddAttachment(string id, string rev, byte[] attachment, string filename, string contentType, Result<JObject> result)
 		{
 			BasePlug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Created)
 						result.Return(JObject.Parse(a.ToText()));
 					else
@@ -236,12 +237,13 @@ namespace LoveSeat
 		}
 		public Result<Stream> GetAttachmentStream(Document doc, string attachmentName, Result<Stream> result)
 		{
-			return GetAttachmentStream(doc.Id, doc.Rev, attachmentName,result);
+			return GetAttachmentStream(doc.Id, doc.Rev, attachmentName, result);
 		}
-		public Result<Stream> GetAttachmentStream(string docId, string rev, string attachmentName,Result<Stream> result)
+		public Result<Stream> GetAttachmentStream(string docId, string rev, string attachmentName, Result<Stream> result)
 		{
 			BasePlug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 					{
 						result.Return(a.ToStream());
@@ -259,7 +261,7 @@ namespace LoveSeat
 		public Result<Stream> GetAttachmentStream(string docId, string attachmentName, Result<Stream> result)
 		{
 			GetDocument(docId, new Result<Document>()).WhenDone(
-				a => GetAttachmentStream(docId, a.Rev, attachmentName,result),
+				a => GetAttachmentStream(docId, a.Rev, attachmentName, result),
 				e => result.Throw(e)
 			);
 
@@ -268,7 +270,8 @@ namespace LoveSeat
 		public Result<JObject> DeleteAttachment(string id, string rev, string attachmentName, Result<JObject> result)
 		{
 			BasePlug.At(id, XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
 					else
@@ -278,14 +281,15 @@ namespace LoveSeat
 			);
 			return result;
 		}
-		public Result<JObject> DeleteAttachment(string id, string attachmentName,Result<JObject> result)
+		public Result<JObject> DeleteAttachment(string id, string attachmentName, Result<JObject> result)
 		{
 			GetDocument(id, new Result<Document>()).WhenDone(
-				a => DeleteAttachment(a.Id, a.Rev, attachmentName,result),
+				a => DeleteAttachment(a.Id, a.Rev, attachmentName, result),
 				e => result.Throw(e)
 			);
 			return result;
 		}
+		#endregion
 
 		/// <summary>
 		/// Gets the results of a view with no view parameters. Use the overload to pass parameters
@@ -308,38 +312,6 @@ namespace LoveSeat
 			ThrowDesignDocException();
 			return View<T>(viewName, DefaultDesignDocId,result);
 		}
-		public Result<string> Show(string showName, string docId, Result<string> result)
-		{
-			ThrowDesignDocException();
-			return Show(showName, docId, DefaultDesignDocId,result);
-		}
-		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
-		{
-			BasePlug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
-				a => {
-					if (a.Status == DreamStatus.Ok)
-						result.Return(a.ToText());
-					else
-						result.Throw(new CouchException(a));
-				},
-				e => result.Throw(e)
-			);
-			return result;
-		}
-		public Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result)
-		{
-			BasePlug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(new ListResult(a)),
-				e => result.Throw(e)
-			);
-			return result;
-		}
-		public Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result)
-		{
-			ThrowDesignDocException();
-			return List(listName, viewName, options, DefaultDesignDocId,result);
-		}
-
 		/// <summary>
 		/// Gets the results of the view using any and all parameters
 		/// </summary>
@@ -389,6 +361,39 @@ namespace LoveSeat
 		{
 			return ProcessGenericResults<T>(BasePlug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
 		}
+		public Result<string> Show(string showName, string docId, Result<string> result)
+		{
+			ThrowDesignDocException();
+			return Show(showName, docId, DefaultDesignDocId, result);
+		}
+		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
+		{
+			BasePlug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+						result.Return(a.ToText());
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result)
+		{
+			BasePlug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
+				a => result.Return(new ListResult(a)),
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result)
+		{
+			ThrowDesignDocException();
+			return List(listName, viewName, options, DefaultDesignDocId, result);
+		}
+
 		/// <summary>
 		/// Gets all the documents in the database using the _all_docs uri
 		/// </summary>
@@ -402,6 +407,7 @@ namespace LoveSeat
 			return ProcessResults(BasePlug.At("_all_docs"), options, result);
 		}
 
+		#region Private Methods
 		private Result<ViewResult<T>> ProcessGenericResults<T>(Plug uri, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
 			uri.With(options).Get(new Result<DreamMessage>()).WhenDone(
@@ -424,6 +430,7 @@ namespace LoveSeat
 		{
 			if (string.IsNullOrEmpty(DefaultDesignDocId))
 				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
-		}
+		} 
+		#endregion
 	}
 }

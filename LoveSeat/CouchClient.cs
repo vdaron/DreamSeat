@@ -162,14 +162,14 @@ namespace LoveSeat
 				{
 					if (exists)
 					{
-						result.Return(new CouchDatabase(BasePlug, databaseName));
+						result.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(databaseName))));
 					}
 					else
 					{
 						if (createIfNotExists)
 						{
 							CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
-								a => result.Return(new CouchDatabase(BasePlug, databaseName)),
+								a => result.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(databaseName)))),
 								e => result.Throw(e)
 							);
 						}
@@ -314,7 +314,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Document GetUser(string userId)
 		{
-			var db = new CouchDatabase(BasePlug, "_users");
+			var db = new CouchDatabase(BasePlug.At("_users"));
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
 			return db.GetDocument(userId, new Result<Document>()).Wait();
 		} 
