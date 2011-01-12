@@ -14,7 +14,7 @@ namespace LoveSeat
 {
 	public class CouchDatabase : CouchBase, IDocumentDatabase
 	{
-		private string defaultDesignDoc = null;
+		public string DefaultDesignDoc { get; set; }
 
 		public CouchDatabase(XUri baseUri, string databaseName)
 			: base(baseUri.At(XUri.EncodeFragment(databaseName)))
@@ -86,9 +86,15 @@ namespace LoveSeat
 			);
 			return result;
 		}
+		/// <summary>
+		/// Delete the specified document
+		/// </summary>
+		/// <param name="id">id of the document</param>
+		/// <param name="rev">revision</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<JObject> DeleteDocument(string id, string rev, Result<JObject> result)
 		{
-			// GetRequest(databaseBaseUri + "/" + id + "?rev=" + rev).Delete().Form().GetResponse().GetJObject();
 			Plug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
@@ -101,9 +107,10 @@ namespace LoveSeat
 			return result;
 		}
 		/// <summary>
-		/// Returns null if document is not found
+		/// Returns document with given id.
+		/// will null if document is not found
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="id">id of the document</param>
 		/// <returns></returns>
 		public Result<Document> GetDocument(string id,Result<Document> result)
 		{
@@ -161,6 +168,29 @@ namespace LoveSeat
 
 			return result;
 		}
+		public Result<Document> SaveDocument(Document document, Result<Document> result)
+		{
+			if (document.Rev == null)
+				return CreateDocument(document, result);
+
+			Plug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Created)
+					{
+						document.Rev = JObject.Parse(a.ToText())["rev"].Value<string>();
+						result.Return(document);
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+
 		/// <summary>
 		/// Adds an attachment to a document.  If revision is not specified then the most recent will be fetched and used.  
 		/// Warning: if you need document update conflicts to occur please use the method that specifies the revision
@@ -198,7 +228,6 @@ namespace LoveSeat
 			);
 			return result;
 		}
-
 		public Result<Stream> GetAttachmentStream(Document doc, string attachmentName, Result<Stream> result)
 		{
 			return GetAttachmentStream(doc.Id, doc.Rev, attachmentName,result);
@@ -252,28 +281,6 @@ namespace LoveSeat
 			return result;
 		}
 
-		public Result<Document> SaveDocument(Document document,Result<Document> result)
-		{
-			if (document.Rev == null)
-				return CreateDocument(document,result);
-
-			Plug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
-				a => {
-					if (a.Status == DreamStatus.Created)
-					{
-						document.Rev = JObject.Parse(a.ToText())["rev"].Value<string>();
-						result.Return(document);
-					}
-					else
-					{
-						result.Throw(new CouchException(a));
-					}
-				},
-				e => result.Throw(e)
-			);
-			return result;
-		}
-
 		/// <summary>
 		/// Gets the results of a view with no view parameters. Use the overload to pass parameters
 		/// </summary>
@@ -284,7 +291,6 @@ namespace LoveSeat
 		{
 			return View<T>(viewName, null, designDoc,result);
 		}
-
 		/// <summary>
 		/// Gets the results of the view using the defaultDesignDoc and no view parameters.  Use the overloads to specify options.
 		/// </summary>
@@ -301,13 +307,6 @@ namespace LoveSeat
 			ThrowDesignDocException();
 			return Show(showName, docId, defaultDesignDoc,result);
 		}
-
-		private void ThrowDesignDocException()
-		{
-			if (string.IsNullOrEmpty(defaultDesignDoc))
-				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
-		}
-
 		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
 		{
 			Plug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
@@ -329,17 +328,12 @@ namespace LoveSeat
 			);
 			return result;
 		}
-
 		public Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result)
 		{
 			ThrowDesignDocException();
 			return List(listName, viewName, options, defaultDesignDoc,result);
 		}
 
-		public void SetDefaultDesignDoc(string designDoc)
-		{
-			this.defaultDesignDoc = designDoc;
-		}
 		/// <summary>
 		/// Gets the results of the view using any and all parameters
 		/// </summary>
@@ -376,7 +370,6 @@ namespace LoveSeat
 			ThrowDesignDocException();
 			return View<T>(viewName, options, defaultDesignDoc, objectSerializer,result);
 		}
-
 		/// <summary>
 		/// Don't use this overload unless you intend to override the default ObjectSerialization behavior.
 		/// </summary>
@@ -390,10 +383,23 @@ namespace LoveSeat
 		{
 			return ProcessGenericResults<T>(Plug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
 		}
+		/// <summary>
+		/// Gets all the documents in the database using the _all_docs uri
+		/// </summary>
+		/// <returns></returns>
+		public Result<ViewResult> GetAllDocuments(Result<ViewResult> result)
+		{
+			return ProcessResults(Plug.At("_all_docs"), null, result);
+		}
+		public Result<ViewResult> GetAllDocuments(ViewOptions options, Result<ViewResult> result)
+		{
+			return ProcessResults(Plug.At("_all_docs"), options, result);
+		}
+
 		private Result<ViewResult<T>> ProcessGenericResults<T>(Plug uri, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
 			uri.With(options).Get(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(new ViewResult<T>(a, objectSerializer)) ,
+				a => result.Return(new ViewResult<T>(a, objectSerializer)),
 				e => result.Throw(e)
 			);
 
@@ -408,26 +414,10 @@ namespace LoveSeat
 
 			return result;
 		}
-
-		//private CouchRequest GetRequest(ViewOptions options, string uri)
-		//{
-		//    if (options != null)
-		//        uri += options.ToString();
-		//    return GetRequest(uri, options == null ? null : options.Etag).Get().Json();
-		//}
-
-
-		/// <summary>
-		/// Gets all the documents in the database using the _all_docs uri
-		/// </summary>
-		/// <returns></returns>
-		public Result<ViewResult> GetAllDocuments(Result<ViewResult> result)
+		private void ThrowDesignDocException()
 		{
-			return ProcessResults(Plug.At("_all_docs"), null, result);
-		}
-		public Result<ViewResult> GetAllDocuments(ViewOptions options, Result<ViewResult> result)
-		{
-			return ProcessResults(Plug.At("_all_docs"), options, result);
+			if (string.IsNullOrEmpty(DefaultDesignDoc))
+				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
 		}
 	}
 }
