@@ -55,6 +55,12 @@ namespace LoveSeat
 
 			return result;
 		}
+		/// <summary>
+		/// Create a new document
+		/// </summary>
+		/// <param name="doc"document></param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<Document> CreateDocument(Document doc, Result<Document> result)
 		{
 			return CreateDocument(doc.Id, doc.ToString(),result);
