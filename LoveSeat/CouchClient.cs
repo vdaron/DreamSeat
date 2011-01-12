@@ -42,6 +42,7 @@ namespace LoveSeat
 		{
 		}
 
+		#region Asynchronous Methods
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
 		/// </summary>
@@ -70,19 +71,16 @@ namespace LoveSeat
 
 			return result;
 		}
-		public JObject TriggerReplication(string source, string target, bool continuous)
-		{
-			return TriggerReplication(source, target, continuous, new Result<JObject>()).Wait();
-		}
+		/// <summary>
+		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
+		/// </summary>
+		/// <param name="source">Uri or database name of database to replicate from</param>
+		/// <param name="target">Uri or database name of database to replicate to</param>
+		/// <returns></returns>
 		public Result<JObject> TriggerReplication(string source, string target, Result<JObject> result)
 		{
 			return TriggerReplication(source, target, false, result);
 		}
-		public JObject TriggerReplication(string source, string target)
-		{
-			return TriggerReplication(source, target, new Result<JObject>()).Wait();
-		}
-
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
@@ -102,10 +100,6 @@ namespace LoveSeat
 			);
 
 			return result;
-		}
-		public bool HasDatabase(string databaseName)
-		{
-			return HasDatabase(databaseName, new Result<bool>()).Wait();
 		}
 		/// <summary>
 		/// Creates a database
@@ -130,10 +124,6 @@ namespace LoveSeat
 			);
 			return result;
 		}
-		public JObject CreateDatabase(string databaseName)
-		{
-			return CreateDatabase(databaseName, new Result<JObject>()).Wait();
-		}
 		/// <summary>
 		/// Deletes the specified database
 		/// </summary>
@@ -142,7 +132,8 @@ namespace LoveSeat
 		public Result<JObject> DeleteDatabase(string databaseName, Result<JObject> result)
 		{
 			Plug.At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 					{
 						result.Return(JObject.Parse(a.ToText()));
@@ -157,20 +148,94 @@ namespace LoveSeat
 
 			return result;
 		}
+		/// <summary>
+		/// Gets a Database, if database didn't exists, it will be created
+		/// </summary>
+		/// <param name="databaseName">Name of the database</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result<CouchDatabase> GetDatabase(string databaseName, Result<CouchDatabase> result)
+		{
+			HasDatabase(databaseName,new Result<bool>()).WhenDone(
+				exists => {
+					if (exists)
+					{
+						result.Return(new CouchDatabase(Plug, databaseName));
+					}
+					else
+					{
+						CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
+							a => result.Return(new CouchDatabase(Plug ,databaseName)),
+							e => result.Throw(e)
+						);
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+		#endregion
+
+		#region Synchronous Methods
+		/// <summary>
+		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
+		/// </summary>
+		/// <param name="source">Uri or database name of database to replicate from</param>
+		/// <param name="target">Uri or database name of database to replicate to</param>
+		/// <param name="continuous">Whether or not CouchDB should continue to replicate going forward on it's own</param>
+		/// <returns></returns>
+		public JObject TriggerReplication(string source, string target, bool continuous)
+		{
+			return TriggerReplication(source, target, continuous, new Result<JObject>()).Wait();
+		}
+		/// <summary>
+		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
+		/// </summary>
+		/// <param name="source">Uri or database name of database to replicate from</param>
+		/// <param name="target">Uri or database name of database to replicate to</param>
+		/// <returns></returns>
+		public JObject TriggerReplication(string source, string target)
+		{
+			return TriggerReplication(source, target, new Result<JObject>()).Wait();
+		}
+		/// <summary>
+		/// Returns a bool indicating whether or not the database exists.
+		/// </summary>
+		/// <param name="databaseName"></param>
+		/// <returns></returns>
+		public bool HasDatabase(string databaseName)
+		{
+			return HasDatabase(databaseName, new Result<bool>()).Wait();
+		}
+		/// <summary>
+		/// Creates a database
+		/// </summary>
+		/// <param name="databaseName">Name of new database</param>
+		/// <returns></returns>
+		public JObject CreateDatabase(string databaseName)
+		{
+			return CreateDatabase(databaseName, new Result<JObject>()).Wait();
+		}
+		/// <summary>
+		/// Deletes the specified database
+		/// </summary>
+		/// <param name="databaseName">Database to delete</param>
+		/// <returns></returns>
 		public JObject DeleteDatabase(string databaseName)
 		{
 			return DeleteDatabase(databaseName, new Result<JObject>()).Wait();
 		}
-
 		/// <summary>
-		/// Gets a Database object
+		/// Gets a Database object, if database didn't exists, it will be created
 		/// </summary>
 		/// <param name="databaseName">Name of database to fetch</param>
 		/// <returns></returns>
 		public CouchDatabase GetDatabase(string databaseName)
 		{
-			return new CouchDatabase(Plug, databaseName);
+			return GetDatabase(databaseName, new Result<CouchDatabase>()).Wait();
 		}
+		#endregion
 
 		#region User Management (disabled for now)
 		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
