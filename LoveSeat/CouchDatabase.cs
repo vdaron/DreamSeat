@@ -14,7 +14,7 @@ namespace LoveSeat
 {
 	public class CouchDatabase : CouchBase, IDocumentDatabase
 	{
-		public string DefaultDesignDoc { get; set; }
+		public string DefaultDesignDocId { get; set; }
 
 		public CouchDatabase(XUri baseUri, string databaseName)
 			: base(baseUri.At(XUri.EncodeFragment(databaseName)))
@@ -300,12 +300,12 @@ namespace LoveSeat
 		public Result<ViewResult<T>> View<T>(string viewName,Result<ViewResult<T>> result)
 		{
 			ThrowDesignDocException();
-			return View<T>(viewName, defaultDesignDoc,result);
+			return View<T>(viewName, DefaultDesignDocId,result);
 		}
 		public Result<string> Show(string showName, string docId, Result<string> result)
 		{
 			ThrowDesignDocException();
-			return Show(showName, docId, defaultDesignDoc,result);
+			return Show(showName, docId, DefaultDesignDocId,result);
 		}
 		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
 		{
@@ -331,7 +331,7 @@ namespace LoveSeat
 		public Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result)
 		{
 			ThrowDesignDocException();
-			return List(listName, viewName, options, defaultDesignDoc,result);
+			return List(listName, viewName, options, DefaultDesignDocId,result);
 		}
 
 		/// <summary>
@@ -355,7 +355,7 @@ namespace LoveSeat
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options,Result<ViewResult<T>> result)
 		{
 			ThrowDesignDocException();
-			return View<T>(viewName, options, defaultDesignDoc,result);
+			return View<T>(viewName, options, DefaultDesignDocId,result);
 		}
 		/// <summary>
 		/// Allows you to override the objectSerializer and use the Default Design Doc settings.
@@ -368,7 +368,7 @@ namespace LoveSeat
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
 			ThrowDesignDocException();
-			return View<T>(viewName, options, defaultDesignDoc, objectSerializer,result);
+			return View<T>(viewName, options, DefaultDesignDocId, objectSerializer,result);
 		}
 		/// <summary>
 		/// Don't use this overload unless you intend to override the default ObjectSerialization behavior.
@@ -416,7 +416,7 @@ namespace LoveSeat
 		}
 		private void ThrowDesignDocException()
 		{
-			if (string.IsNullOrEmpty(DefaultDesignDoc))
+			if (string.IsNullOrEmpty(DefaultDesignDocId))
 				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
 		}
 	}
