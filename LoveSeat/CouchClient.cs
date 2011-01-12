@@ -149,6 +149,42 @@ namespace LoveSeat
 			return result;
 		}
 		/// <summary>
+		///  Gets a Database
+		/// </summary>
+		/// <param name="databaseName">Name of the database</param>
+		/// <param name="createIfNotExists">Flag specifying if the database must be created if not found</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result<CouchDatabase> GetDatabase(string databaseName, bool createIfNotExists, Result<CouchDatabase> result)
+		{
+			HasDatabase(databaseName, new Result<bool>()).WhenDone(
+				exists =>
+				{
+					if (exists)
+					{
+						result.Return(new CouchDatabase(Plug, databaseName));
+					}
+					else
+					{
+						if (createIfNotExists)
+						{
+							CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
+								a => result.Return(new CouchDatabase(Plug, databaseName)),
+								e => result.Throw(e)
+							);
+						}
+						else
+						{
+							result.Return((CouchDatabase)null);
+						}
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+		/// <summary>
 		/// Gets a Database, if database didn't exists, it will be created
 		/// </summary>
 		/// <param name="databaseName">Name of the database</param>
@@ -156,24 +192,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<CouchDatabase> GetDatabase(string databaseName, Result<CouchDatabase> result)
 		{
-			HasDatabase(databaseName,new Result<bool>()).WhenDone(
-				exists => {
-					if (exists)
-					{
-						result.Return(new CouchDatabase(Plug, databaseName));
-					}
-					else
-					{
-						CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
-							a => result.Return(new CouchDatabase(Plug ,databaseName)),
-							e => result.Throw(e)
-						);
-					}
-				},
-				e => result.Throw(e)
-			);
-
-			return result;
+			return GetDatabase(databaseName, true, result);
 		}
 		#endregion
 
@@ -234,6 +253,16 @@ namespace LoveSeat
 		public CouchDatabase GetDatabase(string databaseName)
 		{
 			return GetDatabase(databaseName, new Result<CouchDatabase>()).Wait();
+		}
+		/// <summary>
+		/// Gets a Database object
+		/// </summary>createIfNotExists
+		/// <param name="databaseName">Name of database to fetch</param>
+		/// <param name="createIfNotExists">Flag specifying if the database must be created if not found</param>
+		/// <returns></returns>
+		public CouchDatabase GetDatabase(string databaseName, bool createIfNotExists)
+		{
+			return GetDatabase(databaseName, createIfNotExists, new Result<CouchDatabase>()).Wait();
 		}
 		#endregion
 
