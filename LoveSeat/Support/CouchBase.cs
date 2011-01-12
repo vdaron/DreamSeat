@@ -7,25 +7,25 @@ namespace LoveSeat.Support
 {
     public abstract class CouchBase
     {
-		protected Plug Plug;
+		protected Plug BasePlug;
 
 		protected CouchBase(XUri baseUri)
 		{
-			Plug = Plug.New(baseUri);
+			BasePlug = Plug.New(baseUri);
 		}
 		protected CouchBase(XUri baseUri, string userName, string password)
 		{
-			Plug = Plug.New(baseUri).WithCredentials(userName, password);
+			BasePlug = Plug.New(baseUri).WithCredentials(userName, password);
 		}
 
 		public Result<bool> Authenticate(string userName, string password, Result<bool> result)
 		{
-			Plug.At("_session").Post(DreamMessage.Ok(MimeType.FORM_URLENCODED,String.Format("name={0}&password={1}",userName,password)), new Result<DreamMessage>(TimeSpan.FromSeconds(3))).WhenDone(
+			BasePlug.At("_session").Post(DreamMessage.Ok(MimeType.FORM_URLENCODED,String.Format("name={0}&password={1}",userName,password)), new Result<DreamMessage>(TimeSpan.FromSeconds(3))).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
-						Plug.CookieJar.Update(a.Cookies, new XUri(Plug.Uri.SchemeHostPort));
-						Plug = Plug.WithHeader("X-CouchDB-WWW-Authenticate", "Cookie");
+						BasePlug.CookieJar.Update(a.Cookies, new XUri(BasePlug.Uri.SchemeHostPort));
+						BasePlug = BasePlug.WithHeader("X-CouchDB-WWW-Authenticate", "Cookie");
 						result.Return(true);
 					}
 					else

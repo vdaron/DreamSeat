@@ -52,7 +52,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> TriggerReplication(string source, string target, bool continuous, Result<JObject> result)
 		{
-			Plug p = Plug.At("_replicate");
+			Plug p = BasePlug.At("_replicate");
 			ReplicationOptions options = new ReplicationOptions(source, target, continuous);
 			p.Post(DreamMessage.Ok(MimeType.JSON, options.ToString()), new Result<DreamMessage>()).WhenDone(
 				a =>
@@ -88,7 +88,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<bool> HasDatabase(string databaseName, Result<bool> result)
 		{
-			Plug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -108,7 +108,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> CreateDatabase(string databaseName, Result<JObject> result)
 		{
-			Plug.At(XUri.EncodeFragment(databaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(XUri.EncodeFragment(databaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -131,7 +131,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> DeleteDatabase(string databaseName, Result<JObject> result)
 		{
-			Plug.At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -162,14 +162,14 @@ namespace LoveSeat
 				{
 					if (exists)
 					{
-						result.Return(new CouchDatabase(Plug, databaseName));
+						result.Return(new CouchDatabase(BasePlug, databaseName));
 					}
 					else
 					{
 						if (createIfNotExists)
 						{
 							CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
-								a => result.Return(new CouchDatabase(Plug, databaseName)),
+								a => result.Return(new CouchDatabase(BasePlug, databaseName)),
 								e => result.Throw(e)
 							);
 						}
@@ -314,7 +314,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Document GetUser(string userId)
 		{
-			var db = new CouchDatabase(Plug, "_users");
+			var db = new CouchDatabase(BasePlug, "_users");
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
 			return db.GetDocument(userId, new Result<Document>()).Wait();
 		} 

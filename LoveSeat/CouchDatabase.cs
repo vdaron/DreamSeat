@@ -39,7 +39,7 @@ namespace LoveSeat
 			if (jobj.Value<object>("_rev") != null)
 				jobj.Remove("_rev");
 
-			Plug.At(id).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 					{
@@ -74,7 +74,7 @@ namespace LoveSeat
 		{
 			var json = JObject.Parse(jsonForDocument);
 
-			Plug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
+			BasePlug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 					{
@@ -101,7 +101,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> DeleteDocument(string id, string rev, Result<JObject> result)
 		{
-			Plug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id).With("rev",rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
@@ -120,7 +120,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<Document> GetDocument(string id,Result<Document> result)
 		{
-			Plug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
@@ -154,7 +154,7 @@ namespace LoveSeat
 		}
 		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer,Result<T> result)
 		{
-			Plug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					switch(a.Status)
 					{
@@ -179,7 +179,7 @@ namespace LoveSeat
 			if (document.Rev == null)
 				return CreateDocument(document, result);
 
-			Plug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(document.Id).With("rev", document.Rev).Put(DreamMessage.Ok(MimeType.JSON, document.ToString()), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -223,7 +223,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> AddAttachment(string id, string rev, byte[] attachment, string filename, string contentType, Result<JObject> result)
 		{
-			Plug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Created)
 						result.Return(JObject.Parse(a.ToText()));
@@ -240,7 +240,7 @@ namespace LoveSeat
 		}
 		public Result<Stream> GetAttachmentStream(string docId, string rev, string attachmentName,Result<Stream> result)
 		{
-			Plug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 					{
@@ -267,7 +267,7 @@ namespace LoveSeat
 		}
 		public Result<JObject> DeleteAttachment(string id, string rev, string attachmentName, Result<JObject> result)
 		{
-			Plug.At(id, XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id, XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(JObject.Parse(a.ToText()));
@@ -315,7 +315,7 @@ namespace LoveSeat
 		}
 		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
 		{
-			Plug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
 						result.Return(a.ToText());
@@ -328,7 +328,7 @@ namespace LoveSeat
 		}
 		public Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result)
 		{
-			Plug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
 				a => result.Return(new ListResult(a)),
 				e => result.Throw(e)
 			);
@@ -349,7 +349,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, Result<ViewResult<T>> result)
 		{
-			return ProcessGenericResults<T>(Plug.At("_design",designDoc,"_view",viewName), options, new ObjectSerializer<T>(),result);
+			return ProcessGenericResults<T>(BasePlug.At("_design",designDoc,"_view",viewName), options, new ObjectSerializer<T>(),result);
 		}
 		/// <summary>
 		/// Allows you to specify options and uses the defaultDesignDoc Specified.
@@ -387,7 +387,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
 		{
-			return ProcessGenericResults<T>(Plug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
+			return ProcessGenericResults<T>(BasePlug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
 		}
 		/// <summary>
 		/// Gets all the documents in the database using the _all_docs uri
@@ -395,11 +395,11 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<ViewResult> GetAllDocuments(Result<ViewResult> result)
 		{
-			return ProcessResults(Plug.At("_all_docs"), null, result);
+			return ProcessResults(BasePlug.At("_all_docs"), null, result);
 		}
 		public Result<ViewResult> GetAllDocuments(ViewOptions options, Result<ViewResult> result)
 		{
-			return ProcessResults(Plug.At("_all_docs"), options, result);
+			return ProcessResults(BasePlug.At("_all_docs"), options, result);
 		}
 
 		private Result<ViewResult<T>> ProcessGenericResults<T>(Plug uri, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
