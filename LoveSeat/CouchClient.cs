@@ -268,8 +268,9 @@ namespace LoveSeat
 		}
 		#endregion
 
-		#region User Management (disabled for now)
+		#region Configuration Management
 
+		#region Asynchronous Methods
 		public Result<Dictionary<string, Dictionary<string, string>>> GetConfig(Result<Dictionary<string, Dictionary<string, string>>> result)
 		{
 			BasePlug.At("_config").Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
@@ -320,7 +321,8 @@ namespace LoveSeat
 		public Result SetConfigValue(string section, string keyName, string value, Result result)
 		{
 			BasePlug.At("_config", section, keyName).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
-				a => {
+				a =>
+				{
 					if (a.Status == DreamStatus.Ok)
 						result.Return();
 					else
@@ -343,8 +345,35 @@ namespace LoveSeat
 				e => result.Throw(e)
 			);
 			return result;
-		}
+		} 
+		#endregion
 
+		#region Synchronous Methods
+		public Dictionary<string, Dictionary<string, string>> GetConfig()
+		{
+			return GetConfig(new Result<Dictionary<string, Dictionary<string, string>>>()).Wait();
+		}
+		public Dictionary<string, string> GetConfig(string section)
+		{
+			return GetConfigSection(section, new Result<Dictionary<string, string>>()).Wait();
+		}
+		public string GetConfigValue(string section, string keyName)
+		{
+			return GetConfigValue(section, keyName, new Result<string>()).Wait();
+		}
+		public void SetConfigValue(string section, string keyName, string value)
+		{
+			SetConfigValue(section, keyName, value, new Result()).Wait();
+		}
+		public void DeleteConfigValue(string section, string keyName)
+		{
+			DeleteConfigValue(section, keyName, new Result()).Wait();
+		} 
+		#endregion
+
+		#endregion
+
+		#region User Management (disabled for now)
 		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
 		{
 			SetConfigValue("admins", "vdaron", "ask$2000", new Result()).Wait();

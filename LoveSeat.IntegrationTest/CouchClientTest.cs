@@ -145,7 +145,6 @@ namespace LoveSeat.IntegrationTest
 			client.DeleteConfigValue("coucou", "key", new Result()).Wait();
 			Assert.IsNull(client.GetConfigValue("coucou", "key", new Result<string>()).Wait());
 		}
-
 		[Test]
 		public void Should_Read_ConfigSection()
 		{
@@ -155,7 +154,6 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsTrue(section.ContainsKey("key"));
 			Assert.AreEqual("value", section["key"]);
 		}
-
 		[Test]
 		public void Should_Read_Configs()
 		{
