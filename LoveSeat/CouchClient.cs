@@ -374,9 +374,9 @@ namespace LoveSeat
 		#endregion
 
 		#region User Management (disabled for now)
-		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
+		public JObject CreateAdminUser(string username, string password)
 		{
-			SetConfigValue("admins", "vdaron", "ask$2000", new Result()).Wait();
+			SetConfigValue("admins", username, password, new Result()).Wait();
 
 //            var user = @"{ ""name"": ""%name%"",
 //			  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
