@@ -8,6 +8,7 @@ using MindTouch.Tasking;
 using Newtonsoft.Json.Linq;
 using System.Text;
 using MindTouch.Dream;
+using System.Collections.Generic;
 
 #if NUNIT
 using NUnit.Framework;
@@ -40,7 +41,7 @@ namespace LoveSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient();//, username, password);
+			client = new CouchClient();
 			client.Authenticate(username, password, new Result<bool>()).Wait();
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -100,7 +101,6 @@ namespace LoveSeat.IntegrationTest
 			var newresult = db.SaveDocument(doc, new Result<Document>()).Wait();
 			Assert.AreEqual(newresult.Value<string>("test"), "newprop");
 		}
-
 		[Test]
 		public void Should_Delete_Document()
 		{
@@ -111,8 +111,6 @@ namespace LoveSeat.IntegrationTest
 			var result = db.DeleteDocument(doc.Id, doc.Rev,new Result<JObject>()).Wait();
 			Assert.IsNull(db.GetDocument(id,new Result<Document>()).Wait());
 		}
-
-
 		[Test]
 		public void Should_Determine_If_Doc_Has_Attachment()
 		{
@@ -134,11 +132,35 @@ namespace LoveSeat.IntegrationTest
 			var doc = db.GetDocument("upload", new Result<Document>()).Wait();
 			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
 		}
-
 		[Test]
 		public void Should_Create_Admin_User()
 		{
 			client.CreateAdminUser("Leela", "Turanga");
+		}
+		[Test]
+		public void Should_Create_And_Read_ConfigValue()
+		{
+			client.SetConfigValue("coucou", "key", "value", new Result()).Wait();
+			Assert.AreEqual("value",client.GetConfigValue("coucou","key",new Result<string>()).Wait());
+			client.DeleteConfigValue("coucou", "key", new Result()).Wait();
+			Assert.IsNull(client.GetConfigValue("coucou", "key", new Result<string>()).Wait());
+		}
+
+		[Test]
+		public void Should_Read_ConfigSection()
+		{
+			client.SetConfigValue("coucou", "key", "value", new Result()).Wait();
+			Dictionary<string, string> section = client.GetConfigSection("coucou", new Result<Dictionary<string, string>>()).Wait();
+			Assert.AreEqual(1, section.Count);
+			Assert.IsTrue(section.ContainsKey("key"));
+			Assert.AreEqual("value", section["key"]);
+		}
+
+		[Test]
+		public void Should_Read_Configs()
+		{
+			Dictionary<string, Dictionary<string, string>> config = client.GetConfig(new Result<Dictionary<string, Dictionary<string, string>>>()).Wait();
+			Assert.IsTrue(config.Count > 0);
 		}
 
 		//[Test]
@@ -191,7 +213,6 @@ namespace LoveSeat.IntegrationTest
 			ViewResult cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.Etag }, new Result<ViewResult>()).Wait();
 			Assert.AreEqual(DreamStatus.NotModified, cachedResult.StatusCode);
 		}
-
 		[Test]
 		public void Should_Get_Results_Quickly()
 		{

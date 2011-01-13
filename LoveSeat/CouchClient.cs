@@ -5,6 +5,8 @@ using LoveSeat.Support;
 using Newtonsoft.Json.Linq;
 using MindTouch.Tasking;
 using MindTouch.Dream;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace LoveSeat
 {
@@ -267,18 +269,92 @@ namespace LoveSeat
 		#endregion
 
 		#region User Management (disabled for now)
+
+		public Result<Dictionary<string, Dictionary<string, string>>> GetConfig(Result<Dictionary<string, Dictionary<string, string>>> result)
+		{
+			BasePlug.At("_config").Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+						result.Return(JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(a.ToText()));
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<Dictionary<string, string>> GetConfigSection(string section, Result<Dictionary<string, string>> result)
+		{
+			BasePlug.At("_config", section).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+						result.Return(JsonConvert.DeserializeObject<Dictionary<string, string>>(a.ToText()));
+					else if (a.Status == DreamStatus.NotFound)
+						result.Return(new Dictionary<string, string>());
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<string> GetConfigValue(string section, string keyName, Result<string> result)
+		{
+			BasePlug.At("_config", section, keyName).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					string value = a.ToText();
+					if (a.Status == DreamStatus.Ok)
+						result.Return(value.Substring(1, value.Length - 3));// remove " and "\n
+					else if (a.Status == DreamStatus.NotFound)
+						result.Return((string)null);
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result SetConfigValue(string section, string keyName, string value, Result result)
+		{
+			BasePlug.At("_config", section, keyName).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
+				a => {
+					if (a.Status == DreamStatus.Ok)
+						result.Return();
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result DeleteConfigValue(string section, string keyName, Result result)
+		{
+			BasePlug.At("_config", section, keyName).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+						result.Return();// remove " and "\n
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+
 		public JObject CreateAdminUser(string usernameToCreate, string passwordToCreate)
 		{
-			//            //Creates the user in the local.ini
-			//            var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(usernameToCreate))
-			//                .Put().Json().Data("\"" + passwordToCreate + "\"").GetResponse();
+			SetConfigValue("admins", "vdaron", "ask$2000", new Result()).Wait();
 
-			//            var user = @"{ ""name"": ""%name%"",
-			//  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
-			//}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
-			//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
-			//                .Put().Json().Data(user).GetResponse().GetJObject();
-			//            return docResult;
+//            var user = @"{ ""name"": ""%name%"",
+//			  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
+//			}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
+//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
+//                .Put().Json().Data(user).GetResponse().GetJObject();
+//            return docResult;
 			return JObject.Parse("{}");
 		}
 		/// <summary>
@@ -308,7 +384,7 @@ namespace LoveSeat
 			return GetUser(userId) != null;
 		}
 		/// <summary>
-		/// Get's the user.  
+		/// Get's the user.
 		/// </summary>
 		/// <param name="userId"></param>
 		/// <returns></returns>
