@@ -74,7 +74,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<Document> CreateDocument(string jsonForDocument, Result<Document> result)
 		{
-			var json = JObject.Parse(jsonForDocument);
+			Document doc = new Document(JObject.Parse(jsonForDocument));
 
 			BasePlug.Post(DreamMessage.Ok(MimeType.JSON, jsonForDocument), new Result<DreamMessage>()).WhenDone(
 				a =>
@@ -82,9 +82,9 @@ namespace LoveSeat
 					if (a.Status == DreamStatus.Created)
 					{
 						JObject jobj = JObject.Parse(a.ToText());
-						json["_id"] = jobj["_id"];
-						json["_rev"] = jobj["_rev"];
-						result.Return(new Document(json));
+						doc["_id"] = jobj["id"];
+						doc["_rev"] = jobj["rev"];
+						result.Return(doc);
 					}
 					else
 					{

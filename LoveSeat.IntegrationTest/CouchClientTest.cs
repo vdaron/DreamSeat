@@ -89,6 +89,16 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(db.GetDocument(id,new Result<Document>()).Wait());
 		}
 		[Test]
+		public void Should_Create_Document_From_String_WIthId_GeneratedByCouchDb()
+		{
+			string obj = @"{""test"": ""prop""}";
+			var db = client.GetDatabase(baseDatabase);
+			var result = db.CreateDocument(obj, new Result<Document>()).Wait();
+
+			Assert.IsNotNull(result.Id);
+			Assert.IsNotNull("prop",result["test"].Value<string>());
+		}
+		[Test]
 		public void Should_Save_Existing_Document()
 		{
 			
@@ -224,6 +234,15 @@ namespace LoveSeat.IntegrationTest
 			}
 			var endTime = DateTime.Now;
 			Assert.IsTrue((endTime - startTime).TotalMilliseconds < 80);
+		}
+
+		[Test]
+		public void Should_Create_User()
+		{
+			CouchDatabase db = client.GetDatabase("_users");
+			CouchUser user = db.GetDocument<CouchUser>("org.couchdb.user:Professor", new Result<CouchUser>()).Wait();
+
+
 		}
 	}
 	public class Company
