@@ -287,7 +287,7 @@ namespace LoveSeat
 		}
 		public Result<Dictionary<string, string>> GetConfigSection(string section, Result<Dictionary<string, string>> result)
 		{
-			BasePlug.At("_config", section).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_config",XUri.EncodeFragment(section)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -303,7 +303,7 @@ namespace LoveSeat
 		}
 		public Result<string> GetConfigValue(string section, string keyName, Result<string> result)
 		{
-			BasePlug.At("_config", section, keyName).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_config",XUri.EncodeFragment(section),XUri.EncodeFragment(keyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					string value = a.ToText();
@@ -320,7 +320,7 @@ namespace LoveSeat
 		}
 		public Result SetConfigValue(string section, string keyName, string value, Result result)
 		{
-			BasePlug.At("_config", section, keyName).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_config", XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -334,7 +334,7 @@ namespace LoveSeat
 		}
 		public Result DeleteConfigValue(string section, string keyName, Result result)
 		{
-			BasePlug.At("_config", section, keyName).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_config", XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -389,9 +389,11 @@ namespace LoveSeat
 		/// <summary>
 		/// Deletes user  (if you have permission)
 		/// </summary>
-		/// <param name="userToDelete"></param>
-		public void DeleteAdminUser(string userToDelete)
+		/// <param name="user">User name</param>
+		public void DeleteAdminUser(string user)
 		{
+			DeleteConfigValue("admins", user, new Result()).Wait();
+
 			//var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(userToDelete))
 			//    .Delete().Json().GetResponse();
 
