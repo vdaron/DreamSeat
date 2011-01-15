@@ -141,6 +141,8 @@ namespace LoveSeat.IntegrationTest
 			db.AddAttachment("upload", attachment, "martin.txt", "text/plain", new Result<JObject>()).Wait();
 			var doc = db.GetDocument("upload", new Result<JsonDocument>()).Wait();
 			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
+			var bdoc = db.GetDocument<BaseDocument>("upload", new Result<BaseDocument>()).Wait();
+			Assert.IsTrue(bdoc.GetAttachmentNames().Contains("martin.txt"));
 		}
 		[Test]
 		public void Should_Create_Admin_User()

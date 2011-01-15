@@ -71,6 +71,7 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CouchAttachment.cs" />
     <Compile Include="CouchException.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="CouchUser.cs" />

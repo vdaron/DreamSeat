@@ -68,7 +68,7 @@ namespace LoveSeat
 	{
 		public BaseDocument()
 		{
-			Attachments = new Dictionary<string, object>();
+			Attachments = new Dictionary<string, CouchAttachment>();
 		}
 
 		[JsonProperty("_id")]
@@ -77,7 +77,7 @@ namespace LoveSeat
 		public string Rev { get; set; }
 
 		[JsonProperty("_attachments")]
-		private Dictionary<string, object> Attachments;
+		private Dictionary<string, CouchAttachment> Attachments;
 
 		public IEnumerable<string> GetAttachmentNames()
 		{
