@@ -57,10 +57,14 @@ namespace LoveSeat
 				jobj.Remove("_rev");
 
 			Plug p = BasePlug;
+			string verb = "POST";
 			if (!String.IsNullOrEmpty(id))
+			{
 				p = p.At(XUri.EncodeFragment(id));
+				verb = "PUT";
+			}
 
-			p.Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			p.Invoke(verb,DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
