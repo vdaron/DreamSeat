@@ -419,11 +419,11 @@ namespace LoveSeat
 		/// </summary>
 		/// <param name="userId"></param>
 		/// <returns></returns>
-		public Document GetUser(string userId)
+		public JsonDocument GetUser(string userId)
 		{
 			var db = new CouchDatabase(BasePlug.At("_users"));
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
-			return db.GetDocument(userId, new Result<Document>()).Wait();
+			return db.GetDocument(userId, new Result<JsonDocument>()).Wait();
 		} 
 		#endregion
 	}

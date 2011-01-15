@@ -1,28 +1,28 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace LoveSeat
 {
-	public class CouchUser : Document
+	public class CouchUser : BaseDocument, ICouchDocument
 	{
-		public CouchUser(JObject jobj)
-			: base(jobj)
+		private const string TYPE_USER = "user";
+
+		public CouchUser()
 		{
+			Type = TYPE_USER;
 		}
 
-		public IEnumerable<string> Roles
-		{
-			get
-			{
-				if (!this["roles"].HasValues)
-				{
-					yield return null;
-				}
-				foreach (var role in this["roles"].Values())
-				{
-					yield return role.Value<string>();
-				}
-			}
-		}
+		[JsonProperty("type")]
+		private string Type { get; set; }
+
+		public string Name { get; set; }
+
+		public string[] Roles { get; set; }
+
+		////[JsonProperty("_id")]
+		//public string Id { get; set; }
+		////[JsonProperty("_rev")]
+		//public string Rev { get; set; }
 	}
 }

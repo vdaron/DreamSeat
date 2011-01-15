@@ -85,15 +85,15 @@ namespace LoveSeat.IntegrationTest
 			string obj = @"{""test"": ""prop""}";
 			var db = client.GetDatabase(baseDatabase);
 			string id = Guid.NewGuid().ToString("N");
-			var result = db.CreateDocument(id, obj, new Result<Document>()).Wait();
-			Assert.IsNotNull(db.GetDocument(id,new Result<Document>()).Wait());
+			var result = db.CreateDocument(id, obj, new Result<JObject>()).Wait();
+			Assert.IsNotNull(db.GetDocument(id,new Result<JsonDocument>()).Wait());
 		}
 		[Test]
 		public void Should_Create_Document_From_String_WIthId_GeneratedByCouchDb()
 		{
-			string obj = @"{""test"": ""prop""}";
+			JsonDocument obj = new JsonDocument(@"{""test"": ""prop""}");
 			var db = client.GetDatabase(baseDatabase);
-			var result = db.CreateDocument(obj, new Result<Document>()).Wait();
+			var result = db.CreateDocument(obj, new Result<JsonDocument>()).Wait();
 
 			Assert.IsNotNull(result.Id);
 			Assert.IsNotNull("prop",result["test"].Value<string>());
@@ -101,14 +101,14 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void Should_Save_Existing_Document()
 		{
-			
-			string obj = @"{""test"": ""prop""}";
+			JsonDocument obj = new JsonDocument( @"{""test"": ""prop""}" );
+			obj.Id = Guid.NewGuid().ToString("N");
+
 			var db = client.GetDatabase(baseDatabase);
-			string id = Guid.NewGuid().ToString("N");
-			var result = db.CreateDocument(id, obj, new Result<Document>()).Wait();
-			var doc = db.GetDocument(id, new Result<Document>()).Wait();
+			var result = db.CreateDocument(obj, new Result<JsonDocument>()).Wait();
+			var doc = db.GetDocument(obj.Id, new Result<JsonDocument>()).Wait();
 			doc["test"] = "newprop";
-			var newresult = db.SaveDocument(doc, new Result<Document>()).Wait();
+			var newresult = db.SaveDocument(doc, new Result<JsonDocument>()).Wait();
 			Assert.AreEqual(newresult.Value<string>("test"), "newprop");
 		}
 		[Test]
@@ -116,30 +116,30 @@ namespace LoveSeat.IntegrationTest
 		{
 			var db = client.GetDatabase(baseDatabase);
 			string id = Guid.NewGuid().ToString("N");
-			db.CreateDocument(id, "{}", new Result<Document>()).Wait();
-			var doc = db.GetDocument(id, new Result<Document>()).Wait();
+			db.CreateDocument(id, "{}", new Result<JObject>()).Wait();
+			var doc = db.GetDocument(id, new Result<JsonDocument>()).Wait();
 			var result = db.DeleteDocument(doc.Id, doc.Rev,new Result<JObject>()).Wait();
-			Assert.IsNull(db.GetDocument(id,new Result<Document>()).Wait());
+			Assert.IsNull(db.GetDocument(id,new Result<JsonDocument>()).Wait());
 		}
 		[Test]
 		public void Should_Determine_If_Doc_Has_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
 			string id = Guid.NewGuid().ToString("N");
-			db.CreateDocument(id,"{}",new Result<Document>()).Wait();
+			db.CreateDocument(id, "{}", new Result<JObject>()).Wait();
 			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
 			db.AddAttachment(id, attachment, "martin.txt", "text/plain",new Result<JObject>()).Wait();
-			var doc = db.GetDocument(id, new Result<Document>()).Wait();
+			var doc = db.GetDocument(id, new Result<JsonDocument>()).Wait();
 			Assert.IsTrue(doc.HasAttachment);
 		}
 		[Test]
 		public void Should_Return_Attachment_Names()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""upload""}", new Result<Document>()).Wait();
+			db.CreateDocument(@"{""_id"":""upload""}", new Result<JObject>()).Wait();
 			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
 			db.AddAttachment("upload", attachment, "martin.txt", "text/plain", new Result<JObject>()).Wait();
-			var doc = db.GetDocument("upload", new Result<Document>()).Wait();
+			var doc = db.GetDocument("upload", new Result<JsonDocument>()).Wait();
 			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
 		}
 		[Test]
@@ -181,8 +181,8 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Get_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_upload""}", new Result<Document>()).Wait();
-			var doc = db.GetDocument("test_upload", new Result<Document>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_upload""}", new Result<JObject>()).Wait();
+			var doc = db.GetDocument("test_upload", new Result<JsonDocument>()).Wait();
 			var attachment = Encoding.UTF8.GetBytes("test");
 			db.AddAttachment("test_upload", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
 			using(var stream = db.GetAttachmentStream(doc, "test_upload.txt", new Result<Stream>()).Wait())
@@ -196,19 +196,19 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Delete_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_delete""}", new Result<Document>()).Wait();
-			var doc = db.GetDocument("test_delete", new Result<Document>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_delete""}", new Result<JObject>()).Wait();
+			var doc = db.GetDocument("test_delete", new Result<JsonDocument>()).Wait();
 			var attachment = Encoding.UTF8.GetBytes("test");
 			db.AddAttachment("test_delete", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
 			db.DeleteAttachment("test_delete", "test_upload.txt", new Result<JObject>()).Wait();
-			var retrieved = db.GetDocument("test_delete", new Result<Document>()).Wait();
+			var retrieved = db.GetDocument("test_delete", new Result<JsonDocument>()).Wait();
 			Assert.IsFalse(retrieved.HasAttachment);
 		}
 		[Test]
 		public void Should_Return_Etag_In_ViewResults()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<Document>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<JObject>()).Wait();
 			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
 			Assert.IsTrue(!string.IsNullOrEmpty(result.Etag));
 		}
@@ -216,7 +216,7 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Get_304_If_ETag_Matches()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<Document>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<JObject>()).Wait();
 			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
 			ViewResult cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.Etag }, new Result<ViewResult>()).Wait();
 			Assert.AreEqual(DreamStatus.NotModified, cachedResult.StatusCode);
