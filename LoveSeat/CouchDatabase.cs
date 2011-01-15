@@ -391,7 +391,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> AddAttachment(string id, string rev, byte[] attachment, string filename, string contentType, Result<JObject> result)
 		{
-			BasePlug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, attachment), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(id, filename).With("rev", rev).Put(DreamMessage.Ok(MimeType.New(contentType), attachment), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
