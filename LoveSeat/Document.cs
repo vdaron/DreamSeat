@@ -16,7 +16,15 @@ namespace LoveSeat
 	{
 		public string Id
 		{
-			get { return this["_id"].Value<string>(); }
+			get
+			{
+				JToken rev;
+				if (this.TryGetValue("_id", out rev))
+				{
+					return rev.Value<string>();
+				}
+				return null;
+			}
 			set { this["_id"] = value; }
 		}
 		public string Rev
