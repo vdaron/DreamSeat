@@ -66,9 +66,24 @@ namespace LoveSeat
 
 	public class BaseDocument : ICouchDocument
 	{
+		public BaseDocument()
+		{
+			Attachments = new Dictionary<string, object>();
+		}
+
 		[JsonProperty("_id")]
 		public string Id { get; set; }
 		[JsonProperty("_rev")]
 		public string Rev { get; set; }
+
+		[JsonProperty("_attachments")]
+		private Dictionary<string, object> Attachments;
+
+		public IEnumerable<string> GetAttachmentNames()
+		{
+			foreach (string key in Attachments.Keys)
+				yield return key;
+			yield break;
+		}
 	}
 }
