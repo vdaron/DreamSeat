@@ -16,9 +16,9 @@ namespace LoveSeat
 
 		[JsonProperty("type")]
 		private string Type { get; set; }
-
+		[JsonProperty("name")]
 		public string Name { get; set; }
-
+		[JsonProperty("roles")]
 		public string[] Roles { get; set; }
 	}
 }

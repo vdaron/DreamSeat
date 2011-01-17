@@ -76,8 +76,26 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void Should_Trigger_Replication()
 		{
-			var obj = client.TriggerReplication(baseDatabase, "http://" + host + ":5984/" + replicateDatabase,true);
+			string dbname = "test-replicate-db-created";
+			
+			var obj = client.TriggerReplication(new ReplicationOptions() { Source = baseDatabase, Target = "http://" + host + ":5984/" + replicateDatabase, Continuous = true });
 			Assert.IsTrue(obj != null);
+
+			var obj2 = client.TriggerReplication(
+				new ReplicationOptions() { 
+					Source = baseDatabase, 
+					Target = dbname, 
+					CreateTarget = true
+				});
+
+			Assert.IsTrue(obj2 != null);
+
+			CouchDatabase db = client.GetDatabase(dbname, false);
+			Assert.IsNotNull(db);
+
+			client.DeleteDatabase(dbname);
+			db = client.GetDatabase(dbname, false);
+			Assert.IsNull(db);
 		}
 		[Test]
 		public void Should_Create_Document_From_String()

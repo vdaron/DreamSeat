@@ -52,14 +52,16 @@ namespace LoveSeat
 		/// <param name="target">Uri or database name of database to replicate to</param>
 		/// <param name="continuous">Whether or not CouchDB should continue to replicate going forward on it's own</param>
 		/// <returns></returns>
-		public Result<JObject> TriggerReplication(string source, string target, bool continuous, Result<JObject> result)
+		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
 		{
 			Plug p = BasePlug.At("_replicate");
-			ReplicationOptions options = new ReplicationOptions(source, target, continuous);
-			p.Post(DreamMessage.Ok(MimeType.JSON, options.ToString()), new Result<DreamMessage>()).WhenDone(
+
+			string json = options.ToString();
+			p.Post(DreamMessage.Ok(MimeType.JSON, json), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Accepted)
+					if((a.Status == DreamStatus.Accepted)||
+					   (a.Status == DreamStatus.Ok))
 					{
 						result.Return(JObject.Parse(a.ToText()));
 					}
@@ -73,16 +75,7 @@ namespace LoveSeat
 
 			return result;
 		}
-		/// <summary>
-		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
-		/// </summary>
-		/// <param name="source">Uri or database name of database to replicate from</param>
-		/// <param name="target">Uri or database name of database to replicate to</param>
-		/// <returns></returns>
-		public Result<JObject> TriggerReplication(string source, string target, Result<JObject> result)
-		{
-			return TriggerReplication(source, target, false, result);
-		}
+
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
@@ -206,19 +199,9 @@ namespace LoveSeat
 		/// <param name="target">Uri or database name of database to replicate to</param>
 		/// <param name="continuous">Whether or not CouchDB should continue to replicate going forward on it's own</param>
 		/// <returns></returns>
-		public JObject TriggerReplication(string source, string target, bool continuous)
+		public JObject TriggerReplication(ReplicationOptions options)
 		{
-			return TriggerReplication(source, target, continuous, new Result<JObject>()).Wait();
-		}
-		/// <summary>
-		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
-		/// </summary>
-		/// <param name="source">Uri or database name of database to replicate from</param>
-		/// <param name="target">Uri or database name of database to replicate to</param>
-		/// <returns></returns>
-		public JObject TriggerReplication(string source, string target)
-		{
-			return TriggerReplication(source, target, new Result<JObject>()).Wait();
+			return TriggerReplication(options, new Result<JObject>()).Wait();
 		}
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
