@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using LoveSeat.Interfaces;
 
 namespace LoveSeat
 {
-	public interface ICouchDocument
-	{
-		string Id { get; set; }
-		string Rev { get; set; }
-	}
-
 	public class JsonDocument : JObject, ICouchDocument
 	{
 		public string Id

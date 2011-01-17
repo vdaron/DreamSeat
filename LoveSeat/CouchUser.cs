@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using LoveSeat.Interfaces;
 
 namespace LoveSeat
 {
-	public class CouchUser : BaseDocument, ICouchDocument
+	public class CouchUser : BaseDocument
 	{
 		private const string TYPE_USER = "user";
 
@@ -19,10 +20,5 @@ namespace LoveSeat
 		public string Name { get; set; }
 
 		public string[] Roles { get; set; }
-
-		////[JsonProperty("_id")]
-		//public string Id { get; set; }
-		////[JsonProperty("_rev")]
-		//public string Rev { get; set; }
 	}
 }

@@ -12,7 +12,7 @@ using MindTouch.Tasking;
 
 namespace LoveSeat
 {
-	public class CouchDatabase : CouchBase, IDocumentDatabase
+	public class CouchDatabase : CouchBase
 	{
 		public string DefaultDesignDocId { get; set; }
 
