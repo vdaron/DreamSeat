@@ -76,7 +76,7 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void Should_Trigger_Replication()
 		{
-			var obj = client.TriggerReplication("http://" + host + ":5984/" + replicateDatabase, baseDatabase);
+			var obj = client.TriggerReplication(baseDatabase, "http://" + host + ":5984/" + replicateDatabase,true);
 			Assert.IsTrue(obj != null);
 		}
 		[Test]
@@ -85,15 +85,15 @@ namespace LoveSeat.IntegrationTest
 			string obj = @"{""test"": ""prop""}";
 			var db = client.GetDatabase(baseDatabase);
 			string id = Guid.NewGuid().ToString("N");
-			var result = db.CreateDocument(id, obj, new Result<JObject>()).Wait();
-			Assert.IsNotNull(db.GetDocument(id,new Result<JsonDocument>()).Wait());
+			var result = db.CreateDocument(id, obj, new Result<string>()).Wait();
+			Assert.IsNotNull(db.GetDocument<BaseDocument>(id));
 		}
 		[Test]
 		public void Should_Create_Document_From_String_WIthId_GeneratedByCouchDb()
 		{
 			JsonDocument obj = new JsonDocument(@"{""test"": ""prop""}");
 			var db = client.GetDatabase(baseDatabase);
-			var result = db.CreateDocument(obj, new Result<JsonDocument>()).Wait();
+			var result = db.CreateDocument(obj);
 
 			Assert.IsNotNull(result.Id);
 			Assert.IsNotNull("prop",result["test"].Value<string>());
@@ -105,10 +105,10 @@ namespace LoveSeat.IntegrationTest
 			obj.Id = Guid.NewGuid().ToString("N");
 
 			var db = client.GetDatabase(baseDatabase);
-			var result = db.CreateDocument(obj, new Result<JsonDocument>()).Wait();
-			var doc = db.GetDocument(obj.Id, new Result<JsonDocument>()).Wait();
+			var result = db.CreateDocument(obj);
+			var doc = db.GetDocument<JsonDocument>(obj.Id,new JObjectSerializer());
 			doc["test"] = "newprop";
-			var newresult = db.SaveDocument(doc, new Result<JsonDocument>()).Wait();
+			var newresult = db.SaveDocument(doc);
 			Assert.AreEqual(newresult.Value<string>("test"), "newprop");
 		}
 		[Test]
@@ -116,51 +116,50 @@ namespace LoveSeat.IntegrationTest
 		{
 			var db = client.GetDatabase(baseDatabase);
 			string id = Guid.NewGuid().ToString("N");
-			db.CreateDocument(id, "{}", new Result<JObject>()).Wait();
-			var doc = db.GetDocument(id, new Result<JsonDocument>()).Wait();
-			var result = db.DeleteDocument(doc.Id, doc.Rev,new Result<JObject>()).Wait();
-			Assert.IsNull(db.GetDocument(id,new Result<JsonDocument>()).Wait());
+			db.CreateDocument(id, "{}", new Result<string>()).Wait();
+			var doc = db.GetDocument(id, new ObjectSerializer<BaseDocument>());
+			db.DeleteDocument(doc);
+			Assert.IsNull(db.GetDocument(id, new ObjectSerializer<BaseDocument>()));
 		}
 		[Test]
 		public void Should_Determine_If_Doc_Has_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			string id = Guid.NewGuid().ToString("N");
-			db.CreateDocument(id, "{}", new Result<JObject>()).Wait();
-			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
-			db.AddAttachment(id, attachment, "martin.txt", "text/plain",new Result<JObject>()).Wait();
-			var doc = db.GetDocument(id, new Result<JsonDocument>()).Wait();
-			Assert.IsTrue(doc.HasAttachment);
+			string Id = Guid.NewGuid().ToString("N");
+
+			db.CreateDocument(Id, "{}", new Result<string>()).Wait();
+			using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes("This is a text document")))
+			{
+				db.AddAttachment(Id, ms, "martin.txt");
+			}
+			var doc2 = db.GetDocument(Id,new ObjectSerializer<BaseDocument>());
+			Assert.IsTrue(doc2.HasAttachment);
 		}
 		[Test]
 		public void Should_Return_Attachment_Names()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""upload""}", new Result<JObject>()).Wait();
-			byte[] attachment = Encoding.UTF8.GetBytes("This is a text document");
-			db.AddAttachment("upload", attachment, "martin.txt", "text/plain", new Result<JObject>()).Wait();
-			var doc = db.GetDocument("upload", new Result<JsonDocument>()).Wait();
-			Assert.IsTrue(doc.GetAttachmentNames().Contains("martin.txt"));
-			var bdoc = db.GetDocument<BaseDocument>("upload", new Result<BaseDocument>()).Wait();
+			db.CreateDocument(@"{""_id"":""upload""}", new Result<string>()).Wait();
+			using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes("This is a text document")))
+			{
+				db.AddAttachment("upload", ms, "martin.txt");
+			}
+			var bdoc = db.GetDocument("upload", new ObjectSerializer<BaseDocument>());
 			Assert.IsTrue(bdoc.GetAttachmentNames().Contains("martin.txt"));
 		}
-		[Test]
-		public void Should_Create_Admin_User()
-		{
-			client.CreateAdminUser("Leela", "Turanga");
-		}
+
 		[Test]
 		public void Should_Create_And_Read_ConfigValue()
 		{
-			client.SetConfigValue("coucou", "key", "value", new Result()).Wait();
-			Assert.AreEqual("value",client.GetConfigValue("coucou","key",new Result<string>()).Wait());
-			client.DeleteConfigValue("coucou", "key", new Result()).Wait();
-			Assert.IsNull(client.GetConfigValue("coucou", "key", new Result<string>()).Wait());
+			client.SetConfigValue("coucou", "key", "value");
+			Assert.AreEqual("value",client.GetConfigValue("coucou","key"));
+			client.DeleteConfigValue("coucou", "key");
+			Assert.IsNull(client.GetConfigValue("coucou", "key"));
 		}
 		[Test]
 		public void Should_Read_ConfigSection()
 		{
-			client.SetConfigValue("coucou", "key", "value", new Result()).Wait();
+			client.SetConfigValue("coucou", "key", "value");
 			Dictionary<string, string> section = client.GetConfigSection("coucou", new Result<Dictionary<string, string>>()).Wait();
 			Assert.AreEqual(1, section.Count);
 			Assert.IsTrue(section.ContainsKey("key"));
@@ -173,44 +172,57 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsTrue(config.Count > 0);
 		}
 
-		//[Test]
+		[Test]
+		[Ignore]
 		public void Should_Delete_Admin_User()
 		{
 			client.DeleteAdminUser("Leela");
+		}
+		[Test]
+		[Ignore]
+		public void Should_Create_Admin_User()
+		{
+			client.CreateAdminUser("Leela", "Turanga");
 		}
 
 		[Test]
 		public void Should_Get_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_upload""}", new Result<JObject>()).Wait();
-			var doc = db.GetDocument("test_upload", new Result<JsonDocument>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_upload""}", new Result<string>()).Wait();
+			var doc = db.GetDocument("test_upload", new ObjectSerializer<BaseDocument>());
 			var attachment = Encoding.UTF8.GetBytes("test");
-			db.AddAttachment("test_upload", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
-			using(var stream = db.GetAttachmentStream(doc, "test_upload.txt", new Result<Stream>()).Wait())
-			using (StreamReader sr = new StreamReader(stream))
+			using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes("This is a text document")))
+			{
+				db.AddAttachment("test_upload", ms, "test_upload.txt");
+			}
+			using(Stream stream = db.GetAttachment(doc, "test_upload.txt"))
+			using(StreamReader sr = new StreamReader(stream))
 			{
 				string result = sr.ReadToEnd();
-				Assert.IsTrue(result == "test");
+				Assert.IsTrue(result == "This is a text document");
 			}
 		}
 		[Test]
 		public void Should_Delete_Attachment()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_delete""}", new Result<JObject>()).Wait();
-			var doc = db.GetDocument("test_delete", new Result<JsonDocument>()).Wait();
-			var attachment = Encoding.UTF8.GetBytes("test");
-			db.AddAttachment("test_delete", attachment, "test_upload.txt", "text/html", new Result<JObject>()).Wait();
-			db.DeleteAttachment("test_delete", "test_upload.txt", new Result<JObject>()).Wait();
-			var retrieved = db.GetDocument("test_delete", new Result<JsonDocument>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_delete""}", new Result<string>()).Wait();
+			db.GetDocument("test_delete", new ObjectSerializer<BaseDocument>());
+
+			using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes("This is a text document")))
+			{
+				db.AddAttachment("test_delete", ms, "test_upload.txt");
+			}
+			db.DeleteAttachment("test_delete", "test_upload.txt");
+			var retrieved = db.GetDocument("test_delete", new ObjectSerializer<BaseDocument>());
 			Assert.IsFalse(retrieved.HasAttachment);
 		}
 		[Test]
 		public void Should_Return_Etag_In_ViewResults()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<JObject>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<string>()).Wait();
 			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
 			Assert.IsTrue(!string.IsNullOrEmpty(result.Etag));
 		}
@@ -218,12 +230,13 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Get_304_If_ETag_Matches()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<JObject>()).Wait();
+			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<string>()).Wait();
 			ViewResult result = db.GetAllDocuments(new Result<ViewResult>()).Wait();
 			ViewResult cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.Etag }, new Result<ViewResult>()).Wait();
 			Assert.AreEqual(DreamStatus.NotModified, cachedResult.StatusCode);
 		}
 		[Test]
+		[Ignore]
 		public void Should_Get_Results_Quickly()
 		{
 			var db = client.GetDatabase("accounting");
@@ -235,16 +248,16 @@ namespace LoveSeat.IntegrationTest
 				Console.WriteLine(item.Name);
 			}
 			var endTime = DateTime.Now;
-			Assert.IsTrue((endTime - startTime).TotalMilliseconds < 80);
+			double delay = (endTime - startTime).TotalMilliseconds;
+			Assert.IsTrue(delay < 80);
 		}
 
 		[Test]
+		[Ignore]
 		public void Should_Create_User()
 		{
 			CouchDatabase db = client.GetDatabase("_users");
 			CouchUser user = db.GetDocument<CouchUser>("org.couchdb.user:Professor", new Result<CouchUser>()).Wait();
-
-
 		}
 	}
 	public class Company

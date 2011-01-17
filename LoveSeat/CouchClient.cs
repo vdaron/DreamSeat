@@ -59,7 +59,7 @@ namespace LoveSeat
 			p.Post(DreamMessage.Ok(MimeType.JSON, options.ToString()), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
+					if (a.Status == DreamStatus.Accepted)
 					{
 						result.Return(JObject.Parse(a.ToText()));
 					}

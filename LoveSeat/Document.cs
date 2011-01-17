@@ -51,6 +51,7 @@ namespace LoveSeat
 			: base(JObject.Parse(json))
 		{
 		}
+
 		public bool HasAttachment
 		{
 			get { return this["_attachments"] != null; }
@@ -75,9 +76,10 @@ namespace LoveSeat
 		public string Id { get; set; }
 		[JsonProperty("_rev")]
 		public string Rev { get; set; }
-
 		[JsonProperty("_attachments")]
 		private Dictionary<string, CouchAttachment> Attachments;
+		[JsonIgnore]
+		public bool HasAttachment { get { return Attachments.Count > 0; } }
 
 		public IEnumerable<string> GetAttachmentNames()
 		{
