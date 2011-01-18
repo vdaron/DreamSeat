@@ -78,15 +78,10 @@ namespace LoveSeat.IntegrationTest
 		{
 			string dbname = "test-replicate-db-created";
 			
-			var obj = client.TriggerReplication(new ReplicationOptions() { Source = baseDatabase, Target = "http://" + host + ":5984/" + replicateDatabase, Continuous = true });
+			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://" + host + ":5984/" + replicateDatabase){ Continuous = true });
 			Assert.IsTrue(obj != null);
 
-			var obj2 = client.TriggerReplication(
-				new ReplicationOptions() { 
-					Source = baseDatabase, 
-					Target = dbname, 
-					CreateTarget = true
-				});
+			var obj2 = client.TriggerReplication(new ReplicationOptions(baseDatabase,dbname){CreateTarget = true});
 
 			Assert.IsTrue(obj2 != null);
 
