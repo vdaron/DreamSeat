@@ -21,7 +21,7 @@ namespace LoveSeat
 			var converters = new List<JsonConverter> { new IsoDateTimeConverter() };
 			settings.Converters = converters;
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-			settings.NullValueHandling = NullValueHandling.Include;
+			settings.NullValueHandling = NullValueHandling.Ignore;
 		}
 
 		public virtual T Deserialize(string json)
