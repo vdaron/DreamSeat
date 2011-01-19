@@ -73,6 +73,8 @@
   <ItemGroup>
     <Compile Include="CouchAttachment.cs" />
     <Compile Include="CouchException.cs" />
+    <Compile Include="CouchViewDocument.cs" />
+    <Compile Include="CouchView.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="CouchUser.cs" />
     <Compile Include="Interfaces\ICouchDocument.cs" />
@@ -93,9 +95,6 @@
     <Compile Include="Support\KeyOptions.cs" />
     <Compile Include="ViewOptions.cs" />
     <Compile Include="ViewResult.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
