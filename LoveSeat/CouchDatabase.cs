@@ -27,7 +27,6 @@ namespace LoveSeat
 		}
 
 		#region Documents Management
-
 		#region Primitives methods
 		/// <summary>
 		/// Creates a document when you intend for Couch to generate the id for you.
@@ -60,7 +59,7 @@ namespace LoveSeat
 			string verb = "POST";
 			if (!String.IsNullOrEmpty(id))
 			{
-				p = p.At(XUri.EncodeFragment(id));
+				p = p.AtPath(XUri.EncodeFragment(id));
 				verb = "PUT";
 			}
 
@@ -101,7 +100,7 @@ namespace LoveSeat
 				throw new ArgumentNullException("result");
 
 			JObject jobj = JObject.Parse(json);
-			BasePlug.At(id).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -134,7 +133,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(id).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -159,7 +158,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -262,7 +261,7 @@ namespace LoveSeat
 		}
 		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer, Result<T> result) where T : ICouchDocument
 		{
-			BasePlug.At(id).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					switch (a.Status)
@@ -378,7 +377,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(XUri.EncodeFragment(id), XUri.EncodeFragment(fileName)).With("rev", rev).Put(DreamMessage.Ok(contentType, attachmentLength, attachment), new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(fileName)).With("rev", rev).Put(DreamMessage.Ok(contentType, attachmentLength, attachment), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -409,7 +408,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(XUri.EncodeFragment(id), XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -440,7 +439,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(XUri.EncodeFragment(docId), XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(docId)).At(XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -781,7 +780,7 @@ namespace LoveSeat
 		{
 			if (string.IsNullOrEmpty(DefaultDesignDocId))
 				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
-		} 
+		}
 		#endregion
 	}
 }
