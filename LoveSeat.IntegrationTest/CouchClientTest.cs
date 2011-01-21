@@ -43,7 +43,8 @@ namespace LoveSeat.IntegrationTest
 #endif
 		{
 			client = new CouchClient();
-			client.Authenticate(username, password, new Result<bool>()).Wait();
+			client.Logon(username, password, new Result<bool>()).Wait();
+
 			if (client.HasDatabase(baseDatabase))
 			{
 				client.DeleteDatabase(baseDatabase);
@@ -81,11 +82,31 @@ namespace LoveSeat.IntegrationTest
 		}
 
 		[Test]
+		public void TestCookieAuthentication()
+		{
+			CouchClient client = new CouchClient();
+			client.Logon(username, password, new Result<bool>()).Wait();
+			Assert.IsTrue(client.IsLogged(new Result<bool>()).Wait());
+			client.Logoff(new Result<bool>()).Wait();
+			Assert.IsFalse(client.IsLogged(new Result<bool>()).Wait());
+		}
+
+		[Test]
+		public void TestBasicAuthentication()
+		{
+			CouchClient client = new CouchClient(username,password);
+
+			CouchDatabase db = client.GetDatabase(baseDatabase);
+			db.CreateDocument(new CouchDocument());
+			
+		}
+
+		[Test]
 		public void Should_Trigger_Replication()
 		{
 			string dbname = "test-replicate-db-created";
 			
-			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://" + host + ":5984/" + replicateDatabase){ Continuous = true });
+			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://"+username+":"+password+"@"+ host + ":5984/" + replicateDatabase){ Continuous = true });
 			Assert.IsTrue(obj != null);
 
 			var obj2 = client.TriggerReplication(new ReplicationOptions(baseDatabase,dbname){CreateTarget = true});

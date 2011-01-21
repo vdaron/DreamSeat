@@ -35,7 +35,7 @@ namespace LoveSeat.IntegrationTest
 			string ujson = JsonConvert.SerializeObject(u);
 
 			User u2 = JsonConvert.DeserializeObject<User>(ujson);
-			Assert.AreSame(u.FirstName, u2.FirstName);
+			Assert.AreEqual(u.FirstName, u2.FirstName);
 
 		}
         [Test]
