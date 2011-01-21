@@ -7,7 +7,7 @@ using LoveSeat.Interfaces;
 
 namespace LoveSeat
 {
-	public class JsonDocument : JObject, ICouchDocument
+	public class JDocument : JObject, ICouchDocument
 	{
 		public string Id
 		{
@@ -35,14 +35,14 @@ namespace LoveSeat
 			}
 			set { this["_rev"] = value; }
 		}
-		protected JsonDocument()
+		public JDocument()
 		{
 		}
-		public JsonDocument(JObject jobj)
+		public JDocument(JObject jobj)
 			: base(jobj)
 		{
 		}
-		public JsonDocument(string json)
+		public JDocument(string json)
 			: base(JObject.Parse(json))
 		{
 		}
@@ -60,9 +60,9 @@ namespace LoveSeat
 		}
 	}
 
-	public class BaseDocument : ICouchDocument
+	public class CouchDocument : ICouchDocument
 	{
-		public BaseDocument()
+		public CouchDocument()
 		{
 			Attachments = new Dictionary<string, CouchAttachment>();
 		}
@@ -71,8 +71,10 @@ namespace LoveSeat
 		public string Id { get; set; }
 		[JsonProperty("_rev")]
 		public string Rev { get; set; }
+
 		[JsonProperty("_attachments")]
 		private Dictionary<string, CouchAttachment> Attachments;
+
 		[JsonIgnore]
 		public bool HasAttachment { get { return Attachments.Count > 0; } }
 

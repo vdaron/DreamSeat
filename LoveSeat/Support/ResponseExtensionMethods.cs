@@ -6,9 +6,9 @@ namespace LoveSeat.Support
 {
 	public static class ResponseExtensionMethods
 	{
-		public static JsonDocument GetCouchDocument(this HttpWebResponse response)
+		public static JDocument GetCouchDocument(this HttpWebResponse response)
 		{
-			return new JsonDocument(response.GetJObject()); 
+			return new JDocument(response.GetJObject()); 
 		}
 
         public static string GetResponseString(this HttpWebResponse response)

@@ -189,18 +189,14 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<T> CreateDocument<T>(T doc, Result<T> result) where T : ICouchDocument
 		{
-			return CreateDocument<T>(doc, new ObjectSerializer<T>(), result);
-		}
-		public Result<T> CreateDocument<T>(T doc, IObjectSerializer<T> objectSerializer, Result<T> result) where T : ICouchDocument
-		{
 			if (doc == null)
 				throw new ArgumentNullException("doc");
-			if (objectSerializer == null)
-				throw new ArgumentNullException("objectSerializer");
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			CreateDocument(doc.Id, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
+			ObjectSerializer<T> serializer = new ObjectSerializer<T>();
+
+			CreateDocument(doc.Id, serializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
@@ -221,20 +217,16 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<T> SaveDocument<T>(T doc, Result<T> result) where T : ICouchDocument
 		{
-			return SaveDocument<T>(doc, new ObjectSerializer<T>(), result);
-		}
-		public Result<T> SaveDocument<T>(T doc, IObjectSerializer<T> objectSerializer, Result<T> result) where T : ICouchDocument
-		{
 			if (doc == null)
 				throw new ArgumentNullException("doc");
-			if (objectSerializer == null)
-				throw new ArgumentNullException("objectSerializer");
 			if (result == null)
 				throw new ArgumentNullException("result");
 			if (String.IsNullOrEmpty(doc.Id))
 				throw new ArgumentException("Document must have an id");
 			if (String.IsNullOrEmpty(doc.Rev))
 				throw new ArgumentException("Document must have a revision");
+
+			ObjectSerializer<T> objectSerializer = new ObjectSerializer<T>();
 
 			SaveDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
@@ -257,10 +249,6 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<T> GetDocument<T>(string id, Result<T> result) where T : ICouchDocument
 		{
-			return GetDocument(id, new ObjectSerializer<T>(), result);
-		}
-		public Result<T> GetDocument<T>(string id, IObjectSerializer<T> objectSerializer, Result<T> result) where T : ICouchDocument
-		{
 			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
@@ -269,9 +257,10 @@ namespace LoveSeat
 						case DreamStatus.Ok:
 							try
 							{
-								T res = objectSerializer.Deserialize(a.ToText());
+								ObjectSerializer<T> objectSerializer = new ObjectSerializer<T>();
+								T res =  objectSerializer.Deserialize(a.ToText());
 								// If object inherit BaseDocument, id and rev are set during Deserialiation
-								if (!(res is BaseDocument))
+								if (!(res is CouchDocument))
 								{
 									// Load id and rev (TODO: try to optimise this)
 									JObject idrev = JObject.Parse(a.ToText());
@@ -322,25 +311,13 @@ namespace LoveSeat
 		{
 			return CreateDocument<T>(doc, new Result<T>()).Wait();
 		}
-		public T CreateDocument<T>(T doc, IObjectSerializer<T> objectSerializer) where T : ICouchDocument
-		{
-			return CreateDocument<T>(doc, objectSerializer, new Result<T>()).Wait();
-		}
 		public T SaveDocument<T>(T doc) where T : ICouchDocument
 		{
 			return SaveDocument<T>(doc, new Result<T>()).Wait();
 		}
-		public T SaveDocument<T>(T doc, IObjectSerializer<T> objectSerializer) where T : ICouchDocument
-		{
-			return SaveDocument<T>(doc, objectSerializer, new Result<T>()).Wait();
-		}
 		public T GetDocument<T>(string id) where T : ICouchDocument
 		{
 			return GetDocument<T>(id, new Result<T>()).Wait();
-		}
-		public T GetDocument<T>(string id, IObjectSerializer<T> objectSerializer) where T : ICouchDocument
-		{
-			return GetDocument<T>(id, objectSerializer, new Result<T>()).Wait();
 		}
 		public void DeleteDocument(ICouchDocument doc)
 		{
@@ -499,7 +476,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			GetDocument(id,new Result<BaseDocument>()).WhenDone(
+			GetDocument(id,new Result<CouchDocument>()).WhenDone(
 				a => AddAttachment(id, a.Rev, attachment, filename, result),
 				e => result.Throw(e)
 			);
@@ -559,7 +536,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			GetDocument(docId, new Result<BaseDocument>()).WhenDone(
+			GetDocument(docId, new Result<CouchDocument>()).WhenDone(
 				a => GetAttachment(docId, a.Rev, attachmentName, result),
 				e => result.Throw(e)
 			);
@@ -582,7 +559,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			GetDocument(id, new Result<BaseDocument>()).WhenDone(
+			GetDocument(id, new Result<CouchDocument>()).WhenDone(
 				a => DeleteAttachment(a.Id, a.Rev, attachmentName, result),
 				e => result.Throw(e)
 			);
@@ -641,146 +618,158 @@ namespace LoveSeat
 		}
 		#endregion
 
-		/// <summary>
-		/// Gets the results of a view with no view parameters. Use the overload to pass parameters
-		/// </summary>
-		/// <param name="viewName">The name of the view</param>
-		/// <param name="designDoc">The design doc on which the view resides</param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName, string designDoc, Result<ViewResult<T>> result)
+		#region All Documents Special View
+		#region Asynchronous Methods
+		public Result<ViewResult<Value>> GetAllDocuments<Value>(Result<ViewResult<Value>> result)
 		{
-			return View<T>(viewName, null, designDoc,result);
+			return GetAllDocuments<Value>(new ViewOptions(), result);
 		}
-		/// <summary>
-		/// Gets the results of the view using the defaultDesignDoc and no view parameters.  Use the overloads to specify options.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="viewName"></param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName,Result<ViewResult<T>> result)
+		public Result<ViewResult<Value>> GetAllDocuments<Value>(ViewOptions options, Result<ViewResult<Value>> result)
 		{
-			ThrowDesignDocException();
-			return View<T>(viewName, DefaultDesignDocId,result);
-		}
-		/// <summary>
-		/// Gets the results of the view using any and all parameters
-		/// </summary>
-		/// <param name="viewName">The name of the view</param>
-		/// <param name="options">Options such as startkey etc.</param>
-		/// <param name="designDoc">The design doc on which the view resides</param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, Result<ViewResult<T>> result)
-		{
-			return ProcessGenericResults<T>(BasePlug.At("_design",designDoc,"_view",viewName), options, new ObjectSerializer<T>(),result);
-		}
-		/// <summary>
-		/// Allows you to specify options and uses the defaultDesignDoc Specified.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="viewName"></param>
-		/// <param name="options"></param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options,Result<ViewResult<T>> result)
-		{
-			ThrowDesignDocException();
-			return View<T>(viewName, options, DefaultDesignDocId,result);
-		}
-		/// <summary>
-		/// Allows you to override the objectSerializer and use the Default Design Doc settings.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="viewName"></param>
-		/// <param name="options"></param>
-		/// <param name="objectSerializer"></param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
-		{
-			ThrowDesignDocException();
-			return View<T>(viewName, options, DefaultDesignDocId, objectSerializer,result);
-		}
-		/// <summary>
-		/// Don't use this overload unless you intend to override the default ObjectSerialization behavior.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="viewName"></param>
-		/// <param name="options"></param>
-		/// <param name="designDoc"></param>
-		/// <param name="objectSerializer">Only needed unless you'd like to override the default behavior of the serializer</param>
-		/// <returns></returns>
-		public Result<ViewResult<T>> View<T>(string viewName, ViewOptions options, string designDoc, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
-		{
-			return ProcessGenericResults<T>(BasePlug.At("_design", designDoc, "_view", viewName), options, objectSerializer, result);
-		}
-		public Result<string> Show(string showName, string docId, Result<string> result)
-		{
-			ThrowDesignDocException();
-			return Show(showName, docId, DefaultDesignDocId, result);
-		}
-		public Result<string> Show(string showName, string docId, string designDoc, Result<string> result)
-		{
-			BasePlug.At("_design", designDoc, "_show", showName, docId).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return(a.ToText());
+					{
+						result.Return(GetViewResult<Value>(a));
+					}
 					else
+					{
 						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+				);
+			return result;
+		}
+		public Result<ViewResult<Value, Doc>> GetAllDocuments<Value, Doc>(Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		{
+			return GetAllDocuments<Value, Doc>(new ViewOptions(), result);
+		}
+		public Result<ViewResult<Value, Doc>> GetAllDocuments<Value, Doc>(ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		{
+			options.IncludeDocs = true;
+
+			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						result.Return(GetViewResult<Value, Doc>(a));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+				);
+			return result;
+		}
+		#endregion
+		#region Synchronous Methods
+		public ViewResult<Value> GetAllDocuments<Value>()
+		{
+			return GetAllDocuments<Value>(new ViewOptions());
+		}
+		public ViewResult<Value> GetAllDocuments<Value>(ViewOptions options)
+		{
+			return GetAllDocuments<Value>(options, new Result<ViewResult<Value>>()).Wait();
+		}
+		public ViewResult<Value, Doc> GetAllDocuments<Value, Doc>() where Doc : ICouchDocument
+		{
+			return GetAllDocuments<Value, Doc>(new ViewOptions());
+		}
+		public ViewResult<Value, Doc> GetAllDocuments<Value, Doc>(ViewOptions options) where Doc : ICouchDocument
+		{
+			return GetAllDocuments<Value, Doc>(options, new Result<ViewResult<Value, Doc>>()).Wait();
+		}
+		#endregion
+		#endregion
+
+		#region Views
+		#region Asynchronous methods
+		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, Result<ViewResult<Value>> result)
+		{
+			return GetView<Value>(viewId, viewName, new ViewOptions(), result);
+		}
+		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value>> result)
+		{
+			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						result.Return(GetViewResult<Value>(a));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
 				},
 				e => result.Throw(e)
 			);
 			return result;
 		}
-		public Result<IListResult> List(string listName, string viewName, ViewOptions options, string designDoc, Result<IListResult> result)
+		public Result<ViewResult<Value, Doc>> GetView<Value, Doc>(string viewId, string viewName, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
 		{
-			BasePlug.At("_design", designDoc, "_list", viewName, options.ToString()).Get(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(new ListResult(a)),
+			return GetView<Value, Doc>(viewId, viewName, new ViewOptions(), result);
+		}
+		public Result<ViewResult<Value, Doc>> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		{
+			options.IncludeDocs = true;
+
+			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						result.Return(GetViewResult<Value, Doc>(a));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
 				e => result.Throw(e)
 			);
 			return result;
-		}
-		public Result<IListResult> List(string listName, string viewName, ViewOptions options, Result<IListResult> result)
-		{
-			ThrowDesignDocException();
-			return List(listName, viewName, options, DefaultDesignDocId, result);
-		}
+		} 
+		#endregion
 
-		/// <summary>
-		/// Gets all the documents in the database using the _all_docs uri
-		/// </summary>
-		/// <returns></returns>
-		public Result<ViewResult> GetAllDocuments(Result<ViewResult> result)
+		#region Synchronous methods
+		public ViewResult<Value> GetView<Value>(string viewId, string viewName)
 		{
-			return ProcessResults(BasePlug.At("_all_docs"), null, result);
+			return GetView<Value>(viewId, viewName, new Result<ViewResult<Value>>()).Wait();
 		}
-		public Result<ViewResult> GetAllDocuments(ViewOptions options, Result<ViewResult> result)
+		public ViewResult<Value> GetView<Value>(string viewId, string viewName, ViewOptions options)
 		{
-			return ProcessResults(BasePlug.At("_all_docs"), options, result);
+			return GetView<Value>(viewId, viewName, options, new Result<ViewResult<Value>>()).Wait();
 		}
-
-		#region Private Methods
-		private Result<ViewResult<T>> ProcessGenericResults<T>(Plug uri, ViewOptions options, IObjectSerializer<T> objectSerializer, Result<ViewResult<T>> result)
+		public ViewResult<Value, Doc> GetView<Value, Doc>(string viewId, string viewName) where Doc : ICouchDocument
 		{
-			uri.With(options).Get(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(new ViewResult<T>(a, objectSerializer)),
-				e => result.Throw(e)
-			);
-
-			return result;
+			return GetView<Value, Doc>(viewId, viewName, new Result<ViewResult<Value, Doc>>()).Wait();
 		}
-		private Result<ViewResult> ProcessResults(Plug uri, ViewOptions options, Result<ViewResult> result)
+		public ViewResult<Value, Doc> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options) where Doc : ICouchDocument
 		{
-			uri.With(options).Get(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(new ViewResult(a)),
-				e => result.Throw(e)
-			);
-
-			return result;
-		}
-		private void ThrowDesignDocException()
-		{
-			if (string.IsNullOrEmpty(DefaultDesignDocId))
-				throw new Exception("You must use SetDefaultDesignDoc prior to using this signature.  Otherwise explicitly specify the design doc in the other overloads.");
+			return GetView<Value, Doc>(viewId, viewName, options, new Result<ViewResult<Value, Doc>>()).Wait();
 		}
 		#endregion
+		#endregion
+
+		private ViewResult<Value> GetViewResult<Value>(DreamMessage a)
+		{
+			ObjectSerializer<ViewResult<Value>> objectSerializer = new ObjectSerializer<ViewResult<Value>>();
+			ViewResult<Value> val = objectSerializer.Deserialize(a.ToText());
+			val.ETag = a.Headers.ETag.Substring(1,a.Headers.ETag.Length -2);
+			return val;
+		}
+		private ViewResult<Value, Doc> GetViewResult<Value, Doc>(DreamMessage a) where Doc : ICouchDocument
+		{
+			ObjectSerializer<ViewResult<Value, Doc>> objectSerializer = new ObjectSerializer<ViewResult<Value, Doc>>();
+			ViewResult<Value,Doc> val = objectSerializer.Deserialize(a.ToText());
+			val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+			return val;
+		}
 	}
 }

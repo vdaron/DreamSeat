@@ -17,6 +17,27 @@ namespace LoveSeat.IntegrationTest
     [TestFixture]
     public class NewtonSoftTests
     {
+		public class User
+		{
+			public string FirstName { get; set; }
+			public string LastName { get; set; }
+
+			public User(JObject obj)
+			{ 
+				FirstName = "default"; 
+			}
+		}
+
+		[Test]
+		public void SouldSerializeWithoutDefaultConstructor()
+		{
+			User u = new User(new JObject()) { LastName = "Daron" };
+			string ujson = JsonConvert.SerializeObject(u);
+
+			User u2 = JsonConvert.DeserializeObject<User>(ujson);
+			Assert.AreSame(u.FirstName, u2.FirstName);
+
+		}
         [Test]
         public void JArray_Should_Support_Complex_Types()
         {

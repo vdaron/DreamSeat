@@ -85,7 +85,6 @@ namespace LoveSeat
         public bool? Stale { get; set; }
         public string Etag { get; set; }
 
-
         public  override string ToString()
         {
             string result = "";

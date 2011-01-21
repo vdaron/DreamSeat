@@ -5,7 +5,7 @@ using LoveSeat.Interfaces;
 
 namespace LoveSeat
 {
-	public class CouchUser : BaseDocument
+	public class CouchUser : CouchDocument
 	{
 		private const string TYPE_USER = "user";
 

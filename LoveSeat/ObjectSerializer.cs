@@ -6,19 +6,42 @@ using Newtonsoft.Json.Linq;
 
 namespace LoveSeat
 {
-	public interface IObjectSerializer<T>
+	internal class JsonDocumentConverter : JsonConverter
+	{
+		public override bool CanConvert(System.Type objectType)
+		{
+			return (objectType == typeof(JDocument)) ||(objectType == typeof(JObject));
+		}
+
+		public override object ReadJson(JsonReader reader, System.Type objectType, JsonSerializer serializer)
+		{
+			if(objectType == typeof(JDocument))
+				return new JDocument(JObject.Load(reader));
+			return JObject.Load(reader);
+		}
+
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		{
+			if (value is JObject)
+				((JObject)value).WriteTo(writer);
+			else
+				((JDocument)value).WriteTo(writer);
+		}
+	}
+
+	internal interface IObjectSerializer<T>
 	{
 		T Deserialize(string json);
 		string Serialize(T obj);
 	}
 
-	public class ObjectSerializer<T> : IObjectSerializer<T>
+	internal class ObjectSerializer<T> : IObjectSerializer<T>
 	{
 		protected readonly JsonSerializerSettings settings;
 		public ObjectSerializer()
 		{
 			settings = new JsonSerializerSettings();
-			var converters = new List<JsonConverter> { new IsoDateTimeConverter() };
+			var converters = new List<JsonConverter> { new IsoDateTimeConverter(),new JsonDocumentConverter() };
 			settings.Converters = converters;
 			settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			settings.NullValueHandling = NullValueHandling.Ignore;
@@ -31,19 +54,6 @@ namespace LoveSeat
 		public virtual string Serialize(T obj)
 		{
 			return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
-		}
-	}
-
-	public class JObjectSerializer : IObjectSerializer<JsonDocument>
-	{
-		public JsonDocument Deserialize(string json)
-		{
-			return new JsonDocument(JObject.Parse(json));
-		}
-
-		public string Serialize(JsonDocument obj)
-		{
-			return obj.ToString();
 		}
 	}
 }

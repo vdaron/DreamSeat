@@ -402,11 +402,11 @@ namespace LoveSeat
 		/// </summary>
 		/// <param name="userId"></param>
 		/// <returns></returns>
-		public JsonDocument GetUser(string userId)
+		public JDocument GetUser(string userId)
 		{
 			var db = new CouchDatabase(BasePlug.At("_users"));
 			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
-			return db.GetDocument(userId, new Result<JsonDocument>()).Wait();
+			return db.GetDocument(userId, new Result<JDocument>()).Wait();
 		} 
 		#endregion
 	}

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace LoveSeat
 {
-	public class CouchViewDocument : BaseDocument
+	public class CouchViewDocument : CouchDocument
 	{
 		public CouchViewDocument()
 		{

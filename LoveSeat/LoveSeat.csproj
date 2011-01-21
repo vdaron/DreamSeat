@@ -82,6 +82,7 @@
     <Compile Include="Interfaces\IListResult.cs" />
     <Compile Include="Interfaces\IViewOptions.cs" />
     <Compile Include="Interfaces\IViewResult.cs" />
+    <Compile Include="Interfaces\IViewResultRow.cs" />
     <Compile Include="ListResult.cs" />
     <Compile Include="ObjectSerializer.cs" />
     <Compile Include="PagingHelper.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="Support\KeyOptions.cs" />
     <Compile Include="ViewOptions.cs" />
     <Compile Include="ViewResult.cs" />
+    <Compile Include="ViewResultRow.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
