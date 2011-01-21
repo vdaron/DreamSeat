@@ -83,6 +83,7 @@
     <Compile Include="Interfaces\IViewOptions.cs" />
     <Compile Include="Interfaces\IViewResult.cs" />
     <Compile Include="Interfaces\IViewResultRow.cs" />
+    <Compile Include="JDocument.cs" />
     <Compile Include="ListResult.cs" />
     <Compile Include="ObjectSerializer.cs" />
     <Compile Include="PagingHelper.cs" />
