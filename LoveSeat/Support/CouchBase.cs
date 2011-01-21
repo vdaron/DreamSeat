@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using MindTouch.Dream;
 using MindTouch.Tasking;
+using Newtonsoft.Json.Linq;
 
 namespace LoveSeat.Support
 {
@@ -14,8 +15,9 @@ namespace LoveSeat.Support
 			BasePlug = Plug.New(baseUri);
 		}
 		protected CouchBase(XUri baseUri, string userName, string password)
+			:this(baseUri)
 		{
-			BasePlug = Plug.New(baseUri).WithCredentials(userName, password);
+			BasePlug = BasePlug.WithCredentials(userName, password);
 		}
 
 		/// <summary>
@@ -26,7 +28,7 @@ namespace LoveSeat.Support
 		/// <param name="password">Password</param>
 		/// <param name="result"></param>
 		/// <returns>true if authentication succeed</returns>
-		public Result<bool> Authenticate(string userName, string password, Result<bool> result)
+		public Result<bool> Logon(string userName, string password, Result<bool> result)
 		{
 			string content = String.Format("name={0}&password={1}", userName, password);
 
@@ -37,6 +39,38 @@ namespace LoveSeat.Support
 						BasePlug.CookieJar.Update(a.Cookies, new XUri(BasePlug.Uri.SchemeHostPort));
 						BasePlug = BasePlug.WithHeader("X-CouchDB-WWW-Authenticate", "Cookie");
 						result.Return(true);
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<bool> Logoff(Result<bool> result)
+		{
+			BasePlug.At("_session").Delete(new Result<DreamMessage>()).WhenDone(
+				a => {
+					if (a.Status == DreamStatus.Ok)
+						result.Return(true);
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<bool> IsLogged(Result<bool> result)
+		{
+			BasePlug.At("_session").Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						JObject user = JObject.Parse(a.ToText());
+						result.Return(user["info"]["authenticated"] != null);
 					}
 					else
 					{
