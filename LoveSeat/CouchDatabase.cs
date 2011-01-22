@@ -181,10 +181,10 @@ namespace LoveSeat
 		#endregion
 
 		/// <summary>
-		/// Create a document based on object based on ICouchDocument interface
+		/// Create a document based on object based on ICouchDocument interface. If the ICouchDocument does not have an Id, CouchDB will generate the id for you
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="doc"></param>
+		/// <typeparam name="T">ICouchDocument Type to return</typeparam>
+		/// <param name="doc">ICouchDocument to create</param>
 		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<T> CreateDocument<T>(T doc, Result<T> result) where T : ICouchDocument
@@ -626,6 +626,9 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value>> GetAllDocuments<Value>(ViewOptions options, Result<ViewResult<Value>> result)
 		{
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
@@ -648,6 +651,10 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value, Doc>> GetAllDocuments<Value, Doc>(ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
 		{
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			// Ensure that IncludeDocs is specified
 			options.IncludeDocs = true;
 
 			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
@@ -695,6 +702,13 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value>> result)
 		{
+			if (String.IsNullOrEmpty(viewId))
+				throw new ArgumentNullException("viewId");
+			if (String.IsNullOrEmpty(viewName))
+				throw new ArgumentNullException("viewName");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
@@ -717,6 +731,13 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value, Doc>> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
 		{
+			if (String.IsNullOrEmpty(viewId))
+				throw new ArgumentNullException("viewId");
+			if (String.IsNullOrEmpty(viewName))
+				throw new ArgumentNullException("viewName");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			options.IncludeDocs = true;
 
 			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
@@ -736,7 +757,6 @@ namespace LoveSeat
 			return result;
 		} 
 		#endregion
-
 		#region Synchronous methods
 		public ViewResult<Value> GetView<Value>(string viewId, string viewName)
 		{
