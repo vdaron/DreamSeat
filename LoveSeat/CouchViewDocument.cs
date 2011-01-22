@@ -10,19 +10,19 @@ namespace LoveSeat
 	{
 		public CouchViewDocument()
 		{
-			Language = "javascript";
+			Language = Constants.JAVASCRIPT;
 			Views = new Dictionary<string, CouchView>();
 		}
 		public CouchViewDocument(string id)
 			:this()
 		{
-			Id = "_design/" + id;
+			Id = Constants.DESIGN + "/" + id;
 		}
 
-		[JsonProperty("language")]
+		[JsonProperty(Constants.LANGUAGE)]
 		public string Language{get;set;}
 
-		[JsonProperty("views")]
+		[JsonProperty(Constants.VIEWS)]
 		public Dictionary<string, CouchView> Views { get; internal set; }
 	}
 }

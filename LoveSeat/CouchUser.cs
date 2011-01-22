@@ -7,18 +7,16 @@ namespace LoveSeat
 {
 	public class CouchUser : CouchDocument
 	{
-		private const string TYPE_USER = "user";
-
 		public CouchUser()
 		{
-			Type = TYPE_USER;
+			Type = Constants.TYPE_USER;
 		}
 
-		[JsonProperty("type")]
+		[JsonProperty(Constants.TYPE)]
 		private string Type { get; set; }
-		[JsonProperty("name")]
+		[JsonProperty(Constants.NAME)]
 		public string Name { get; set; }
-		[JsonProperty("roles")]
+		[JsonProperty(Constants.ROLES)]
 		public string[] Roles { get; set; }
 	}
 }
