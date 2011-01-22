@@ -376,7 +376,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(fileName)).With("rev", rev).Put(DreamMessage.Ok(contentType, attachmentLength, attachment), new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(fileName)).With(Constants.REV, rev).Put(DreamMessage.Ok(contentType, attachmentLength, attachment), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -407,7 +407,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(attachmentName)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(attachmentName)).With(Constants.REV, rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)

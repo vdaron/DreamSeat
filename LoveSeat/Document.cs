@@ -14,12 +14,12 @@ namespace LoveSeat
 			Attachments = new Dictionary<string, CouchAttachment>();
 		}
 
-		[JsonProperty("_id")]
+		[JsonProperty(Constants._ID)]
 		public string Id { get; set; }
-		[JsonProperty("_rev")]
+		[JsonProperty(Constants._REV)]
 		public string Rev { get; set; }
 
-		[JsonProperty("_attachments")]
+		[JsonProperty(Constants.ATTACHMENTS)]
 		private Dictionary<string, CouchAttachment> Attachments;
 
 		[JsonIgnore]

@@ -37,5 +37,39 @@ namespace LoveSeat
 		public const string ALL_DOCS = "_all_docs";
 		public const string DESIGN = "_design";
 		public const string VIEW = "_view";
+
+		public const string TYPE = "type";
+		public const string NAME = "name";
+		public const string ROLES = "roles";
+		public const string TYPE_USER = "user";
+
+		public const string ATTACHMENTS ="_attachments";
+		public const string JAVASCRIPT = "javascript";
+		public const string LANGUAGE = "language";
+		public const string VIEWS = "views";
+
+		public const string SOURCE = "source";
+		public const string TARGET = "target";
+		public const string CONTINUOUS = "continuous";
+		public const string QUERY_PARAMS = "query_params";
+		public const string CREATE_TARGET = "create_target";
+		public const string FILTER = "filter";
+
+		public const string KEY = "key";
+		public const string STARTKEY = "startkey";
+		public const string ENDKEY = "endkey";
+		public const string LIMIT = "limit";
+		public const string SKIP = "skip";
+		public const string REDUCE = "reduce";
+		public const string GROUP = "group";
+		public const string INCLUDE_DOCS = "include_docs";
+		public const string INCLUSIVE_END = "inclusive_end";
+		public const string GROUP_LEVEL = "group_level";
+		public const string DESCENDING = "descending";
+		public const string STALE = "stale";
+		public const string OK = "ok";
+		public const string STARTKEY_DOCID = "startkey_docid";
+		public const string ENDKEY_DOCID = "endkey_docid";
+
 	}
 }

@@ -5,17 +5,17 @@ namespace LoveSeat
 {
 	public class ReplicationOptions
 	{
-		[JsonProperty("source")]
+		[JsonProperty(Constants.SOURCE)]
 		public string Source { get; internal set; }
-		[JsonProperty("target")]
+		[JsonProperty(Constants.TARGET)]
 		public string Target { get; internal set; }
-		[JsonProperty("continuous")]
+		[JsonProperty(Constants.CONTINUOUS)]
 		public bool? Continuous { get; set; }
-		[JsonProperty("query_params")]
+		[JsonProperty(Constants.QUERY_PARAMS)]
 		public Dictionary<string,string> QueryParams { get; set; }
-		[JsonProperty("create_target")]
+		[JsonProperty(Constants.CREATE_TARGET)]
 		public bool? CreateTarget { get; set; }
-		[JsonProperty("filter")]
+		[JsonProperty(Constants.FILTER)]
 		public string Filter { get; set; }
 
 		public ReplicationOptions(string source, string target)
