@@ -629,7 +629,7 @@ namespace LoveSeat
 			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
 						result.Return(GetViewResult<Value>(a));
 					}
@@ -653,7 +653,7 @@ namespace LoveSeat
 			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
 						result.Return(GetViewResult<Value, Doc>(a));
 					}
@@ -698,7 +698,7 @@ namespace LoveSeat
 			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
 						result.Return(GetViewResult<Value>(a));
 					}
@@ -722,7 +722,7 @@ namespace LoveSeat
 			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
 						result.Return(GetViewResult<Value, Doc>(a));
 					}
@@ -759,16 +759,34 @@ namespace LoveSeat
 
 		private ViewResult<Value> GetViewResult<Value>(DreamMessage a)
 		{
-			ObjectSerializer<ViewResult<Value>> objectSerializer = new ObjectSerializer<ViewResult<Value>>();
-			ViewResult<Value> val = objectSerializer.Deserialize(a.ToText());
-			val.ETag = a.Headers.ETag.Substring(1,a.Headers.ETag.Length -2);
+			ViewResult<Value> val = null;
+			switch (a.Status)
+			{
+				case DreamStatus.Ok:
+					ObjectSerializer<ViewResult<Value>> objectSerializer = new ObjectSerializer<ViewResult<Value>>();
+					val = objectSerializer.Deserialize(a.ToText());
+					val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+					break;
+				default:
+					val = new ViewResult<Value>() { Status = a.Status };
+					break;
+			}
 			return val;
 		}
 		private ViewResult<Value, Doc> GetViewResult<Value, Doc>(DreamMessage a) where Doc : ICouchDocument
 		{
-			ObjectSerializer<ViewResult<Value, Doc>> objectSerializer = new ObjectSerializer<ViewResult<Value, Doc>>();
-			ViewResult<Value,Doc> val = objectSerializer.Deserialize(a.ToText());
-			val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+			ViewResult<Value, Doc> val = null;
+			switch (a.Status)
+			{
+				case DreamStatus.Ok:
+					ObjectSerializer<ViewResult<Value, Doc>> objectSerializer = new ObjectSerializer<ViewResult<Value, Doc>>();
+					val = objectSerializer.Deserialize(a.ToText());
+					val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+					break;
+				default:
+					val = new ViewResult<Value, Doc>() { Status = a.Status };
+					break;
+			}
 			return val;
 		}
 	}

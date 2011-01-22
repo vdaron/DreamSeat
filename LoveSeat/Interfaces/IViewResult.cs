@@ -1,6 +1,7 @@
 using System.Net;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using MindTouch.Dream;
 
 namespace LoveSeat.Interfaces
 {
@@ -9,6 +10,7 @@ namespace LoveSeat.Interfaces
 		int TotalRows { get; }
 		int OffSet { get; }
 		string ETag { get; }
+		DreamStatus Status { get; }
 	}
 	public interface IViewResult<T> : IBaseViewResult
 	{

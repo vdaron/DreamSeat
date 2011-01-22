@@ -274,7 +274,7 @@ namespace LoveSeat.IntegrationTest
 			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<string>()).Wait();
 			ViewResult<JObject> result = db.GetAllDocuments(new Result<ViewResult<JObject>>()).Wait();
 			ViewResult<JObject> cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.ETag }, new Result<ViewResult<JObject>>()).Wait();
-			//Assert.AreEqual(DreamStatus.NotModified, cachedResult.StatusCode);
+			Assert.AreEqual(DreamStatus.NotModified, cachedResult.Status);
 		}
 		[Test]
 		[Ignore]

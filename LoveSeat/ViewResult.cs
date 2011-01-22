@@ -27,6 +27,9 @@ namespace LoveSeat
 		}
 		[JsonIgnore]
 		public string ETag { get; internal set; }
+
+		[JsonIgnore]
+		public DreamStatus Status { get; internal set; }
 	}
 	public class ViewResult<T> : BaseViewResult, IViewResult<T>
 	{
