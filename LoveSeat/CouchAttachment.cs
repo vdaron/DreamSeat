@@ -8,13 +8,13 @@ namespace LoveSeat
 {
 	public class CouchAttachment
 	{
-		[JsonProperty("stub")]
+		[JsonProperty(Constants.STUB)]
 		public bool Stub{get;internal set;}
-		[JsonProperty("content_type")]
+		[JsonProperty(Constants.CONTENT_TYPE)]
 		public string ContentType{get;internal set;}
-		[JsonProperty("length")]
+		[JsonProperty(Constants.LENGTH)]
 		public long Length{get;internal set;}
-		[JsonProperty("data")]
+		[JsonProperty(Constants.DATA)]
 		public string Data { get; internal set; }
 	}
 }

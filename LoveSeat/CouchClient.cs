@@ -19,7 +19,7 @@ namespace LoveSeat
 		/// This is only intended for use if your CouchDb is in Admin Party
 		/// </summary>
 		public CouchClient()
-			: this("localhost", 5984, null, null)
+			: this(Constants.LOCALHOST, Constants.DEFAULT_PORT, null, null)
 		{
 		}
 		/// <summary>
@@ -28,7 +28,7 @@ namespace LoveSeat
 		/// <param name="username"></param>
 		/// <param name="password"></param>
 		public CouchClient(string username, string password)
-			: this("localhost", 5984, username, password)
+			: this(Constants.LOCALHOST, Constants.DEFAULT_PORT, username, password)
 		{
 		}
 
@@ -54,7 +54,7 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
 		{
-			Plug p = BasePlug.At("_replicate");
+			Plug p = BasePlug.At(Constants.REPLICATE);
 
 			string json = options.ToString();
 			p.Post(DreamMessage.Ok(MimeType.JSON, json), new Result<DreamMessage>()).WhenDone(
@@ -256,7 +256,7 @@ namespace LoveSeat
 		#region Asynchronous Methods
 		public Result<Dictionary<string, Dictionary<string, string>>> GetConfig(Result<Dictionary<string, Dictionary<string, string>>> result)
 		{
-			BasePlug.At("_config").Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.CONFIG).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -270,7 +270,7 @@ namespace LoveSeat
 		}
 		public Result<Dictionary<string, string>> GetConfigSection(string section, Result<Dictionary<string, string>> result)
 		{
-			BasePlug.At("_config",XUri.EncodeFragment(section)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -286,7 +286,7 @@ namespace LoveSeat
 		}
 		public Result<string> GetConfigValue(string section, string keyName, Result<string> result)
 		{
-			BasePlug.At("_config",XUri.EncodeFragment(section),XUri.EncodeFragment(keyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section),XUri.EncodeFragment(keyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					string value = a.ToText();
@@ -303,7 +303,7 @@ namespace LoveSeat
 		}
 		public Result SetConfigValue(string section, string keyName, string value, Result result)
 		{
-			BasePlug.At("_config", XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -317,7 +317,7 @@ namespace LoveSeat
 		}
 		public Result DeleteConfigValue(string section, string keyName, Result result)
 		{
-			BasePlug.At("_config", XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)

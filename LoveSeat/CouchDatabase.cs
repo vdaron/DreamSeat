@@ -74,15 +74,15 @@ namespace LoveSeat
 				throw new ArgumentNullException("result");
 
 			JObject jobj = JObject.Parse(json);
-			if (jobj.Value<object>("_rev") != null)
-				jobj.Remove("_rev");
+			if (jobj.Value<object>(Constants._REV) != null)
+				jobj.Remove(Constants._REV);
 
 			Plug p = BasePlug;
-			string verb = "POST";
+			string verb = Verb.POST;
 			if (!String.IsNullOrEmpty(id))
 			{
 				p = p.AtPath(XUri.EncodeFragment(id));
-				verb = "PUT";
+				verb = Verb.PUT;
 			}
 
 			p.Invoke(verb,DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
@@ -122,7 +122,7 @@ namespace LoveSeat
 				throw new ArgumentNullException("result");
 
 			JObject jobj = JObject.Parse(json);
-			BasePlug.AtPath(XUri.EncodeFragment(id)).With("rev", rev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).With(Constants.REV, rev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
@@ -155,7 +155,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).With("rev", rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(id)).With(Constants.REV, rev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
@@ -222,8 +222,8 @@ namespace LoveSeat
 				a =>
 				{
 					JObject value = JObject.Parse(a);
-					doc.Id = value["id"].Value<string>();
-					doc.Rev = value["rev"].Value<string>();
+					doc.Id = value[Constants.ID].Value<string>();
+					doc.Rev = value[Constants.REV].Value<string>();
 					result.Return(doc);
 				},
 				e => result.Throw(e)
@@ -254,8 +254,8 @@ namespace LoveSeat
 				a =>
 				{
 					JObject value = JObject.Parse(a);
-					doc.Id = value["id"].Value<string>();
-					doc.Rev = value["rev"].Value<string>();
+					doc.Id = value[Constants.ID].Value<string>();
+					doc.Rev = value[Constants.REV].Value<string>();
 					result.Return(doc);
 				},
 				e => result.Throw(e)
@@ -286,8 +286,8 @@ namespace LoveSeat
 								{
 									// Load id and rev (TODO: try to optimise this)
 									JObject idrev = JObject.Parse(a.ToText());
-									res.Id = idrev["_id"].Value<string>();
-									res.Rev = idrev["_rev"].Value<string>();
+									res.Id = idrev[Constants._ID].Value<string>();
+									res.Rev = idrev[Constants._REV].Value<string>();
 								}
 								result.Return(res);
 							}
@@ -651,7 +651,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.ALL_DOCS).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
@@ -679,7 +679,7 @@ namespace LoveSeat
 			// Ensure that IncludeDocs is specified
 			options.IncludeDocs = true;
 
-			BasePlug.At("_all_docs").With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.ALL_DOCS).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
@@ -731,7 +731,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.DESIGN, XUri.EncodeFragment(viewId), Constants.VIEW, XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
@@ -762,7 +762,7 @@ namespace LoveSeat
 
 			options.IncludeDocs = true;
 
-			BasePlug.At("_design", XUri.EncodeFragment(viewId), "_view", XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.DESIGN, XUri.EncodeFragment(viewId), Constants.VIEW, XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
@@ -807,7 +807,8 @@ namespace LoveSeat
 				case DreamStatus.Ok:
 					ObjectSerializer<ViewResult<Value>> objectSerializer = new ObjectSerializer<ViewResult<Value>>();
 					val = objectSerializer.Deserialize(a.ToText());
-					val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+					val.Status = DreamStatus.Ok;
+					val.ETag = a.Headers.ETag;
 					break;
 				default:
 					val = new ViewResult<Value>() { Status = a.Status };
@@ -823,7 +824,8 @@ namespace LoveSeat
 				case DreamStatus.Ok:
 					ObjectSerializer<ViewResult<Value, Doc>> objectSerializer = new ObjectSerializer<ViewResult<Value, Doc>>();
 					val = objectSerializer.Deserialize(a.ToText());
-					val.ETag = a.Headers.ETag.Substring(1, a.Headers.ETag.Length - 2);
+					val.Status = DreamStatus.Ok;
+					val.ETag = a.Headers.ETag;
 					break;
 				default:
 					val = new ViewResult<Value, Doc>() { Status = a.Status };
