@@ -71,7 +71,9 @@
     <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
     <Compile Include="CouchAttachment.cs" />
+    <Compile Include="CouchDatabaseInfo.cs" />
     <Compile Include="CouchException.cs" />
     <Compile Include="CouchViewDocument.cs" />
     <Compile Include="CouchView.cs" />

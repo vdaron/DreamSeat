@@ -292,6 +292,15 @@ namespace LoveSeat.IntegrationTest
 			//double delay = (endTime - startTime).TotalMilliseconds;
 			//Assert.IsTrue(delay < 80);
 		}
+		[Test]
+		public void Should_Get_Database_Info()
+		{
+			var db = client.GetDatabase(baseDatabase);
+
+			CouchDatabaseInfo info = db.GetInfo();
+			Assert.IsNotNull(info);
+			Assert.AreEqual(baseDatabase, info.Name);
+		}
 
 		[Test]
 		public void Should_Return_View_Results()

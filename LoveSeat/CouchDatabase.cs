@@ -26,6 +26,28 @@ namespace LoveSeat
 		{
 		}
 
+		/// <summary>
+		/// Retrieve DatabaseInformation
+		/// </summary>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result<CouchDatabaseInfo> GetInfo(Result<CouchDatabaseInfo> result)
+		{
+			BasePlug.Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a => {
+					if(a.Status == DreamStatus.Ok)
+						result.Return(JsonConvert.DeserializeObject<CouchDatabaseInfo>(a.ToText()));
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public CouchDatabaseInfo GetInfo()
+		{
+			return GetInfo(new Result<CouchDatabaseInfo>()).Wait();
+		}
 		#region Documents Management
 		#region Primitives methods
 		/// <summary>
