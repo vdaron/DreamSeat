@@ -77,6 +77,27 @@ namespace LoveSeat
 		}
 
 		/// <summary>
+		/// Restarts the CouchDB instance. You must be authenticated as a user with administration privileges for this to work.
+		/// </summary>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result RestartServer(Result result)
+		{
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			BasePlug.At(Constants.RESTART).Post(DreamMessage.Ok(MimeType.JSON,String.Empty), new Result<DreamMessage>()).WhenDone(
+				a => {
+					if (a.Status == DreamStatus.Ok)
+						result.Return();
+					else
+						result.Throw(new CouchException(a));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
 		/// <param name="databaseName"></param>

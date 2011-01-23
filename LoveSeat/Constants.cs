@@ -73,5 +73,6 @@ namespace LoveSeat
 
 		public const string COMPACT = "_compact";
 		public const string TEMP_VIEW = "_temp_view";
+		public const string RESTART = "_restart";
 	}
 }

@@ -362,6 +362,11 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(result);
 			Assert.AreEqual(DreamStatus.Ok, result.Status);
 		}
+		[Test]
+		public void Should_Restart_Server()
+		{
+			client.RestartServer(new Result()).Wait();
+		}
 	}
 	public class Company
 	{
