@@ -71,5 +71,6 @@ namespace LoveSeat
 		public const string STARTKEY_DOCID = "startkey_docid";
 		public const string ENDKEY_DOCID = "endkey_docid";
 
+		public const string COMPACT = "_compact";
 	}
 }

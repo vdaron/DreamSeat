@@ -33,6 +33,9 @@ namespace LoveSeat
 		/// <returns></returns>
 		public Result<CouchDatabaseInfo> GetInfo(Result<CouchDatabaseInfo> result)
 		{
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			BasePlug.Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if(a.Status == DreamStatus.Ok)
@@ -48,6 +51,72 @@ namespace LoveSeat
 		{
 			return GetInfo(new Result<CouchDatabaseInfo>()).Wait();
 		}
+
+		/// <summary>
+		/// Request compaction of the specified database. Compaction compresses the disk database file
+		/// </summary>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result Compact(Result result)
+		{
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			BasePlug.At(Constants.COMPACT).Post(DreamMessage.Ok(MimeType.JSON,""), new Result<DreamMessage>()).WhenDone(
+				a => {
+					if (a.Status == DreamStatus.Accepted)
+					{
+						result.Return();
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public void Compact()
+		{
+			Compact(new Result()).Wait();
+		}
+
+		/// <summary>
+		/// Compacts the view indexes associated with the specified design document. You can use this in place of the full database compaction if
+		/// you know a specific set of view indexes have been affected by a recent database change
+		/// </summary>
+		/// <param name="documentViewId">Design Document id to compact</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result CompactDocumentView(string documentViewId,Result result)
+		{
+			if (String.IsNullOrEmpty(documentViewId))
+				throw new ArgumentNullException(documentViewId);
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			BasePlug.At(Constants.COMPACT).At(XUri.EncodeFragment(documentViewId)).Post(DreamMessage.Ok(MimeType.JSON, ""), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Accepted)
+					{
+						result.Return();
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public void CompactDocumentView(string documentViewId)
+		{
+			CompactDocumentView(documentViewId, new Result()).Wait();
+		}
+
 		#region Documents Management
 		#region Primitives methods
 		/// <summary>

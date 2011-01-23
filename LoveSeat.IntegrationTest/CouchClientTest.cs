@@ -335,6 +335,23 @@ namespace LoveSeat.IntegrationTest
 
 			Assert.IsNotNull(doc.Rev);
 		}
+		[Test]
+		public void Should_Start_Compact()
+		{
+			var db = client.GetDatabase(baseDatabase);
+			db.Compact();
+		}
+
+		[Test]
+		public void Should_Start_CompactView()
+		{
+			var db = client.GetDatabase(baseDatabase);
+			CouchViewDocument doc = new CouchViewDocument("test_compactview");
+			doc.Views.Add("test", new CouchView("function(doc) { emit(null, doc) }"));
+			db.CreateDocument(doc);
+
+			db.CompactDocumentView("test_compactview");
+		}
 	}
 	public class Company
 	{
