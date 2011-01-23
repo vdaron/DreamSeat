@@ -854,6 +854,11 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value>> GetTempView<Value>(CouchView view, ViewOptions options, Result<ViewResult<Value>> result)
 		{
+			if (view == null)
+				throw new ArgumentNullException("view");
+			if(result == null)
+				throw new ArgumentNullException("null");
+
 			BasePlug.At(Constants.TEMP_VIEW).With(options).Post(DreamMessage.Ok(MimeType.JSON, JsonConvert.SerializeObject(view)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
@@ -876,6 +881,11 @@ namespace LoveSeat
 		}
 		public Result<ViewResult<Value, Doc>> GetTempView<Value, Doc>(CouchView view, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
 		{
+			if (view == null)
+				throw new ArgumentNullException("view");
+			if (result == null)
+				throw new ArgumentNullException("null");
+
 			BasePlug.At(Constants.TEMP_VIEW).With(options).Post(DreamMessage.Ok(MimeType.JSON, JsonConvert.SerializeObject(view)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
