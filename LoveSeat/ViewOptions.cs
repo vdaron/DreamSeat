@@ -87,7 +87,7 @@ namespace LoveSeat
 
         public  override string ToString()
         {
-            string result = "";
+            string result = String.Empty;
             if ((Key != null) && (Key.Count > 0))
                 result += "&key=" + Key.ToString();
             if ((StartKey != null) && (StartKey.Count > 0))

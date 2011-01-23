@@ -365,7 +365,7 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void Should_Restart_Server()
 		{
-			client.RestartServer(new Result()).Wait();
+			client.RestartServer();
 		}
 	}
 	public class Company

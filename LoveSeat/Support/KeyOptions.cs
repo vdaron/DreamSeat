@@ -28,7 +28,7 @@ namespace LoveSeat
         {
             if (objects.Count == 0)
             {
-                return "";
+                return String.Empty;
             }
             if (objects.Count == 1)
             {

@@ -225,6 +225,13 @@ namespace LoveSeat
 			return TriggerReplication(options, new Result<JObject>()).Wait();
 		}
 		/// <summary>
+		/// Restarts the CouchDB instance. You must be authenticated as a user with administration privileges for this to work.
+		/// </summary>
+		public void RestartServer()
+		{
+			RestartServer(new Result()).Wait();
+		}
+		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
 		/// <param name="databaseName"></param>

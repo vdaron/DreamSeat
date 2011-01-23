@@ -62,7 +62,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(Constants.COMPACT).Post(DreamMessage.Ok(MimeType.JSON,""), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.COMPACT).Post(DreamMessage.Ok(MimeType.JSON,String.Empty), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Accepted)
 					{
@@ -96,7 +96,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(Constants.COMPACT).At(XUri.EncodeFragment(documentViewId)).Post(DreamMessage.Ok(MimeType.JSON, ""), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.COMPACT).At(XUri.EncodeFragment(documentViewId)).Post(DreamMessage.Ok(MimeType.JSON, String.Empty), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Accepted)
