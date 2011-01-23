@@ -745,10 +745,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			// Ensure that IncludeDocs is specified
-			options.IncludeDocs = true;
-
-			BasePlug.At(Constants.ALL_DOCS).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.ALL_DOCS).With(Constants.INCLUDE_DOCS, true).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
@@ -829,9 +826,7 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			options.IncludeDocs = true;
-
-			BasePlug.At(Constants.DESIGN, XUri.EncodeFragment(viewId), Constants.VIEW, XUri.EncodeFragment(viewName)).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.DESIGN, XUri.EncodeFragment(viewId), Constants.VIEW, XUri.EncodeFragment(viewName)).With(Constants.INCLUDE_DOCS, true).With(options).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)

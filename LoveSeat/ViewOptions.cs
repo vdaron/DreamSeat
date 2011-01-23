@@ -32,8 +32,6 @@ namespace LoveSeat
 				plug.With(Constants.REDUCE,options.Reduce.Value);
 			if (options.Group.HasValue)
 				plug.With(Constants.GROUP,options.Group.Value);
-			if (options.IncludeDocs.HasValue)
-				plug.With(Constants.INCLUDE_DOCS, options.IncludeDocs.Value);
 			if (options.InclusiveEnd.HasValue)
 				plug.With(Constants.INCLUSIVE_END,options.InclusiveEnd.Value);
 			if (options.GroupLevel.HasValue)
@@ -78,50 +76,10 @@ namespace LoveSeat
         public int? Skip { get; set; }
         public bool? Reduce { get; set; }
         public bool? Group { get; set; }
-        public bool? IncludeDocs { get; set; }
         public bool? InclusiveEnd { get; set; }
         public int? GroupLevel { get; set; }
         public bool? Descending { get; set; }
         public bool? Stale { get; set; }
         public string Etag { get; set; }
-
-        public  override string ToString()
-        {
-            string result = String.Empty;
-            if ((Key != null) && (Key.Count > 0))
-                result += "&key=" + Key.ToString();
-            if ((StartKey != null) && (StartKey.Count > 0))
-                if((StartKey.Count == 1) && (EndKey.Count > 1))
-                    result += "&startkey=[" + StartKey.ToString() + "]";
-                else
-                    result += "&startkey=" + StartKey.ToString();
-            if ((EndKey != null) && (EndKey.Count > 0))
-                result += "&endkey=" + EndKey.ToString();
-            if (Limit.HasValue)
-                result += "&limit=" + Limit.Value.ToString();
-            if (Skip.HasValue)
-                result += "&skip=" + Skip.Value.ToString();
-            if (Reduce.HasValue)
-                result += "&reduce=" + Reduce.Value.ToString().ToLower();
-            if (Group.HasValue)
-                result += "&group=" + Group.Value.ToString().ToLower();
-            if (IncludeDocs.HasValue)
-                result += "&include_docs=" + IncludeDocs.Value.ToString().ToLower();
-            if (InclusiveEnd.HasValue)
-                result += "&inclusive_end=" + InclusiveEnd.Value.ToString().ToLower();
-            if (GroupLevel.HasValue)
-                result += "&group_level=" + GroupLevel.Value.ToString();
-            if (Descending.HasValue)
-                result += "&descending=" + Descending.Value.ToString().ToLower();
-            if (Stale.HasValue && Stale.Value)
-                result += "&stale=ok";
-            if (!string.IsNullOrEmpty(StartKeyDocId))
-                result += "&startkey_docid=" + StartKeyDocId;
-            if (!string.IsNullOrEmpty(EndKeyDocId))
-                result += "&endkey_docid=" + EndKeyDocId;
-            return result.Length < 1 ? "" :  "?" + result.Substring(1);
-        }
     }
-   
-
 }

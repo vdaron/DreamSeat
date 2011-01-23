@@ -11,7 +11,6 @@ namespace LoveSeat.Interfaces
         int? Skip { get; set; }
         bool? Reduce { get; set; }
         bool? Group { get; set; }
-        bool? IncludeDocs { get; set; }
         bool? InclusiveEnd { get; set; }
         int? GroupLevel { get; set; }
         bool? Descending { get; set; }
