@@ -846,7 +846,52 @@ namespace LoveSeat
 				e => result.Throw(e)
 			);
 			return result;
-		} 
+		}
+
+		public Result<ViewResult<Value>> GetTempView<Value>(CouchView view, Result<ViewResult<Value>> result)
+		{
+			return GetTempView(view, null, result);
+		}
+		public Result<ViewResult<Value>> GetTempView<Value>(CouchView view, ViewOptions options, Result<ViewResult<Value>> result)
+		{
+			BasePlug.At(Constants.TEMP_VIEW).With(options).Post(DreamMessage.Ok(MimeType.JSON, JsonConvert.SerializeObject(view)), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
+					{
+						result.Return(GetViewResult<Value>(a));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+		public Result<ViewResult<Value, Doc>> GetTempView<Value, Doc>(CouchView view, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		{
+			return GetTempView(view, null, result);
+		}
+		public Result<ViewResult<Value, Doc>> GetTempView<Value, Doc>(CouchView view, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		{
+			BasePlug.At(Constants.TEMP_VIEW).With(options).Post(DreamMessage.Ok(MimeType.JSON, JsonConvert.SerializeObject(view)), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
+					{
+						result.Return(GetViewResult<Value,Doc>(a));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
 		#endregion
 		#region Synchronous methods
 		public ViewResult<Value> GetView<Value>(string viewId, string viewName)
@@ -864,6 +909,23 @@ namespace LoveSeat
 		public ViewResult<Value, Doc> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options) where Doc : ICouchDocument
 		{
 			return GetView<Value, Doc>(viewId, viewName, options, new Result<ViewResult<Value, Doc>>()).Wait();
+		}
+
+		public ViewResult<Value> GetTempView<Value>(CouchView view)
+		{
+			return GetTempView<Value>(view, null, new Result<ViewResult<Value>>()).Wait();
+		}
+		public ViewResult<Value> GetTempView<Value>(CouchView view, ViewOptions options)
+		{
+			return GetTempView<Value>(view, options, new Result<ViewResult<Value>>()).Wait();
+		}
+		public ViewResult<Value, Doc> GetTempView<Value, Doc>(CouchView view) where Doc : ICouchDocument
+		{
+			return GetTempView(view, null, new Result<ViewResult<Value, Doc>>()).Wait();
+		}
+		public ViewResult<Value, Doc> GetTempView<Value, Doc>(CouchView view, ViewOptions options) where Doc : ICouchDocument
+		{
+			return GetTempView(view, options, new Result<ViewResult<Value, Doc>>()).Wait();
 		}
 		#endregion
 		#endregion

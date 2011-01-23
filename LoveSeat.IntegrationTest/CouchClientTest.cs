@@ -341,7 +341,6 @@ namespace LoveSeat.IntegrationTest
 			var db = client.GetDatabase(baseDatabase);
 			db.Compact();
 		}
-
 		[Test]
 		public void Should_Start_CompactView()
 		{
@@ -351,6 +350,17 @@ namespace LoveSeat.IntegrationTest
 			db.CreateDocument(doc);
 
 			db.CompactDocumentView("test_compactview");
+		}
+		[Test]
+		public void Should_Run_TestView()
+		{
+			var db = client.GetDatabase(baseDatabase);
+			db.CreateDocument("id1", "{}", new Result<string>()).Wait();
+			CouchViewDocument doc = new CouchViewDocument("test_compactview");
+			ViewResult<JObject> result = db.GetTempView<JObject>(new CouchView("function(doc) { emit(null, doc) }"));
+
+			Assert.IsNotNull(result);
+			Assert.AreEqual(DreamStatus.Ok, result.Status);
 		}
 	}
 	public class Company
