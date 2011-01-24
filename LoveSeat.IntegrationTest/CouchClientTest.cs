@@ -306,9 +306,9 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Return_View_Results()
 		{
 			CouchDatabase db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(new JDocument() { Id = "test_doc" });
-			db.CreateDocument(new JDocument() { Id = "test_doc2" });
-			db.CreateDocument(new JDocument() { Id = "test_doc3" });
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
 
 			ViewResult<JObject> result = db.GetView<JObject>("testviewitem", "testview", new Result<ViewResult<JObject>>()).Wait();
 			Assert.IsNotNull(result);
@@ -318,24 +318,25 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Return_View_Results_With_Documents()
 		{
 			CouchDatabase db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(new JDocument() { Id = "test_doc" });
-			db.CreateDocument(new JDocument() { Id = "test_doc2" });
-			db.CreateDocument(new JDocument() { Id = "test_doc3" });
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
 
 			ViewResult<JObject,JDocument> result = db.GetView<JObject,JDocument>("testviewitem", "testview");
 			Assert.IsNotNull(result);
 			foreach (ViewResultRow<JObject, JDocument> row in result.Rows)
 			{
 				Assert.IsNotNull(row.Doc);
+				Assert.IsNotNull(row.Key);
 			}
 		}
 		[Test]
 		public void Should_Return_View_Results_As_JObject()
 		{
 			CouchDatabase db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(new JDocument() { Id = "test_doc" });
-			db.CreateDocument(new JDocument() { Id = "test_doc2" });
-			db.CreateDocument(new JDocument() { Id = "test_doc3" });
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
+			db.CreateDocument(new JDocument());
 
 			JObject result = db.GetView("testviewitem", "testview", new Result<JObject>()).Wait();
 			Assert.IsNotNull(result);
