@@ -306,7 +306,6 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Return_View_Results()
 		{
 			CouchDatabase db = client.GetDatabase(baseDatabase);
-
 			db.CreateDocument(new JDocument() { Id = "test_doc" });
 			db.CreateDocument(new JDocument() { Id = "test_doc2" });
 			db.CreateDocument(new JDocument() { Id = "test_doc3" });
@@ -314,6 +313,18 @@ namespace LoveSeat.IntegrationTest
 			ViewResult<JObject> result = db.GetView<JObject>("testviewitem", "testview", new Result<ViewResult<JObject>>()).Wait();
 			Assert.IsNotNull(result);
 			Assert.IsTrue(result.TotalRows > 0);
+		}
+		[Test]
+		public void Should_Return_View_Results_As_JObject()
+		{
+			CouchDatabase db = client.GetDatabase(baseDatabase);
+			db.CreateDocument(new JDocument() { Id = "test_doc" });
+			db.CreateDocument(new JDocument() { Id = "test_doc2" });
+			db.CreateDocument(new JDocument() { Id = "test_doc3" });
+
+			JObject result = db.GetView("testviewitem", "testview", new Result<JObject>()).Wait();
+			Assert.IsNotNull(result);
+			Assert.IsNotNull(result["rows"]);
 		}
 
 		[Test]

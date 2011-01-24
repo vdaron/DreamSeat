@@ -784,11 +784,7 @@ namespace LoveSeat
 
 		#region Views
 		#region Asynchronous methods
-		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, Result<ViewResult<Value>> result)
-		{
-			return GetView<Value>(viewId, viewName, new ViewOptions(), result);
-		}
-		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value>> result)
+		private Result<DreamMessage> GetView(string viewId, string viewName, ViewOptions options, Result<DreamMessage> result)
 		{
 			if (String.IsNullOrEmpty(viewId))
 				throw new ArgumentNullException("viewId");
@@ -802,12 +798,35 @@ namespace LoveSeat
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<Value>(a));
+						result.Return(a);
 					}
 					else
 					{
 						result.Throw(new CouchException(a));
 					}
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
+
+		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, Result<ViewResult<Value>> result)
+		{
+			return GetView<Value>(viewId, viewName, new ViewOptions(), result);
+		}
+		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value>> result)
+		{
+			if (String.IsNullOrEmpty(viewId))
+				throw new ArgumentNullException("viewId");
+			if (String.IsNullOrEmpty(viewName))
+				throw new ArgumentNullException("viewName");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					result.Return(GetViewResult<Value>(a));
 				},
 				e => result.Throw(e)
 			);
@@ -826,17 +845,13 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			BasePlug.At(Constants.DESIGN, XUri.EncodeFragment(viewId), Constants.VIEW, XUri.EncodeFragment(viewName)).With(Constants.INCLUDE_DOCS, true).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			// Ensure Documents are requested
+			options.IncludeDocs = true;
+
+			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
-					{
-						result.Return(GetViewResult<Value, Doc>(a));
-					}
-					else
-					{
-						result.Throw(new CouchException(a));
-					}
+					result.Return(GetViewResult<Value, Doc>(a));
 				},
 				e => result.Throw(e)
 			);
@@ -897,6 +912,29 @@ namespace LoveSeat
 			);
 			return result;
 		}
+
+		public Result<JObject> GetView(string viewId, string viewName, Result<JObject> result)
+		{
+			return GetView(viewId,viewName,new ViewOptions(),result);
+		}
+		public Result<JObject> GetView(string viewId, string viewName, ViewOptions options, Result<JObject> result)
+		{
+			if (String.IsNullOrEmpty(viewId))
+				throw new ArgumentNullException("viewId");
+			if (String.IsNullOrEmpty(viewName))
+				throw new ArgumentNullException("viewName");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			GetView(viewId, viewName, options, new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					result.Return(JObject.Parse(a.ToText()));
+				},
+				e => result.Throw(e)
+			);
+			return result;
+		}
 		#endregion
 		#region Synchronous methods
 		public ViewResult<Value> GetView<Value>(string viewId, string viewName)
@@ -931,6 +969,15 @@ namespace LoveSeat
 		public ViewResult<Value, Doc> GetTempView<Value, Doc>(CouchView view, ViewOptions options) where Doc : ICouchDocument
 		{
 			return GetTempView(view, options, new Result<ViewResult<Value, Doc>>()).Wait();
+		}
+
+		public JObject GetView(string viewId, string viewName)
+		{
+			return GetView(viewId, viewName, new Result<JObject>()).Wait();
+		}
+		public JObject GetView(string viewId, string viewName, ViewOptions options)
+		{
+			return GetView(viewId, viewName, options, new Result<JObject>()).Wait();
 		}
 		#endregion
 		#endregion
