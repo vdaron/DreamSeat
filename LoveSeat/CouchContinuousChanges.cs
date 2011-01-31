@@ -33,7 +33,7 @@ namespace LoveSeat
 		}
 	}
 
-	public class CouchContinuousChanges<T> where T : ICouchDocument
+	public class CouchContinuousChanges<T> : IDisposable where T : ICouchDocument
 	{
 		private AsyncStreamReader theReader;
 		private ObjectSerializer<CouchChangeResult<T>> theSerializer = new ObjectSerializer<CouchChangeResult<T>>();
