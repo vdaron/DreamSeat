@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoveSeat.Integration.MSTest
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{570E4930-3B96-4CDE-AA1F-34733F1F0E9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestStream", "TestStream\TestStream.csproj", "{CF25C671-022F-4FE5-AFD9-370F25842C9A}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = LoveSeat.vsmdi
@@ -54,16 +52,6 @@ Global
 		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|x86.ActiveCfg = Release|Any CPU
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Debug|x86.ActiveCfg = Debug|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Debug|x86.Build.0 = Debug|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Release|Any CPU.ActiveCfg = Release|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Release|Mixed Platforms.Build.0 = Release|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Release|x86.ActiveCfg = Release|x86
-		{CF25C671-022F-4FE5-AFD9-370F25842C9A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

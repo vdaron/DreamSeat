@@ -10,6 +10,8 @@ using System.Text;
 using MindTouch.Dream;
 using System.Collections.Generic;
 using LoveSeat.Interfaces;
+using LoveSeat.Support;
+using System.Diagnostics;
 
 #if NUNIT
 using NUnit.Framework;
@@ -42,8 +44,8 @@ namespace LoveSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient();
-			client.Logon(username, password, new Result<bool>()).Wait();
+			client = new CouchClient(username, password);
+			//client.Logon(username, password, new Result<bool>()).Wait();
 
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -389,10 +391,30 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(result);
 			Assert.AreEqual(DreamStatus.Ok, result.Status);
 		}
+
 		[Test]
 		public void Should_Restart_Server()
 		{
 			client.RestartServer();
+		}
+
+		[Test]
+		public void GetChanges()
+		{
+			System.Threading.AutoResetEvent evt = new System.Threading.AutoResetEvent(false);
+			var db = client.GetDatabase("test");
+			using (CouchContinuousChanges ccc = db.GetCoutinuousChanges(new ChangeOptions(), (x, y) => {
+					Assert.IsNotNull(y.Id);
+					Assert.IsTrue(y.Sequence > 0);
+					Debug.WriteLine(y.Id);
+					evt.Set(); 
+				},
+				new Result<CouchContinuousChanges>()).Wait())
+			{
+				db.CreateDocument(null, "{}", new Result<string>()).Wait();
+				evt.WaitOne();
+				Debug.WriteLine("done");
+			}
 		}
 	}
 	public class Company

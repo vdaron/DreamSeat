@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using MindTouch.Dream;
 using MindTouch.Tasking;
+using System.Net.Sockets;
 
 namespace LoveSeat
 {
@@ -116,6 +117,60 @@ namespace LoveSeat
 		{
 			CompactDocumentView(documentViewId, new Result()).Wait();
 		}
+
+		#region Change Management
+		public Result<CouchChanges> GetChanges(ChangeOptions options, Result<CouchChanges> result)
+		{
+			options.Feed = ChangeFeed.Normal;
+
+			BasePlug.At(Constants._CHANGES).With(options).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						ObjectSerializer<CouchChanges> serializer = new ObjectSerializer<CouchChanges>();
+						result.Return(serializer.Deserialize(a.ToText()));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+		public Result<CouchContinuousChanges> GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate aCallback, Result<CouchContinuousChanges> result)
+		{
+			options.Feed = ChangeFeed.Continuous;
+			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.IsSuccessful)
+					{
+						result.Return(new CouchContinuousChanges(a, aCallback));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+
+		public CouchChanges GetChanges(ChangeOptions options)
+		{
+			return GetChanges(options, new Result<CouchChanges>()).Wait();
+		}
+		public CouchContinuousChanges GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate aCallback)
+		{
+			return GetCoutinuousChanges(options, aCallback, new Result<CouchContinuousChanges>()).Wait();
+		}
+		#endregion
 
 		#region Documents Management
 		#region Primitives methods
