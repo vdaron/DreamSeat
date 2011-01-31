@@ -19,11 +19,11 @@ namespace LoveSeat
 	public class CouchChangeResult
 	{
 		[JsonProperty(Constants.ID)]
-		public string Id { get; private set; }
+		public string Id { get; protected set; }
 		[JsonProperty(Constants.SEQUENCE)]
-		public int Sequence { get; private set; }
+		public int Sequence { get; protected set; }
 		[JsonProperty(Constants.CHANGES)]
-		public JObject[] Changes { get; private set; }
+		public JObject[] Changes { get; protected set; }
 	}
 
 	public class CouchChanges<T>  where T : ICouchDocument
