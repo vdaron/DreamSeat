@@ -399,7 +399,21 @@ namespace LoveSeat.IntegrationTest
 		}
 
 		[Test]
-		public void GetChanges()
+		public void GetChangesWithDocument()
+		{
+			if (client.HasDatabase("test_simple_changes"))
+				client.DeleteDatabase("test_simple_changes");
+
+			var db = client.GetDatabase("test_simple_changes");
+			db.CreateDocument(null, "{}", new Result<string>()).Wait();
+
+			CouchChanges<JDocument> changes = db.GetChanges<JDocument>(new ChangeOptions(), new Result<CouchChanges<JDocument>>()).Wait();
+			Assert.AreEqual(1,changes.Results.Length);
+		}
+
+
+		[Test]
+		public void GetContinuousChanges()
 		{
 			System.Threading.AutoResetEvent evt = new System.Threading.AutoResetEvent(false);
 			var db = client.GetDatabase("test");

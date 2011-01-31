@@ -74,7 +74,7 @@ namespace LoveSeat.Support
 			}
 			if (options.IncludeDocs.HasValue)
 			{
-				plug = plug.With(Constants.INCLUDE_DOCS, options.IncludeDocs.Value);
+				plug = plug.With(Constants.INCLUDE_DOCS, options.IncludeDocs.Value ? "true" : "false");
 			}
 			if (options.Limit.HasValue)
 			{

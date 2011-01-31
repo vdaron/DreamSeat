@@ -141,7 +141,34 @@ namespace LoveSeat
 
 			return result;
 		}
-		public Result<CouchContinuousChanges> GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate aCallback, Result<CouchContinuousChanges> result)
+		public Result<CouchChanges<T>> GetChanges<T>(ChangeOptions options, Result<CouchChanges<T>> result) where T : ICouchDocument
+		{
+			options.Feed = ChangeFeed.Normal;
+			options.IncludeDocs = true;
+
+			BasePlug.At(Constants._CHANGES).With(options).Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.Status == DreamStatus.Ok)
+					{
+						ObjectSerializer<CouchChanges<T>> serializer = new ObjectSerializer<CouchChanges<T>>();
+						result.Return(serializer.Deserialize(a.ToText()));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+
+		public Result<CouchContinuousChanges> GetCoutinuousChanges(
+			ChangeOptions options,
+			CouchChangeDelegate aCallback,
+			Result<CouchContinuousChanges> result)
 		{
 			options.Feed = ChangeFeed.Continuous;
 			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
@@ -161,6 +188,30 @@ namespace LoveSeat
 
 			return result;
 		}
+		public Result<CouchContinuousChanges<T>> GetCoutinuousChanges<T>(
+			ChangeOptions options,
+			CouchChangeDelegate<T> aCallback,
+			Result<CouchContinuousChanges<T>> result) where T : ICouchDocument
+		{
+			options.Feed = ChangeFeed.Continuous;
+			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+				a =>
+				{
+					if (a.IsSuccessful)
+					{
+						result.Return(new CouchContinuousChanges<T>(a, aCallback));
+					}
+					else
+					{
+						result.Throw(new CouchException(a));
+					}
+				},
+				e => result.Throw(e)
+			);
+
+			return result;
+		}
+
 
 		public CouchChanges GetChanges(ChangeOptions options)
 		{
@@ -170,7 +221,17 @@ namespace LoveSeat
 		{
 			return GetCoutinuousChanges(options, aCallback, new Result<CouchContinuousChanges>()).Wait();
 		}
+		public CouchChanges<T> GetChanges<T>(ChangeOptions options) where T : ICouchDocument
+		{
+			return GetChanges<T>(options, new Result<CouchChanges<T>>()).Wait();
+		}
+		public CouchContinuousChanges<T> GetCoutinuousChanges<T>(ChangeOptions options, CouchChangeDelegate<T> aCallback) where T : ICouchDocument
+		{
+			return GetCoutinuousChanges<T>(options, aCallback, new Result<CouchContinuousChanges<T>>()).Wait();
+		}
+
 		#endregion
+
 
 		#region Documents Management
 		#region Primitives methods
