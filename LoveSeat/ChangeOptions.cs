@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace LoveSeat
 {
-	public enum ChangeFeed
+	internal enum ChangeFeed
 	{
 		Normal,
 		LongPoll, // unsupported
