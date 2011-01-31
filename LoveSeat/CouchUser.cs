@@ -10,6 +10,7 @@ namespace LoveSeat
 		public CouchUser()
 		{
 			Type = Constants.TYPE_USER;
+			Roles = new string[0];
 		}
 
 		[JsonProperty(Constants.TYPE)]
