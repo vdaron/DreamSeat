@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading;
 using System.Globalization;
+using MindTouch.IO;
 
 namespace LoveSeat.Support
 {
@@ -20,7 +21,7 @@ namespace LoveSeat.Support
 
 	public class AsyncStreamReader : IDisposable
 	{
-		private byte[] theAsyncBuffer = new byte[1024];
+		private byte[] theAsyncBuffer = new byte[1024];//TODO: Fix this.
 		private IAsyncResult theAsyncResult;
 		private List<char> theCharList = new List<char>();
 		private Decoder theDecoder;
@@ -64,6 +65,7 @@ namespace LoveSeat.Support
 						theCharList.Add(c);
 
 					ReadLinesAndCallback();
+
 					if (!isDisposed)
 					{
 						theAsyncResult = BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
@@ -72,14 +74,21 @@ namespace LoveSeat.Support
 			}
 			catch
 			{
-			
+				//TODO: ??
 			}
 		}
 		private void ReadLinesAndCallback()
 		{
 			while (ReadLineFromStack(theCurrentLine))
 			{
-				theLineReaded(this, new LineReceivedEventArgs(theCurrentLine.ToString()));
+				try
+				{
+					theLineReaded(this, new LineReceivedEventArgs(theCurrentLine.ToString()));
+				}
+				catch
+				{
+					// TODO: Add Logging
+				}
 				theCurrentLine.Length = 0;
 			}
 		}
