@@ -194,6 +194,8 @@ namespace LoveSeat
 			Result<CouchContinuousChanges<T>> result) where T : ICouchDocument
 		{
 			options.Feed = ChangeFeed.Continuous;
+			options.IncludeDocs = true;
+
 			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
