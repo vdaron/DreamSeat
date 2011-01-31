@@ -216,13 +216,11 @@ namespace LoveSeat.IntegrationTest
 		}
 
 		[Test]
-		[Ignore]
 		public void Should_Delete_Admin_User()
 		{
 			client.DeleteAdminUser("Leela");
 		}
 		[Test]
-		[Ignore]
 		public void Should_Create_Admin_User()
 		{
 			client.CreateAdminUser("Leela", "Turanga");
@@ -401,14 +399,34 @@ namespace LoveSeat.IntegrationTest
 		[Test]
 		public void GetChangesWithDocument()
 		{
-			if (client.HasDatabase("test_simple_changes"))
-				client.DeleteDatabase("test_simple_changes");
+			if (client.HasDatabase("test_changes"))
+				client.DeleteDatabase("test_changes");
 
-			var db = client.GetDatabase("test_simple_changes");
+			var db = client.GetDatabase("test_changes");
 			db.CreateDocument(null, "{}", new Result<string>()).Wait();
 
 			CouchChanges<JDocument> changes = db.GetChanges<JDocument>(new ChangeOptions(), new Result<CouchChanges<JDocument>>()).Wait();
 			Assert.AreEqual(1,changes.Results.Length);
+			Assert.IsNotNull(changes.Results[0].Doc);
+			Assert.IsNotNull(changes.Results[0].Changes);
+			Assert.IsNotNull(changes.Results[0].Id);
+			Assert.IsNotNull(changes.Results[0].Sequence);
+		}
+
+		[Test]
+		public void GetChanges()
+		{
+			if (client.HasDatabase("test_changes"))
+				client.DeleteDatabase("test_changes");
+
+			var db = client.GetDatabase("test_changes");
+			db.CreateDocument(null, "{}", new Result<string>()).Wait();
+
+			CouchChanges changes = db.GetChanges(new ChangeOptions(), new Result<CouchChanges>()).Wait();
+			Assert.AreEqual(1, changes.Results.Length);
+			Assert.IsNotNull(changes.Results[0].Changes);
+			Assert.IsNotNull(changes.Results[0].Id);
+			Assert.IsNotNull(changes.Results[0].Sequence);
 		}
 
 
@@ -416,18 +434,68 @@ namespace LoveSeat.IntegrationTest
 		public void GetContinuousChanges()
 		{
 			System.Threading.AutoResetEvent evt = new System.Threading.AutoResetEvent(false);
-			var db = client.GetDatabase("test");
-			using (CouchContinuousChanges ccc = db.GetCoutinuousChanges(new ChangeOptions(), (x, y) => {
-					Assert.IsNotNull(y.Id);
-					Assert.IsTrue(y.Sequence > 0);
-					Debug.WriteLine(y.Id);
-					evt.Set(); 
+			if (client.HasDatabase("test_changes"))
+				client.DeleteDatabase("test_changes");
+
+			string id = null;
+			var db = client.GetDatabase("test_changes");
+			using (CouchContinuousChanges ccc = db.GetCoutinuousChanges(new ChangeOptions() {Since=0}, (x, y) =>
+				{
+					try
+					{
+						id = y.Id;
+						Assert.IsNotNull(y.Id);
+						Assert.IsTrue(y.Sequence > 0);
+					}
+					catch (Exception e)
+					{
+					}
+					finally
+					{
+						evt.Set();
+					}
 				},
 				new Result<CouchContinuousChanges>()).Wait())
 			{
-				db.CreateDocument(null, "{}", new Result<string>()).Wait();
+				JDocument result = db.CreateDocument(new JDocument(), new Result<JDocument>()).Wait();
 				evt.WaitOne();
-				Debug.WriteLine("done");
+
+				Assert.AreEqual(result.Id, id);
+			}
+		}
+		[Test]
+		public void GetContinuousChangesWithDocument()
+		{
+			System.Threading.AutoResetEvent evt = new System.Threading.AutoResetEvent(false);
+			if (client.HasDatabase("test_changes"))
+				client.DeleteDatabase("test_changes");
+
+			string id = null;
+			var db = client.GetDatabase("test_changes");
+			using (CouchContinuousChanges<JDocument> ccc = db.GetCoutinuousChanges<JDocument>(new ChangeOptions() { Since = 0 }, (x, y) =>
+				{
+					try
+					{
+						Assert.IsNotNull(y.Doc);
+						id = y.Doc.Id;
+						Assert.IsNotNull(y.Id);
+						Assert.IsTrue(y.Sequence > 0);
+					}
+					catch (Exception ex)
+					{
+
+					}
+					finally
+					{
+						evt.Set();
+					}
+				},
+			new Result<CouchContinuousChanges<JDocument>>()).Wait())
+			{
+				JDocument result = db.CreateDocument(new JDocument(), new Result<JDocument>()).Wait();
+				evt.WaitOne();
+
+				Assert.AreEqual(result.Id, id);
 			}
 		}
 	}
