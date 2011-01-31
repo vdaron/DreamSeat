@@ -384,18 +384,17 @@ namespace LoveSeat
 
 		#endregion
 
-		#region User Management (disabled for now)
-		public JObject CreateAdminUser(string username, string password)
+		#region User Management
+		public void CreateAdminUser(string username, string password)
 		{
 			SetConfigValue("admins", username, password, new Result()).Wait();
+			SetConfigValue("bobo", "user", "password", new Result()).Wait();
 
-//            var user = @"{ ""name"": ""%name%"",
-//			  ""_id"": ""org.couchdb.user:%name%"", ""type"": ""user"", ""roles"": [],
-//			}".Replace("%name%", usernameToCreate).Replace("\r\n", "");
-//            var docResult = GetRequest(baseUri + "_users/org.couchdb.user:" + HttpUtility.UrlEncode(usernameToCreate))
-//                .Put().Json().Data(user).GetResponse().GetJObject();
-//            return docResult;
-			return JObject.Parse("{}");
+			CouchUser user = new CouchUser();
+			user.Name = username;
+
+			ObjectSerializer<CouchUser> serializer = new ObjectSerializer<CouchUser>();
+			BasePlug.At("_users", HttpUtility.UrlEncode("org.couchdb.user:" + username)).Put(DreamMessage.Ok(MimeType.JSON, serializer.Serialize(user)), new Result<DreamMessage>()).Wait();
 		}
 		/// <summary>
 		/// Deletes user  (if you have permission)
@@ -405,16 +404,13 @@ namespace LoveSeat
 		{
 			DeleteConfigValue("admins", user, new Result()).Wait();
 
-			//var iniResult = GetRequest(baseUri + "_config/admins/" + HttpUtility.UrlEncode(userToDelete))
-			//    .Delete().Json().GetResponse();
-
-			//var userDb = this.GetDatabase("_users");
-			//var userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userToDelete);
-			//var userDoc = userDb.GetDocument(userId, new Result<Document>()).Wait();
-			//if (userDoc != null)
-			//{
-			//    userDb.DeleteDocument(userDoc.Id, userDoc.Rev, new Result<JObject>()).Wait();
-			//}
+			var userDb = GetDatabase("_users");
+			var userId = "org.couchdb.user:" + user;
+			var userDoc = userDb.GetDocument(userId, new Result<JDocument>()).Wait();
+			if (userDoc != null)
+			{
+				userDb.DeleteDocument(userDoc.Id, userDoc.Rev, new Result<string>()).Wait();
+			}
 		}
 		/// <summary>
 		/// Returns true/false depending on whether or not the user is contained in the _users database
