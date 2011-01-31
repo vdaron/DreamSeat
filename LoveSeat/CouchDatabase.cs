@@ -119,8 +119,19 @@ namespace LoveSeat
 		}
 
 		#region Change Management
+		/// <summary>
+		/// Request database changes
+		/// </summary>
+		/// <param name="options">Change options</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<CouchChanges> GetChanges(ChangeOptions options, Result<CouchChanges> result)
 		{
+			if (options == null)
+				throw new ArgumentNullException("options");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			options.Feed = ChangeFeed.Normal;
 
 			BasePlug.At(Constants._CHANGES).With(options).Get(new Result<DreamMessage>()).WhenDone(
@@ -141,8 +152,20 @@ namespace LoveSeat
 
 			return result;
 		}
+		/// <summary>
+		/// Request database changes including documents
+		/// </summary>
+		/// <typeparam name="T">Type of document used while returning changes</typeparam>
+		/// <param name="options">Change options</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<CouchChanges<T>> GetChanges<T>(ChangeOptions options, Result<CouchChanges<T>> result) where T : ICouchDocument
 		{
+			if (options == null)
+				throw new ArgumentNullException("options");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			options.Feed = ChangeFeed.Normal;
 			options.IncludeDocs = true;
 
@@ -164,19 +187,32 @@ namespace LoveSeat
 
 			return result;
 		}
-
+		/// <summary>
+		/// Request continuous changes from database
+		/// </summary>
+		/// <param name="options">Change options</param>
+		/// <param name="callback">Callback used for each change notification</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<CouchContinuousChanges> GetCoutinuousChanges(
 			ChangeOptions options,
-			CouchChangeDelegate aCallback,
+			CouchChangeDelegate callback,
 			Result<CouchContinuousChanges> result)
 		{
+			if (options == null)
+				throw new ArgumentNullException("options");
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			options.Feed = ChangeFeed.Continuous;
 			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.IsSuccessful)
 					{
-						result.Return(new CouchContinuousChanges(a, aCallback));
+						result.Return(new CouchContinuousChanges(a, callback));
 					}
 					else
 					{
@@ -188,11 +224,26 @@ namespace LoveSeat
 
 			return result;
 		}
+		/// <summary>
+		/// Request continuous changes from database including Documents
+		/// </summary>
+		/// <typeparam name="T">>Type of document used while returning changes</typeparam>
+		/// <param name="options">Change options</param>
+		/// <param name="callback">Callback used for each change notification</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
 		public Result<CouchContinuousChanges<T>> GetCoutinuousChanges<T>(
 			ChangeOptions options,
-			CouchChangeDelegate<T> aCallback,
+			CouchChangeDelegate<T> callback,
 			Result<CouchContinuousChanges<T>> result) where T : ICouchDocument
 		{
+			if (options == null)
+				throw new ArgumentNullException("options");
+			if (callback == null)
+				throw new ArgumentNullException("callback");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
 			options.Feed = ChangeFeed.Continuous;
 			options.IncludeDocs = true;
 
@@ -201,7 +252,7 @@ namespace LoveSeat
 				{
 					if (a.IsSuccessful)
 					{
-						result.Return(new CouchContinuousChanges<T>(a, aCallback));
+						result.Return(new CouchContinuousChanges<T>(a, callback));
 					}
 					else
 					{
@@ -214,26 +265,48 @@ namespace LoveSeat
 			return result;
 		}
 
-
+		/// <summary>
+		/// Request database changes
+		/// </summary>
+		/// <param name="options">Change options</param>
+		/// <returns></returns>
 		public CouchChanges GetChanges(ChangeOptions options)
 		{
 			return GetChanges(options, new Result<CouchChanges>()).Wait();
 		}
-		public CouchContinuousChanges GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate aCallback)
-		{
-			return GetCoutinuousChanges(options, aCallback, new Result<CouchContinuousChanges>()).Wait();
-		}
+		/// <summary>
+		/// Request database changes including documents
+		/// </summary>
+		/// <typeparam name="T">Type of document used while returning changes</typeparam>
+		/// <param name="options">Change options</param>
+		/// <returns></returns>
 		public CouchChanges<T> GetChanges<T>(ChangeOptions options) where T : ICouchDocument
 		{
 			return GetChanges<T>(options, new Result<CouchChanges<T>>()).Wait();
 		}
+		/// <summary>
+		/// Request continuous changes from database
+		/// </summary>
+		/// <param name="options">Change options</param>
+		/// <param name="callback">Callback used for each change notification</param>
+		/// <returns></returns>
+		public CouchContinuousChanges GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate aCallback)
+		{
+			return GetCoutinuousChanges(options, aCallback, new Result<CouchContinuousChanges>()).Wait();
+		}
+		/// <summary>
+		/// Request continuous changes from database including Documents
+		/// </summary>
+		/// <typeparam name="T">>Type of document used while returning changes</typeparam>
+		/// <param name="options">Change options</param>
+		/// <param name="callback">Callback used for each change notification</param>
+		/// <returns></returns>
 		public CouchContinuousChanges<T> GetCoutinuousChanges<T>(ChangeOptions options, CouchChangeDelegate<T> aCallback) where T : ICouchDocument
 		{
 			return GetCoutinuousChanges<T>(options, aCallback, new Result<CouchContinuousChanges<T>>()).Wait();
 		}
 
 		#endregion
-
 
 		#region Documents Management
 		#region Primitives methods
