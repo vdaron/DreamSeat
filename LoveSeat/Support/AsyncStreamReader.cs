@@ -21,7 +21,7 @@ namespace LoveSeat.Support
 
 	public class AsyncStreamReader : IDisposable
 	{
-		private byte[] theAsyncBuffer = new byte[1024];//TODO: Fix this.
+		private byte[] theAsyncBuffer = new byte[1];//TODO: Fix this.
 		private IAsyncResult theAsyncResult;
 		private List<char> theCharList = new List<char>();
 		private Decoder theDecoder;
