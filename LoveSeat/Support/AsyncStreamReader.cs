@@ -19,12 +19,11 @@ namespace LoveSeat.Support
 		private readonly byte[] theReadBuffer = new byte[1];//TODO: Fix this.
 		private readonly List<byte> theTempLineBytes = new List<byte>();
 		private readonly EventHandler<LineReceivedEventArgs> theLineReaded;
+		private readonly Stream theBaseStream;
+		private readonly Encoding theEncoding;
 
 		private bool isDisposed;
 		private int theTempListIndex;
-
-		public Stream BaseStream{get;private set;}
-		public Encoding Encoding{get;private set;}
 
 		public AsyncStreamReader(Stream stream, EventHandler<LineReceivedEventArgs> lineReceived):this(stream, Encoding.UTF8, lineReceived)
 		{
@@ -38,17 +37,17 @@ namespace LoveSeat.Support
 			if (!stream.CanRead)
 				throw new ArgumentException("Stream does not support reading");
 
-			BaseStream = stream;
-			Encoding = encoding;
+			theBaseStream = stream;
+			theEncoding = encoding;
 			theLineReaded = lineReceived;
-			BaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
+			theBaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
 		}
 
 		private void AsyncCallback(IAsyncResult ar)
 		{
 			try
 			{
-				int size = BaseStream.EndRead(ar);
+				int size = theBaseStream.EndRead(ar);
 				if (size > 0)
 				{
 					for(int i = 0; i < size; i++)
@@ -60,7 +59,7 @@ namespace LoveSeat.Support
 
 					if (!isDisposed)
 					{
-						BaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
+						theBaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
 					}
 				}
 			}
@@ -100,7 +99,7 @@ namespace LoveSeat.Support
 
 			if(endLineIndex > 0)
 			{
-				line = Encoding.GetString(theTempLineBytes.ToArray(), 0, endLineIndex);
+				line = theEncoding.GetString(theTempLineBytes.ToArray(), 0, endLineIndex);
 				theTempLineBytes.RemoveRange(0,theTempListIndex);
 				theTempListIndex = 0;
 			}
@@ -111,7 +110,7 @@ namespace LoveSeat.Support
 		public void Dispose()
 		{
 			isDisposed = true;
-			BaseStream.Dispose();
+			theBaseStream.Dispose();
 		}
 	}
 }
