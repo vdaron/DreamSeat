@@ -16,12 +16,12 @@ namespace LoveSeat.Support
 
 	public class AsyncStreamReader : IDisposable
 	{
-		private byte[] theAsyncBuffer = new byte[1];//TODO: Fix this.
-		private List<char> theCharList = new List<char>();
-		private Decoder theDecoder;
-		private StringBuilder theCurrentLine = new StringBuilder();
-		private EventHandler<LineReceivedEventArgs> theLineReaded;
+		private readonly byte[] theReadBuffer = new byte[1];//TODO: Fix this.
+		private readonly List<byte> theTempLineBytes = new List<byte>();
+		private readonly EventHandler<LineReceivedEventArgs> theLineReaded;
+
 		private bool isDisposed;
+		private int theTempListIndex;
 
 		public Stream BaseStream{get;private set;}
 		public Encoding Encoding{get;private set;}
@@ -40,9 +40,8 @@ namespace LoveSeat.Support
 
 			BaseStream = stream;
 			Encoding = encoding;
-			theDecoder = encoding.GetDecoder();
 			theLineReaded = lineReceived;
-			BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
+			BaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
 		}
 
 		private void AsyncCallback(IAsyncResult ar)
@@ -52,17 +51,16 @@ namespace LoveSeat.Support
 				int size = BaseStream.EndRead(ar);
 				if (size > 0)
 				{
-					char[] charArray = new char[theDecoder.GetCharCount(theAsyncBuffer, 0, size)];
-					theDecoder.GetChars(theAsyncBuffer, 0, size, charArray, 0, false);
-
-					foreach (char c in charArray)
-						theCharList.Add(c);
+					for(int i = 0; i < size; i++)
+					{
+						theTempLineBytes.Add(theReadBuffer[i]);
+					}
 
 					ReadLinesAndCallback();
 
 					if (!isDisposed)
 					{
-						BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
+						BaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
 					}
 				}
 			}
@@ -73,42 +71,41 @@ namespace LoveSeat.Support
 		}
 		private void ReadLinesAndCallback()
 		{
-			while (ReadLineFromStack(theCurrentLine))
+			string line = ReadLine();
+			while (!String.IsNullOrEmpty(line))
 			{
 				try
 				{
-					theLineReaded(this, new LineReceivedEventArgs(theCurrentLine.ToString()));
+					theLineReaded(this, new LineReceivedEventArgs(line));
 				}
 				catch
 				{
 					// TODO: Add Logging
 				}
-				theCurrentLine.Length = 0;
+				line = ReadLine();
 			}
 		}
-		private bool ReadLineFromStack(StringBuilder builder)
+		private string ReadLine()
 		{
-			bool newLine = false;
-			while(!newLine && theCharList.Count > 0)
+			string line = null;
+			int endLineIndex = 0;
+
+			for (; theTempListIndex < theTempLineBytes.Count && endLineIndex == 0; theTempListIndex++)
 			{
-				char ch = theCharList[0];
-				theCharList.RemoveAt(0);
-				switch (ch)
+				if (theTempLineBytes[theTempListIndex] == '\n')
 				{
-					case '\r':
-						if (theCharList.Count > 0 && theCharList[0] == '\n')
-							theCharList.RemoveAt(0);
-						newLine = true;
-						break;
-					case '\n':
-						newLine = true;
-						break;
-					default:
-						builder.Append(ch);
-						break;
+					endLineIndex = theTempListIndex;
 				}
 			}
-			return newLine;
+
+			if(endLineIndex > 0)
+			{
+				line = Encoding.GetString(theTempLineBytes.ToArray(), 0, endLineIndex);
+				theTempLineBytes.RemoveRange(0,theTempListIndex);
+				theTempListIndex = 0;
+			}
+
+			return line;
 		}
 
 		public void Dispose()
