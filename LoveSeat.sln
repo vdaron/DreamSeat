@@ -5,8 +5,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoveSeat", "LoveSeat\LoveSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoveSeat.IntegrationTest", "LoveSeat.IntegrationTest\LoveSeat.IntegrationTest.csproj", "{7496CEA9-442C-4468-8350-54F34693F64A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoveSeat.Integration.MSTest", "LoveSeat.Integration.MSTest\LoveSeat.Integration.MSTest.csproj", "{D2BCDF92-456C-41FB-AB3E-0C56292773C3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{570E4930-3B96-4CDE-AA1F-34733F1F0E9D}"
 EndProject
 Global
@@ -42,16 +40,6 @@ Global
 		{7496CEA9-442C-4468-8350-54F34693F64A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7496CEA9-442C-4468-8350-54F34693F64A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7496CEA9-442C-4468-8350-54F34693F64A}.Release|x86.ActiveCfg = Release|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{D2BCDF92-456C-41FB-AB3E-0C56292773C3}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
