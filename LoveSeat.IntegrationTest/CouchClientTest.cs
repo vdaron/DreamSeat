@@ -32,10 +32,10 @@ namespace LoveSeat.IntegrationTest
 		private const string baseDatabase = "love-seat-test-base";
 		private const string replicateDatabase = "love-seat-test-repli";
 
-		private static readonly string host = ConfigurationManager.AppSettings["Host"].ToString();
-		private static readonly int port = int.Parse(ConfigurationManager.AppSettings["Port"].ToString());
-		private static readonly string username = ConfigurationManager.AppSettings["UserName"].ToString();
-		private static readonly string password = ConfigurationManager.AppSettings["Password"].ToString();
+		private static readonly string host = ConfigurationManager.AppSettings["Host"];
+		private static readonly int port = int.Parse(ConfigurationManager.AppSettings["Port"]);
+		private static readonly string username = ConfigurationManager.AppSettings["UserName"];
+		private static readonly string password = ConfigurationManager.AppSettings["Password"];
 
 		[TestFixtureSetUp]
 #if NUNIT
@@ -84,6 +84,7 @@ namespace LoveSeat.IntegrationTest
 		}
 
 		[Test]
+		[Ignore]
 		public void TestCookieAuthentication()
 		{
 			CouchClient client = new CouchClient();
@@ -350,7 +351,6 @@ namespace LoveSeat.IntegrationTest
 			CouchDatabase db = client.GetDatabase("_users");
 			CouchUser user = db.GetDocument<CouchUser>("org.couchdb.user:Professor", new Result<CouchUser>()).Wait();
 		}
-
 		[Test]
 		public void CreateViewDocument()
 		{
@@ -389,13 +389,12 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(result);
 			Assert.AreEqual(DreamStatus.Ok, result.Status);
 		}
-
 		[Test]
+		[Ignore]
 		public void Should_Restart_Server()
 		{
 			client.RestartServer();
 		}
-
 		[Test]
 		public void GetChangesWithDocument()
 		{
@@ -412,7 +411,6 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(changes.Results[0].Id);
 			Assert.IsNotNull(changes.Results[0].Sequence);
 		}
-
 		[Test]
 		public void GetChanges()
 		{
@@ -428,8 +426,6 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(changes.Results[0].Id);
 			Assert.IsNotNull(changes.Results[0].Sequence);
 		}
-
-
 		[Test]
 		public void GetContinuousChanges()
 		{

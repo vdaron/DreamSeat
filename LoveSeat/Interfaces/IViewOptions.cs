@@ -1,5 +1,3 @@
-using Newtonsoft.Json.Linq;
-
 namespace LoveSeat.Interfaces
 {
     public interface IViewOptions

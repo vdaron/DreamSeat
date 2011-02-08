@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Web;
 using LoveSeat.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 
-namespace LoveSeat
+namespace LoveSeat.Support
 {
     public class KeyOptions : IKeyOptions
     {
@@ -21,7 +18,7 @@ namespace LoveSeat
 
         public KeyOptions(JArray jArray)
         {
-            this.objects = jArray;
+            objects = jArray;
         }
 
         public override string ToString()

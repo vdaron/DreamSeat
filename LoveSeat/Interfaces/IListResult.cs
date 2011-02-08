@@ -1,5 +1,4 @@
-﻿using System.Net;
-using MindTouch.Dream;
+﻿using MindTouch.Dream;
 
 namespace LoveSeat.Interfaces
 {

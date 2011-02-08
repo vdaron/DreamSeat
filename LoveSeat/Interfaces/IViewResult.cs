@@ -1,6 +1,4 @@
-using System.Net;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using MindTouch.Dream;
 
 namespace LoveSeat.Interfaces

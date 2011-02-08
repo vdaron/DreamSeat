@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using MindTouch.Dream;
 using MindTouch.Tasking;
 using Newtonsoft.Json.Linq;
@@ -34,15 +33,16 @@ namespace LoveSeat.Support
 
 			BasePlug.At("_session").Post(DreamMessage.Ok(MimeType.FORM_URLENCODED,content), new Result<DreamMessage>()).WhenDone(
 				a => {
-					if (a.Status == DreamStatus.Ok)
+					switch(a.Status)
 					{
-						BasePlug.CookieJar.Update(a.Cookies, new XUri(BasePlug.Uri.SchemeHostPort));
-						BasePlug = BasePlug.WithHeader("X-CouchDB-WWW-Authenticate", "Cookie");
-						result.Return(true);
-					}
-					else
-					{
-						result.Throw(new CouchException(a));
+						case DreamStatus.Ok:
+							BasePlug.CookieJar.Update(a.Cookies, new XUri(BasePlug.Uri.SchemeHostPort));
+							BasePlug = BasePlug.WithHeader("X-CouchDB-WWW-Authenticate", "Cookie");
+							result.Return(true);
+							break;
+						default:
+							result.Throw(new CouchException(a));
+							break;
 					}
 				},
 				e => result.Throw(e)

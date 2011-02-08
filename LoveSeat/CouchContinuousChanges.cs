@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using MindTouch.Dream;
-using LoveSeat.Support;
 using LoveSeat.Interfaces;
+using LoveSeat.Support;
+using MindTouch.Dream;
 
 namespace LoveSeat
 {
@@ -13,8 +10,8 @@ namespace LoveSeat
 
 	public class CouchContinuousChanges : IDisposable
 	{
-		private AsyncStreamReader theReader;
-		private ObjectSerializer<CouchChangeResult> theSerializer = new ObjectSerializer<CouchChangeResult>();
+		private readonly AsyncStreamReader theReader;
+		private readonly ObjectSerializer<CouchChangeResult> theSerializer = new ObjectSerializer<CouchChangeResult>();
 
 		internal CouchContinuousChanges(DreamMessage aMessage, CouchChangeDelegate aCallback)
 		{
@@ -35,8 +32,8 @@ namespace LoveSeat
 
 	public class CouchContinuousChanges<T> : IDisposable where T : ICouchDocument
 	{
-		private AsyncStreamReader theReader;
-		private ObjectSerializer<CouchChangeResult<T>> theSerializer = new ObjectSerializer<CouchChangeResult<T>>();
+		private readonly AsyncStreamReader theReader;
+		private readonly ObjectSerializer<CouchChangeResult<T>> theSerializer = new ObjectSerializer<CouchChangeResult<T>>();
 
 		internal CouchContinuousChanges(DreamMessage aMessage, CouchChangeDelegate<T> aCallback)
 		{

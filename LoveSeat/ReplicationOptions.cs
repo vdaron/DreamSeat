@@ -1,5 +1,5 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace LoveSeat
 {
@@ -26,8 +26,7 @@ namespace LoveSeat
 
 		public override string ToString()
 		{
-			JsonSerializerSettings settings = new JsonSerializerSettings();
-			settings.NullValueHandling = NullValueHandling.Ignore;
+			JsonSerializerSettings settings = new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore};
 			return JsonConvert.SerializeObject(this, Formatting.None, settings);
 		}
 	}

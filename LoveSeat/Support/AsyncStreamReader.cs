@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Threading;
-using System.Globalization;
-using MindTouch.IO;
+using System.Text;
 
 namespace LoveSeat.Support
 {
 	public class LineReceivedEventArgs : EventArgs
 	{
 		public string Line { get; private set; }
-
 		public LineReceivedEventArgs(string line)
 		{
 			Line = line;
@@ -22,12 +17,11 @@ namespace LoveSeat.Support
 	public class AsyncStreamReader : IDisposable
 	{
 		private byte[] theAsyncBuffer = new byte[1];//TODO: Fix this.
-		private IAsyncResult theAsyncResult;
 		private List<char> theCharList = new List<char>();
 		private Decoder theDecoder;
 		private StringBuilder theCurrentLine = new StringBuilder();
 		private EventHandler<LineReceivedEventArgs> theLineReaded;
-		private bool isDisposed = false;
+		private bool isDisposed;
 
 		public Stream BaseStream{get;private set;}
 		public Encoding Encoding{get;private set;}
@@ -48,7 +42,7 @@ namespace LoveSeat.Support
 			Encoding = encoding;
 			theDecoder = encoding.GetDecoder();
 			theLineReaded = lineReceived;
-			theAsyncResult = BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
+			BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
 		}
 
 		private void AsyncCallback(IAsyncResult ar)
@@ -68,7 +62,7 @@ namespace LoveSeat.Support
 
 					if (!isDisposed)
 					{
-						theAsyncResult = BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
+						BaseStream.BeginRead(theAsyncBuffer, 0, theAsyncBuffer.Length, AsyncCallback, null);
 					}
 				}
 			}
@@ -123,5 +117,4 @@ namespace LoveSeat.Support
 			BaseStream.Dispose();
 		}
 	}
-
 }

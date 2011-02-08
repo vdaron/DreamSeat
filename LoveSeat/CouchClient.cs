@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
 using System.Web;
 using LoveSeat.Support;
-using Newtonsoft.Json.Linq;
-using MindTouch.Tasking;
 using MindTouch.Dream;
-using System.Collections.Generic;
+using MindTouch.Tasking;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace LoveSeat
 {
@@ -45,12 +44,12 @@ namespace LoveSeat
 		}
 
 		#region Asynchronous Methods
+
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
 		/// </summary>
-		/// <param name="source">Uri or database name of database to replicate from</param>
-		/// <param name="target">Uri or database name of database to replicate to</param>
-		/// <param name="continuous">Whether or not CouchDB should continue to replicate going forward on it's own</param>
+		/// <param name="options">Replication Options</param>
+		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
 		{
@@ -97,30 +96,28 @@ namespace LoveSeat
 			);
 			return result;
 		}
+
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
 		/// <param name="databaseName"></param>
+		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<bool> HasDatabase(string databaseName, Result<bool> result)
 		{
 			BasePlug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
-				a =>
-				{
-					if (a.Status == DreamStatus.Ok)
-						result.Return(true);
-					else
-						result.Return(false);
-				},
+				a => result.Return(a.Status == DreamStatus.Ok),
 				e => result.Throw(e)
 			);
 
 			return result;
 		}
+
 		/// <summary>
 		/// Creates a database
 		/// </summary>
 		/// <param name="databaseName">Name of new database</param>
+		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<JObject> CreateDatabase(string databaseName, Result<JObject> result)
 		{
@@ -140,10 +137,12 @@ namespace LoveSeat
 			);
 			return result;
 		}
+
 		/// <summary>
 		/// Deletes the specified database
 		/// </summary>
 		/// <param name="databaseName">Database to delete</param>
+		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<JObject> DeleteDatabase(string databaseName, Result<JObject> result)
 		{
@@ -216,9 +215,7 @@ namespace LoveSeat
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
 		/// </summary>
-		/// <param name="source">Uri or database name of database to replicate from</param>
-		/// <param name="target">Uri or database name of database to replicate to</param>
-		/// <param name="continuous">Whether or not CouchDB should continue to replicate going forward on it's own</param>
+		/// <param name="options">Replication options</param>
 		/// <returns></returns>
 		public JObject TriggerReplication(ReplicationOptions options)
 		{
@@ -301,12 +298,18 @@ namespace LoveSeat
 			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
-					if (a.Status == DreamStatus.Ok)
-						result.Return(JsonConvert.DeserializeObject<Dictionary<string, string>>(a.ToText()));
-					else if (a.Status == DreamStatus.NotFound)
-						result.Return(new Dictionary<string, string>());
-					else
-						result.Throw(new CouchException(a));
+					switch(a.Status)
+					{
+						case DreamStatus.Ok:
+							result.Return(JsonConvert.DeserializeObject<Dictionary<string, string>>(a.ToText()));
+							break;
+						case DreamStatus.NotFound:
+							result.Return(new Dictionary<string, string>());
+							break;
+						default:
+							result.Throw(new CouchException(a));
+							break;
+					}
 				},
 				e => result.Throw(e)
 			);
@@ -316,15 +319,21 @@ namespace LoveSeat
 		{
 			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section),XUri.EncodeFragment(keyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
-				{
-					string value = a.ToText();
-					if (a.Status == DreamStatus.Ok)
-						result.Return(value.Substring(1, value.Length - 3));// remove " and "\n
-					else if (a.Status == DreamStatus.NotFound)
-						result.Return((string)null);
-					else
-						result.Throw(new CouchException(a));
-				},
+					{
+						string value = a.ToText();
+						switch(a.Status)
+						{
+							case DreamStatus.Ok:
+								result.Return(value.Substring(1, value.Length - 3));// remove " and "\n
+								break;
+							case DreamStatus.NotFound:
+								result.Return((string)null);
+								break;
+							default:
+								result.Throw(new CouchException(a));
+								break;
+						}
+					},
 				e => result.Throw(e)
 			);
 			return result;
@@ -390,8 +399,7 @@ namespace LoveSeat
 			SetConfigValue("admins", username, password, new Result()).Wait();
 			SetConfigValue("bobo", "user", "password", new Result()).Wait();
 
-			CouchUser user = new CouchUser();
-			user.Name = username;
+			CouchUser user = new CouchUser {Name = username};
 
 			ObjectSerializer<CouchUser> serializer = new ObjectSerializer<CouchUser>();
 			BasePlug.At("_users", HttpUtility.UrlEncode("org.couchdb.user:" + username)).Put(DreamMessage.Ok(MimeType.JSON, serializer.Serialize(user)), new Result<DreamMessage>()).Wait();

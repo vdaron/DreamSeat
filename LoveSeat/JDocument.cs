@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json.Linq;
 using LoveSeat.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace LoveSeat
 {
@@ -14,11 +12,7 @@ namespace LoveSeat
 			get
 			{
 				JToken rev;
-				if (this.TryGetValue("_id", out rev))
-				{
-					return rev.Value<string>();
-				}
-				return null;
+				return TryGetValue("_id", out rev) ? rev.Value<string>() : null;
 			}
 			set { this["_id"] = value; }
 		}
@@ -27,11 +21,7 @@ namespace LoveSeat
 			get
 			{
 				JToken rev;
-				if (this.TryGetValue("_rev", out rev))
-				{
-					return rev.Value<string>();
-				}
-				return null;
+				return TryGetValue("_rev", out rev) ? rev.Value<string>() : null;
 			}
 			set { this["_rev"] = value; }
 		}
@@ -43,7 +33,7 @@ namespace LoveSeat
 		{
 		}
 		public JDocument(string json)
-			: base(JObject.Parse(json))
+			: base(Parse(json))
 		{
 		}
 
@@ -55,8 +45,7 @@ namespace LoveSeat
 		public IEnumerable<string> GetAttachmentNames()
 		{
 			var attachment = this["_attachments"];
-			if (attachment == null) return null;
-			return attachment.Select(x => x.Value<JProperty>().Name);
+			return attachment == null ? null : attachment.Select(x => x.Value<JProperty>().Name);
 		}
 	}
 }

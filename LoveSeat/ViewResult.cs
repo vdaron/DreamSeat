@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Web;
+﻿using System.Collections.Generic;
 using LoveSeat.Interfaces;
-using LoveSeat.Support;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using MindTouch.Dream;
+using Newtonsoft.Json;
 
 namespace LoveSeat
 {
