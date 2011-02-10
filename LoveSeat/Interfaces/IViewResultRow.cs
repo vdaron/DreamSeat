@@ -1,16 +1,17 @@
-﻿namespace LoveSeat.Interfaces
+﻿using Newtonsoft.Json.Linq;
+namespace LoveSeat.Interfaces
 {
-	public interface IViewResultRow
+	public interface IViewResultRow<TKey>
 	{
 		string Id { get; }
-		string Key { get; }
+		TKey Key { get; }
 	}
-	public interface IViewResultRow<T> : IViewResultRow
+	public interface IViewResultRow<TKey,TValue> : IViewResultRow<TKey>
 	{
-		T Value { get; }
+		TValue Value { get; }
 	}
-	public interface IViewResultRow<T, U> : IViewResultRow<T> where U : ICouchDocument
+	public interface IViewResultRow<TKey, TValue, TDocument> : IViewResultRow<TKey,TValue> where TDocument : ICouchDocument
 	{
-		U Doc { get; }
+		TDocument Doc { get; }
 	}
 }

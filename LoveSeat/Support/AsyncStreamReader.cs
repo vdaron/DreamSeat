@@ -16,7 +16,7 @@ namespace LoveSeat.Support
 
 	public class AsyncStreamReader : IDisposable
 	{
-		private readonly byte[] theReadBuffer = new byte[1];//TODO: Fix this.
+		private readonly byte[] theReadBuffer = new byte[1024];//TODO: Fix this.
 		private readonly List<byte> theTempLineBytes = new List<byte>();
 		private readonly EventHandler<LineReceivedEventArgs> theLineReaded;
 		private readonly Stream theBaseStream;

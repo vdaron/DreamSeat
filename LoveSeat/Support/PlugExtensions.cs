@@ -24,7 +24,7 @@ namespace LoveSeat.Support
 			if (options.Skip.HasValue)
 				plug = plug.With(Constants.SKIP, options.Skip.ToString());
 			if (options.Reduce.HasValue)
-				plug = plug.With(Constants.REDUCE, options.Reduce.Value);
+				plug = plug.With(Constants.REDUCE, options.Reduce.Value ? "true" : "false");
 			if (options.Group.HasValue)
 				plug = plug.With(Constants.GROUP, options.Group.Value);
 			if (options.InclusiveEnd.HasValue)

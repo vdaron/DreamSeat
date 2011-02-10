@@ -10,12 +10,12 @@ namespace LoveSeat.Interfaces
 		string ETag { get; }
 		DreamStatus Status { get; }
 	}
-	public interface IViewResult<T> : IBaseViewResult
+	public interface IViewResult<TKey, TValue> : IBaseViewResult
 	{
-		IEnumerable<ViewResultRow<T>> Rows { get; }
+		IEnumerable<ViewResultRow<TKey, TValue>> Rows { get; }
 	}
-	public interface IViewResult<T, U> : IBaseViewResult where U : ICouchDocument
+	public interface IViewResult<TKey, TValue, TDocument> : IBaseViewResult where TDocument : ICouchDocument
 	{
-		IEnumerable<ViewResultRow<T, U>> Rows { get; }
+		IEnumerable<ViewResultRow<TKey, TValue, TDocument>> Rows { get; }
 	}
 }

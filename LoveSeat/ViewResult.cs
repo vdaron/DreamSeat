@@ -25,19 +25,19 @@ namespace LoveSeat
 		[JsonIgnore]
 		public DreamStatus Status { get; internal set; }
 	}
-	public class ViewResult<T> : BaseViewResult, IViewResult<T>
+	public class ViewResult<TKey, TValue> : BaseViewResult, IViewResult<TKey, TValue>
 	{
 		[JsonProperty("rows")]
-		public IEnumerable<ViewResultRow<T>> Rows
+		public IEnumerable<ViewResultRow<TKey,TValue>> Rows
 		{
 			get;
 			internal set;
 		}
 	}
-	public class ViewResult<T, U> : BaseViewResult, IViewResult<T, U> where U : ICouchDocument
+	public class ViewResult<TKey, TValue, TDocument> : BaseViewResult, IViewResult<TKey, TValue, TDocument> where TDocument : ICouchDocument
 	{
 		[JsonProperty("rows")]
-		public IEnumerable<ViewResultRow<T, U>> Rows
+		public IEnumerable<ViewResultRow<TKey, TValue,TDocument>> Rows
 		{
 			get;
 			internal set;

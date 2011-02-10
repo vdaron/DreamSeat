@@ -465,18 +465,18 @@ namespace LoveSeat
 		/// <summary>
 		/// Create a document based on object based on ICouchDocument interface. If the ICouchDocument does not have an Id, CouchDB will generate the id for you
 		/// </summary>
-		/// <typeparam name="T">ICouchDocument Type to return</typeparam>
+		/// <typeparam name="TDocument">ICouchDocument Type to return</typeparam>
 		/// <param name="doc">ICouchDocument to create</param>
 		/// <param name="result"></param>
 		/// <returns></returns>
-		public Result<T> CreateDocument<T>(T doc, Result<T> result) where T : class, ICouchDocument
+		public Result<TDocument> CreateDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
 		{
 			if (doc == null)
 				throw new ArgumentNullException("doc");
 			if (result == null)
 				throw new ArgumentNullException("result");
 
-			ObjectSerializer<T> serializer = new ObjectSerializer<T>();
+			ObjectSerializer<TDocument> serializer = new ObjectSerializer<TDocument>();
 
 			CreateDocument(doc.Id, serializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
@@ -493,11 +493,11 @@ namespace LoveSeat
 		/// <summary>
 		/// Create a document based on object based on ICouchDocument interface
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
+		/// <typeparam name="TDocument"></typeparam>
 		/// <param name="doc"></param>
 		/// <param name="result"></param>
 		/// <returns></returns>
-		public Result<T> SaveDocument<T>(T doc, Result<T> result) where T : class, ICouchDocument
+		public Result<TDocument> SaveDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
 		{
 			if (doc == null)
 				throw new ArgumentNullException("doc");
@@ -508,7 +508,7 @@ namespace LoveSeat
 			if (String.IsNullOrEmpty(doc.Rev))
 				throw new ArgumentException("Document must have a revision");
 
-			ObjectSerializer<T> objectSerializer = new ObjectSerializer<T>();
+			ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
 
 			SaveDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
@@ -525,11 +525,11 @@ namespace LoveSeat
 		/// <summary>
 		/// Retrieve Document using with specified id and deserialize result
 		/// </summary>
-		/// <typeparam name="T">Object created during deserialization, must inherit ICouchDocument</typeparam>
+		/// <typeparam name="TDocument">Object created during deserialization, must inherit ICouchDocument</typeparam>
 		/// <param name="id">id of the document</param>
 		/// <param name="result"></param>
 		/// <returns></returns>
-		public Result<T> GetDocument<T>(string id, Result<T> result) where T : ICouchDocument
+		public Result<TDocument> GetDocument<TDocument>(string id, Result<TDocument> result) where TDocument : ICouchDocument
 		{
 			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
@@ -539,8 +539,8 @@ namespace LoveSeat
 						case DreamStatus.Ok:
 							try
 							{
-								ObjectSerializer<T> objectSerializer = new ObjectSerializer<T>();
-								T res =  objectSerializer.Deserialize(a.ToText());
+								ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
+								TDocument res = objectSerializer.Deserialize(a.ToText());
 								// If object inherit BaseDocument, id and rev are set during Deserialiation
 								if (!(res is CouchDocument))
 								{
@@ -557,7 +557,7 @@ namespace LoveSeat
 							}
 							break;
 						case DreamStatus.NotFound:
-							result.Return(default(T));
+							result.Return(default(TDocument));
 							break;
 						default:
 							result.Throw(new CouchException(a));
@@ -589,17 +589,17 @@ namespace LoveSeat
 			return result;
 		}
 
-		public T CreateDocument<T>(T doc) where T : class, ICouchDocument
+		public TDocument CreateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
 		{
-			return CreateDocument(doc, new Result<T>()).Wait();
+			return CreateDocument(doc, new Result<TDocument>()).Wait();
 		}
-		public T SaveDocument<T>(T doc) where T : class, ICouchDocument
+		public TDocument SaveDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
 		{
-			return SaveDocument(doc, new Result<T>()).Wait();
+			return SaveDocument(doc, new Result<TDocument>()).Wait();
 		}
-		public T GetDocument<T>(string id) where T : class, ICouchDocument
+		public TDocument GetDocument<TDocument>(string id) where TDocument : class, ICouchDocument
 		{
-			return GetDocument(id, new Result<T>()).Wait();
+			return GetDocument(id, new Result<TDocument>()).Wait();
 		}
 		public void DeleteDocument(ICouchDocument doc)
 		{
@@ -906,11 +906,11 @@ namespace LoveSeat
 
 		#region All Documents Special View
 		#region Asynchronous Methods
-		public Result<ViewResult<Value>> GetAllDocuments<Value>(Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(Result<ViewResult<TKey, TValue>> result)
 		{
 			return GetAllDocuments(new ViewOptions(), result);
 		}
-		public Result<ViewResult<Value>> GetAllDocuments<Value>(ViewOptions options, Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(ViewOptions options, Result<ViewResult<TKey, TValue>> result)
 		{
 			if (result == null)
 				throw new ArgumentNullException("result");
@@ -920,7 +920,7 @@ namespace LoveSeat
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<Value>(a));
+						result.Return(GetViewResult<TKey, TValue>(a));
 					}
 					else
 					{
@@ -931,11 +931,11 @@ namespace LoveSeat
 				);
 			return result;
 		}
-		public Result<ViewResult<Value, Doc>> GetAllDocuments<Value, Doc>(Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			return GetAllDocuments(new ViewOptions(), result);
 		}
-		public Result<ViewResult<Value, Doc>> GetAllDocuments<Value, Doc>(ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions options, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			if (result == null)
 				throw new ArgumentNullException("result");
@@ -945,7 +945,7 @@ namespace LoveSeat
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<Value, Doc>(a));
+						result.Return(GetViewResult<TKey, TValue, TDocument>(a));
 					}
 					else
 					{
@@ -958,21 +958,21 @@ namespace LoveSeat
 		}
 		#endregion
 		#region Synchronous Methods
-		public ViewResult<Value> GetAllDocuments<Value>()
+		public ViewResult<TKey, TValue> GetAllDocuments<TKey, TValue>()
 		{
-			return GetAllDocuments<Value>(new ViewOptions());
+			return GetAllDocuments<TKey, TValue>(new ViewOptions());
 		}
-		public ViewResult<Value> GetAllDocuments<Value>(ViewOptions options)
+		public ViewResult<TKey, TValue> GetAllDocuments<TKey, TValue>(ViewOptions options)
 		{
-			return GetAllDocuments(options, new Result<ViewResult<Value>>()).Wait();
+			return GetAllDocuments(options, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
-		public ViewResult<Value, Doc> GetAllDocuments<Value, Doc>() where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetAllDocuments<TKey, TValue, TDocument>() where TDocument : ICouchDocument
 		{
-			return GetAllDocuments<Value, Doc>(new ViewOptions());
+			return GetAllDocuments<TKey, TValue, TDocument>(new ViewOptions());
 		}
-		public ViewResult<Value, Doc> GetAllDocuments<Value, Doc>(ViewOptions options) where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions options) where TDocument : ICouchDocument
 		{
-			return GetAllDocuments(options, new Result<ViewResult<Value, Doc>>()).Wait();
+			return GetAllDocuments(options, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
 		#endregion
 		#endregion
@@ -1005,11 +1005,11 @@ namespace LoveSeat
 			return result;
 		}
 
-		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetView<TKey, TValue>(string viewId, string viewName, Result<ViewResult<TKey, TValue>> result)
 		{
 			return GetView(viewId, viewName, new ViewOptions(), result);
 		}
-		public Result<ViewResult<Value>> GetView<Value>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetView<TKey, TValue>(string viewId, string viewName, ViewOptions options, Result<ViewResult<TKey, TValue>> result)
 		{
 			if (String.IsNullOrEmpty(viewId))
 				throw new ArgumentNullException("viewId");
@@ -1019,16 +1019,16 @@ namespace LoveSeat
 				throw new ArgumentNullException("result");
 
 			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
-				a => result.Return(GetViewResult<Value>(a)),
+				a => result.Return(GetViewResult<TKey, TValue>(a)),
 				e => result.Throw(e)
 			);
 			return result;
 		}
-		public Result<ViewResult<Value, Doc>> GetView<Value, Doc>(string viewId, string viewName, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetView<TKey, TValue, TDocument>(string viewId, string viewName, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			return GetView(viewId, viewName, new ViewOptions(), result);
 		}
-		public Result<ViewResult<Value, Doc>> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetView<TKey, TValue, TDocument>(string viewId, string viewName, ViewOptions options, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			if (String.IsNullOrEmpty(viewId))
 				throw new ArgumentNullException("viewId");
@@ -1041,17 +1041,17 @@ namespace LoveSeat
 			options.IncludeDocs = true;
 
 			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
-				a => result.Return(GetViewResult<Value, Doc>(a)),
+				a => result.Return(GetViewResult<TKey, TValue, TDocument>(a)),
 				e => result.Throw(e)
 			);
 			return result;
 		}
 
-		public Result<ViewResult<Value>> GetTempView<Value>(CouchView view, Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetTempView<TKey, TValue>(CouchView view, Result<ViewResult<TKey, TValue>> result)
 		{
 			return GetTempView(view, null, result);
 		}
-		public Result<ViewResult<Value>> GetTempView<Value>(CouchView view, ViewOptions options, Result<ViewResult<Value>> result)
+		public Result<ViewResult<TKey, TValue>> GetTempView<TKey, TValue>(CouchView view, ViewOptions options, Result<ViewResult<TKey, TValue>> result)
 		{
 			if (view == null)
 				throw new ArgumentNullException("view");
@@ -1063,7 +1063,7 @@ namespace LoveSeat
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<Value>(a));
+						result.Return(GetViewResult<TKey, TValue>(a));
 					}
 					else
 					{
@@ -1074,11 +1074,11 @@ namespace LoveSeat
 			);
 			return result;
 		}
-		public Result<ViewResult<Value, Doc>> GetTempView<Value, Doc>(CouchView view, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetTempView<TKey, TValue, TDocument>(CouchView view, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			return GetTempView(view, null, result);
 		}
-		public Result<ViewResult<Value, Doc>> GetTempView<Value, Doc>(CouchView view, ViewOptions options, Result<ViewResult<Value, Doc>> result) where Doc : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetTempView<TKey, TValue, TDocument>(CouchView view, ViewOptions options, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
 		{
 			if (view == null)
 				throw new ArgumentNullException("view");
@@ -1090,7 +1090,7 @@ namespace LoveSeat
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<Value, Doc>(a));
+						result.Return(GetViewResult<TKey, TValue, TDocument>(a));
 					}
 					else
 					{
@@ -1123,38 +1123,38 @@ namespace LoveSeat
 		}
 		#endregion
 		#region Synchronous methods
-		public ViewResult<Value> GetView<Value>(string viewId, string viewName)
+		public ViewResult<TKey, TValue> GetView<TKey, TValue>(string viewId, string viewName)
 		{
-			return GetView(viewId, viewName, new Result<ViewResult<Value>>()).Wait();
+			return GetView(viewId, viewName, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
-		public ViewResult<Value> GetView<Value>(string viewId, string viewName, ViewOptions options)
+		public ViewResult<TKey, TValue> GetView<TKey, TValue>(string viewId, string viewName, ViewOptions options)
 		{
-			return GetView(viewId, viewName, options, new Result<ViewResult<Value>>()).Wait();
+			return GetView(viewId, viewName, options, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
-		public ViewResult<Value, Doc> GetView<Value, Doc>(string viewId, string viewName) where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetView<TKey, TValue, TDocument>(string viewId, string viewName) where TDocument : ICouchDocument
 		{
-			return GetView(viewId, viewName, new Result<ViewResult<Value, Doc>>()).Wait();
+			return GetView(viewId, viewName, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
-		public ViewResult<Value, Doc> GetView<Value, Doc>(string viewId, string viewName, ViewOptions options) where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetView<TKey, TValue, TDocument>(string viewId, string viewName, ViewOptions options) where TDocument : ICouchDocument
 		{
-			return GetView(viewId, viewName, options, new Result<ViewResult<Value, Doc>>()).Wait();
+			return GetView(viewId, viewName, options, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
 
-		public ViewResult<Value> GetTempView<Value>(CouchView view)
+		public ViewResult<TKey, TValue> GetTempView<TKey, TValue>(CouchView view)
 		{
-			return GetTempView(view, null, new Result<ViewResult<Value>>()).Wait();
+			return GetTempView(view, null, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
-		public ViewResult<Value> GetTempView<Value>(CouchView view, ViewOptions options)
+		public ViewResult<TKey, TValue> GetTempView<TKey, TValue>(CouchView view, ViewOptions options)
 		{
-			return GetTempView(view, options, new Result<ViewResult<Value>>()).Wait();
+			return GetTempView(view, options, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
-		public ViewResult<Value, Doc> GetTempView<Value, Doc>(CouchView view) where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetTempView<TKey, TValue, TDocument>(CouchView view) where TDocument : ICouchDocument
 		{
-			return GetTempView(view, null, new Result<ViewResult<Value, Doc>>()).Wait();
+			return GetTempView(view, null, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
-		public ViewResult<Value, Doc> GetTempView<Value, Doc>(CouchView view, ViewOptions options) where Doc : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetTempView<TKey, TValue, TDocument>(CouchView view, ViewOptions options) where TDocument : ICouchDocument
 		{
-			return GetTempView(view, options, new Result<ViewResult<Value, Doc>>()).Wait();
+			return GetTempView(view, options, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
 
 		public JObject GetView(string viewId, string viewName)
@@ -1168,36 +1168,36 @@ namespace LoveSeat
 		#endregion
 		#endregion
 
-		private static ViewResult<Value> GetViewResult<Value>(DreamMessage a)
+		private static ViewResult<TKey, TValue> GetViewResult<TKey, TValue>(DreamMessage a)
 		{
-			ViewResult<Value> val;
+			ViewResult<TKey, TValue> val;
 			switch (a.Status)
 			{
 				case DreamStatus.Ok:
-					ObjectSerializer<ViewResult<Value>> objectSerializer = new ObjectSerializer<ViewResult<Value>>();
+					ObjectSerializer<ViewResult<TKey, TValue>> objectSerializer = new ObjectSerializer<ViewResult<TKey, TValue>>();
 					val = objectSerializer.Deserialize(a.ToText());
 					val.Status = DreamStatus.Ok;
 					val.ETag = a.Headers.ETag;
 					break;
 				default:
-					val = new ViewResult<Value> { Status = a.Status };
+					val = new ViewResult<TKey, TValue> { Status = a.Status };
 					break;
 			}
 			return val;
 		}
-		private static ViewResult<Value, Doc> GetViewResult<Value, Doc>(DreamMessage a) where Doc : ICouchDocument
+		private static ViewResult<TKey, TValue, TDocument> GetViewResult<TKey, TValue, TDocument>(DreamMessage a) where TDocument : ICouchDocument
 		{
-			ViewResult<Value, Doc> val;
+			ViewResult<TKey, TValue, TDocument> val;
 			switch (a.Status)
 			{
 				case DreamStatus.Ok:
-					ObjectSerializer<ViewResult<Value, Doc>> objectSerializer = new ObjectSerializer<ViewResult<Value, Doc>>();
+					ObjectSerializer<ViewResult<TKey, TValue, TDocument>> objectSerializer = new ObjectSerializer<ViewResult<TKey, TValue, TDocument>>();
 					val = objectSerializer.Deserialize(a.ToText());
 					val.Status = DreamStatus.Ok;
 					val.ETag = a.Headers.ETag;
 					break;
 				default:
-					val = new ViewResult<Value, Doc> { Status = a.Status };
+					val = new ViewResult<TKey, TValue, TDocument> { Status = a.Status };
 					break;
 			}
 			return val;

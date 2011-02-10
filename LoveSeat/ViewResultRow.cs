@@ -1,8 +1,9 @@
 ﻿using LoveSeat.Interfaces;
+using Newtonsoft.Json.Linq;
 
 namespace LoveSeat
 {
-	public class ViewResultRow : IViewResultRow
+	public class ViewResultRow<TKey> : IViewResultRow<TKey>
 	{
 		public string Id
 		{
@@ -10,23 +11,28 @@ namespace LoveSeat
 			internal set;
 		}
 
-		public string Key
+		public TKey Key
 		{
 			get;
 			internal set;
 		}
 	}
-	public class ViewResultRow<T> : ViewResultRow, IViewResultRow<T>
+	public class ViewResultRow<TKey, TValue> : 
+		ViewResultRow<TKey>, 
+		IViewResultRow<TKey,TValue>
 	{
-		public T Value
+		public TValue Value
 		{
 			get;
 			internal set;
 		}
 	}
-	public class ViewResultRow<T, U> : ViewResultRow<T>, IViewResultRow<T, U> where U : ICouchDocument
+	public class ViewResultRow<TKey, TValue, TDocument> : 
+		ViewResultRow<TKey,TValue>, 
+		IViewResultRow<TKey, TValue, TDocument> 
+		where TDocument : ICouchDocument
 	{
-		public U Doc
+		public TDocument Doc
 		{
 			get;
 			internal set;

@@ -265,7 +265,7 @@ namespace LoveSeat.IntegrationTest
 		{
 			var db = client.GetDatabase(baseDatabase);
 			db.CreateDocument(@"{""_id"":""test_eTag""}", new Result<string>()).Wait();
-			ViewResult<JObject> result = db.GetAllDocuments(new Result<ViewResult<JObject>>()).Wait();
+			ViewResult<string, JObject> result = db.GetAllDocuments(new Result<ViewResult<string, JObject>>()).Wait();
 			Assert.IsTrue(!string.IsNullOrEmpty(result.ETag));
 		}
 		[Test]
@@ -273,8 +273,8 @@ namespace LoveSeat.IntegrationTest
 		{
 			var db = client.GetDatabase(baseDatabase);
 			db.CreateDocument(@"{""_id"":""test_eTag_exception""}", new Result<string>()).Wait();
-			ViewResult<JObject> result = db.GetAllDocuments(new Result<ViewResult<JObject>>()).Wait();
-			ViewResult<JObject> cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.ETag }, new Result<ViewResult<JObject>>()).Wait();
+			ViewResult<string, JObject> result = db.GetAllDocuments(new Result<ViewResult<string, JObject>>()).Wait();
+			ViewResult<string, JObject> cachedResult = db.GetAllDocuments(new ViewOptions { Etag = result.ETag }, new Result<ViewResult<string, JObject>>()).Wait();
 			Assert.AreEqual(DreamStatus.NotModified, cachedResult.Status);
 		}
 		[Test]
@@ -311,7 +311,7 @@ namespace LoveSeat.IntegrationTest
 			db.CreateDocument(new JDocument());
 			db.CreateDocument(new JDocument());
 
-			ViewResult<JObject> result = db.GetView<JObject>("testviewitem", "testview", new Result<ViewResult<JObject>>()).Wait();
+			ViewResult<string, JObject> result = db.GetView<string, JObject>("testviewitem", "testview", new Result<ViewResult<string, JObject>>()).Wait();
 			Assert.IsNotNull(result);
 			Assert.IsTrue(result.TotalRows > 0);
 		}
@@ -323,9 +323,9 @@ namespace LoveSeat.IntegrationTest
 			db.CreateDocument(new JDocument());
 			db.CreateDocument(new JDocument());
 
-			ViewResult<JObject,JDocument> result = db.GetView<JObject,JDocument>("testviewitem", "testview");
+			ViewResult<string, JObject, JDocument> result = db.GetView<string, JObject, JDocument>("testviewitem", "testview");
 			Assert.IsNotNull(result);
-			foreach (ViewResultRow<JObject, JDocument> row in result.Rows)
+			foreach (ViewResultRow<string, JObject, JDocument> row in result.Rows)
 			{
 				Assert.IsNotNull(row.Doc);
 				Assert.IsNotNull(row.Key);
@@ -384,7 +384,7 @@ namespace LoveSeat.IntegrationTest
 			var db = client.GetDatabase(baseDatabase);
 			db.CreateDocument("id1", "{}", new Result<string>()).Wait();
 			CouchViewDocument doc = new CouchViewDocument("test_compactview");
-			ViewResult<JObject> result = db.GetTempView<JObject>(new CouchView("function(doc) { emit(null, doc) }"));
+			ViewResult<string, JObject> result = db.GetTempView<string, JObject>(new CouchView("function(doc) { emit(null, doc) }"));
 
 			Assert.IsNotNull(result);
 			Assert.AreEqual(DreamStatus.Ok, result.Status);
