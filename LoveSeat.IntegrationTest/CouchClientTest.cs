@@ -152,7 +152,7 @@ namespace LoveSeat.IntegrationTest
 			var result = db.CreateDocument(obj);
 			var doc = db.GetDocument<JDocument>(obj.Id);
 			doc["test"] = "newprop";
-			var newresult = db.SaveDocument(doc);
+			var newresult = db.UpdateDocument(doc);
 			Assert.AreEqual(newresult.Value<string>("test"), "newprop");
 		}
 		[Test]

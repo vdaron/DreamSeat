@@ -497,7 +497,7 @@ namespace LoveSeat
 		/// <param name="doc"></param>
 		/// <param name="result"></param>
 		/// <returns></returns>
-		public Result<TDocument> SaveDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
+		public Result<TDocument> UpdateDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
 		{
 			if (doc == null)
 				throw new ArgumentNullException("doc");
@@ -593,9 +593,9 @@ namespace LoveSeat
 		{
 			return CreateDocument(doc, new Result<TDocument>()).Wait();
 		}
-		public TDocument SaveDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
+		public TDocument UpdateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
 		{
-			return SaveDocument(doc, new Result<TDocument>()).Wait();
+			return UpdateDocument(doc, new Result<TDocument>()).Wait();
 		}
 		public TDocument GetDocument<TDocument>(string id) where TDocument : class, ICouchDocument
 		{
