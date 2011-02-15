@@ -10,7 +10,7 @@ namespace LoveSeat.Support
 		public string Line { get; private set; }
 		public LineReceivedEventArgs(string line)
 		{
-			Line = line;
+			Line = line.Trim();
 		}
 	}
 
@@ -71,7 +71,7 @@ namespace LoveSeat.Support
 		private void ReadLinesAndCallback()
 		{
 			string line = ReadLine();
-			while (!String.IsNullOrEmpty(line))
+			while (line != null)
 			{
 				try
 				{
