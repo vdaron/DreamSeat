@@ -25,7 +25,7 @@
 		public string Filter { get; set; }
 		
 		/// <summary>
-		/// Period after which an empty line is sent during longpoll or continuous
+		/// Period (in milliseconds) after which an empty line is sent during longpoll or continuous
 		/// </summary>
 		public int? Heartbeat { get; set; }
 
