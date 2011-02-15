@@ -306,7 +306,6 @@ namespace LoveSeat
 
 		#region Documents Management
 		#region Primitives methods
-
 		/// <summary>
 		/// Creates a document when you intend for Couch to generate the id for you.
 		/// </summary>
@@ -317,7 +316,6 @@ namespace LoveSeat
 		{
 			return CreateDocument(null, json, result);
 		}
-
 		/// <summary>
 		/// Creates a document using the json provided. 
 		/// No validation or smarts attempted here by design for simplicities sake
@@ -370,7 +368,7 @@ namespace LoveSeat
 		/// <param name="json"></param>
 		/// <param name="result"></param>
 		/// <returns></returns>
-		public Result<string> SaveDocument(string id, string rev, string json, Result<string> result)
+		public Result<string> UpdateDocument(string id, string rev, string json, Result<string> result)
 		{
 			if (String.IsNullOrEmpty(id))
 				throw new ArgumentNullException("id");
@@ -460,6 +458,25 @@ namespace LoveSeat
 			);
 			return result;
 		}
+		/// <summary>
+		/// Check if a document exists
+		/// </summary>
+		/// <param name="id">id of the document</param>
+		/// <param name="result"></param>
+		/// <returns></returns>
+		public Result<bool> DocumentExists(string id,Result<bool> result)
+		{
+			if (String.IsNullOrEmpty(id))
+				throw new ArgumentNullException("id");
+			if (result == null)
+				throw new ArgumentNullException("result");
+
+			BasePlug.AtPath(XUri.EncodeFragment(id)).Head(new Result<DreamMessage>()).WhenDone(
+				a => result.Return(a.IsSuccessful),
+				e => result.Throw(e)
+			);
+			return result;
+		}
 		#endregion
 
 		/// <summary>
@@ -510,7 +527,7 @@ namespace LoveSeat
 
 			ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
 
-			SaveDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
+			UpdateDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
@@ -605,6 +622,11 @@ namespace LoveSeat
 		{
 			DeleteDocument(doc, new Result<JObject>()).Wait();
 		}
+		public bool DocumentExists(string id)
+		{
+			return DocumentExists(id, new Result<bool>()).Wait();
+		}
+
 		#endregion
 
 		#region Attachment Management
