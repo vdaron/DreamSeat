@@ -78,7 +78,7 @@
     <Compile Include="CouchContinuousChanges.cs" />
     <Compile Include="CouchDatabaseInfo.cs" />
     <Compile Include="CouchException.cs" />
-    <Compile Include="CouchViewDocument.cs" />
+    <Compile Include="CouchDesignDocument.cs" />
     <Compile Include="CouchView.cs" />
     <Compile Include="CouchDocument.cs" />
     <Compile Include="CouchUser.cs" />
