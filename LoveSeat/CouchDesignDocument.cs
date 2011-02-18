@@ -3,14 +3,14 @@ using Newtonsoft.Json;
 
 namespace LoveSeat
 {
-	public class CouchViewDocument : CouchDocument
+	public class CouchDesignDocument : CouchDocument
 	{
-		public CouchViewDocument()
+		public CouchDesignDocument()
 		{
 			Language = Constants.JAVASCRIPT;
 			Views = new Dictionary<string, CouchView>();
 		}
-		public CouchViewDocument(string id)
+		public CouchDesignDocument(string id)
 			:this()
 		{
 			Id = Constants.DESIGN + "/" + id;

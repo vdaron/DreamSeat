@@ -60,7 +60,7 @@ namespace LoveSeat.IntegrationTest
 			client.CreateDatabase(replicateDatabase);
 
 			CouchDatabase db = client.GetDatabase(baseDatabase);
-			CouchViewDocument view = new CouchViewDocument("testviewitem");
+			CouchDesignDocument view = new CouchDesignDocument("testviewitem");
 			view.Views.Add("testview", new CouchView("function(doc) {emit(doc._rev, doc)}"));
 			db.CreateDocument(view);
 
@@ -355,7 +355,7 @@ namespace LoveSeat.IntegrationTest
 		public void CreateViewDocument()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			CouchViewDocument doc = new CouchViewDocument("firstviewdoc");
+			CouchDesignDocument doc = new CouchDesignDocument("firstviewdoc");
 			doc.Views.Add("all", new CouchView("function(doc) { emit(null, doc) }"));
 
 			db.CreateDocument(doc);
@@ -372,7 +372,7 @@ namespace LoveSeat.IntegrationTest
 		public void Should_Start_CompactView()
 		{
 			var db = client.GetDatabase(baseDatabase);
-			CouchViewDocument doc = new CouchViewDocument("test_compactview");
+			CouchDesignDocument doc = new CouchDesignDocument("test_compactview");
 			doc.Views.Add("test", new CouchView("function(doc) { emit(null, doc) }"));
 			db.CreateDocument(doc);
 
@@ -383,7 +383,7 @@ namespace LoveSeat.IntegrationTest
 		{
 			var db = client.GetDatabase(baseDatabase);
 			db.CreateDocument("id1", "{}", new Result<string>()).Wait();
-			CouchViewDocument doc = new CouchViewDocument("test_compactview");
+			CouchDesignDocument doc = new CouchDesignDocument("test_compactview");
 			ViewResult<string, JObject> result = db.GetTempView<string, JObject>(new CouchView("function(doc) { emit(null, doc) }"));
 
 			Assert.IsNotNull(result);

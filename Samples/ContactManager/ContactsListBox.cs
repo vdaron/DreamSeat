@@ -59,7 +59,7 @@ namespace ContactManager
 
 			if (!exists.Value)
 			{
-				CouchViewDocument view = new CouchViewDocument("contactview");
+				CouchDesignDocument view = new CouchDesignDocument("contactview");
 				view.Views.Add("all",
 				               new CouchView(
 				                  @"function(doc){
@@ -68,7 +68,7 @@ namespace ContactManager
 				                       }
 				                    }"));
 
-				Result<CouchViewDocument> creationResult = new Result<CouchViewDocument>();
+				Result<CouchDesignDocument> creationResult = new Result<CouchDesignDocument>();
 				yield return theDatabase.CreateDocument(view, creationResult);
 
 				if(creationResult.HasException)
