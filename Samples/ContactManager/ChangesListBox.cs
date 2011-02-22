@@ -46,7 +46,10 @@ namespace ContactManager
 		private static void ChangesListBoxFormat(object sender, ListControlConvertEventArgs e)
 		{
 			CouchChangeResult change = e.ListItem as CouchChangeResult;
-			e.Value = change != null ? String.Format("{0:0000}\t{1}\t{2}", change.Sequence, change.Id, change.Changes.ToString()) : e.ListItem.ToString();
+			if((change != null)&&(change.Changes.Length >= 1))
+			{
+				e.Value = String.Format("{0:0000}\t{1}\t{2}", change.Sequence, change.Id, change.Changes[0].ToString());
+			}
 		}
 	}
 }
