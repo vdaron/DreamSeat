@@ -508,12 +508,12 @@ namespace LoveSeat
 			return result;
 		}
 		/// <summary>
-		/// Create a document based on object based on ICouchDocument interface
+		/// Update a document
 		/// </summary>
-		/// <typeparam name="TDocument"></typeparam>
-		/// <param name="doc"></param>
+		/// <typeparam name="TDocument">Type of document</typeparam>
+		/// <param name="doc">Document to update</param>
 		/// <param name="result"></param>
-		/// <returns></returns>
+		/// <returns>Updated document</returns>
 		public Result<TDocument> UpdateDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
 		{
 			if (doc == null)
@@ -587,9 +587,9 @@ namespace LoveSeat
 			return result;
 		}
 		/// <summary>
-		/// 
+		/// Delete specified document
 		/// </summary>
-		/// <param name="doc"></param>
+		/// <param name="doc">document to delete</param>
 		/// <param name="result"></param>
 		/// <returns></returns>
 		public Result<JObject> DeleteDocument(ICouchDocument doc, Result<JObject> result)
@@ -606,27 +606,59 @@ namespace LoveSeat
 			return result;
 		}
 
+		/// <summary>
+		/// Create a document based on object based on ICouchDocument interface. If the ICouchDocument does not have an Id, CouchDB will generate the id for you
+		/// This method is synchronous
+		/// </summary>
+		/// <typeparam name="TDocument">ICouchDocument Type to return</typeparam>
+		/// <param name="doc">ICouchDocument to create</param>
+		/// <returns></returns>
 		public TDocument CreateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
 		{
 			return CreateDocument(doc, new Result<TDocument>()).Wait();
 		}
+		/// <summary>
+		/// Update a document
+		/// This method is synchronous
+		/// </summary>
+		/// <typeparam name="TDocument">Type of document</typeparam>
+		/// <param name="doc">Document to update</param>
+		/// <returns>Updated document</returns>
 		public TDocument UpdateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
 		{
 			return UpdateDocument(doc, new Result<TDocument>()).Wait();
 		}
+		/// <summary>
+		/// Retrieve Document using with specified id and deserialize result
+		/// This method is synchronous
+		/// </summary>
+		/// <typeparam name="TDocument">Object created during deserialization, must inherit ICouchDocument</typeparam>
+		/// <param name="id">id of the document</param>
+		/// <returns></returns>
 		public TDocument GetDocument<TDocument>(string id) where TDocument : class, ICouchDocument
 		{
 			return GetDocument(id, new Result<TDocument>()).Wait();
 		}
+		/// <summary>
+		/// Delete specified document
+		/// This method is synchronous
+		/// </summary>
+		/// <param name="doc">document to delete</param>
+		/// <returns></returns>
 		public void DeleteDocument(ICouchDocument doc)
 		{
 			DeleteDocument(doc, new Result<JObject>()).Wait();
 		}
+		/// <summary>
+		/// Check id a document exists in Database
+		/// This method is synchronous
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		public bool DocumentExists(string id)
 		{
 			return DocumentExists(id, new Result<bool>()).Wait();
 		}
-
 		#endregion
 
 		#region Attachment Management

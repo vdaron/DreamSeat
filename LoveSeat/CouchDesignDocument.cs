@@ -23,8 +23,10 @@ namespace LoveSeat
 
 		[JsonProperty(Constants.VIEWS)]
 		public Dictionary<string, CouchView> Views { get; internal set; }
+
 		[JsonProperty(Constants.SHOWS)]
 		public Dictionary<string,string> Shows { get; private set; }
+		
 		[JsonProperty(Constants.LISTS)]
 		public Dictionary<string,string> Lists { get; private set; }
 	}
