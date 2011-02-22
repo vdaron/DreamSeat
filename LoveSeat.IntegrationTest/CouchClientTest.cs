@@ -494,6 +494,20 @@ namespace LoveSeat.IntegrationTest
 				Assert.AreEqual(result.Id, id);
 			}
 		}
+
+		[Test]
+		public void CreateShow()
+		{
+			var db = client.GetDatabase(baseDatabase);
+
+			JDocument d = new JDocument(@"{""title"": ""some title""}");
+			d.Id = "sampleid";
+			db.CreateDocument(d);
+
+			CouchDesignDocument doc = new CouchDesignDocument("showdoc");
+			doc.Shows.Add("simple", "function(doc, req) {return '<h1>' + doc.title + '</h1>';}");
+			db.CreateDocument(doc);
+		}
 	}
 	public class Company
 	{
