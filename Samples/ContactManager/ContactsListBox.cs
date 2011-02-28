@@ -47,7 +47,7 @@ namespace ContactManager
 			}
 		}
 
-		private Yield LoadContactsHelper(Result<ViewResult<object, Contact>> aResult)
+		private Yield LoadContactsHelper(Result<ViewResult<string,string, Contact>> aResult)
 		{
 			Result<bool> exists = new Result<bool>();
 			yield return theDatabase.DocumentExists("_design/contactview", exists);
@@ -64,7 +64,7 @@ namespace ContactManager
 				               new CouchView(
 				                  @"function(doc){
 				                       if(doc.type && doc.type == 'contact'){
-				                          emit(doc.lastName, doc)
+				                          emit(doc.lastName, doc.firstName)
 				                       }
 				                    }"));
 
@@ -78,8 +78,8 @@ namespace ContactManager
 				}
 			}
 
-			var viewRes = new Result<ViewResult<object, Contact>>();
-			yield return theDatabase.GetView("contactview", "all", viewRes);
+			var viewRes = new Result<ViewResult<string, string, Contact>>();
+			yield return theDatabase.GetView("contactview", "all",viewRes);
 
 			if(viewRes.HasException)
 			{
@@ -89,12 +89,12 @@ namespace ContactManager
 			aResult.Return(viewRes.Value);
 		}
 	
-		private void DisplayContacts(ViewResult<object, Contact> o)
+		private void DisplayContacts(ViewResult<string,string, Contact> o)
 		{
 			Items.Clear();
 			foreach(var row in o.Rows)
 			{
-				Items.Add(row.Value);
+				Items.Add(row.Doc);
 			}
 		}
 
@@ -119,7 +119,7 @@ namespace ContactManager
 			Items.Clear();
 			Items.Add("Loading Contacts");
 
-			Coroutine.Invoke(LoadContactsHelper, new Result<ViewResult<object, Contact>>()).WhenDone(
+			Coroutine.Invoke(LoadContactsHelper, new Result<ViewResult<string,string, Contact>>()).WhenDone(
 				a => BeginInvoke((MethodInvoker)(() => DisplayContacts(a))),
 				ErrorManagement.ProcessException
 				);

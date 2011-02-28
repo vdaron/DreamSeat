@@ -28,6 +28,11 @@ namespace LoveSeat.IntegrationTest
 	[TestFixture]
 	public class CouchClientTest
 	{
+		public class TestSubClass : CouchDocument
+		{
+			public string TESTVAL { get; set; }
+		}
+
 		private static CouchClient client;
 		private const string baseDatabase = "love-seat-test-base";
 		private const string replicateDatabase = "love-seat-test-repli";
@@ -244,6 +249,26 @@ namespace LoveSeat.IntegrationTest
 				string result = sr.ReadToEnd();
 				Assert.IsTrue(result == "This is a text document");
 			}
+		}
+
+		[Test]
+		public void ShouldCreateAttachmentInSubCouchDocumentClass()
+		{
+			var db = client.GetDatabase(baseDatabase);
+
+			TestSubClass tsc = new TestSubClass {TESTVAL = "Hello"};
+
+			tsc = db.CreateDocument(tsc, new Result<TestSubClass>()).Wait();
+
+			var attachment = Encoding.UTF8.GetBytes("test");
+			using (MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes("This is a text document")))
+			{
+				db.AddAttachment(tsc.Id, ms, "test_upload.txt");
+			}
+
+			tsc = db.GetDocument(tsc.Id, new Result<TestSubClass>()).Wait();
+
+			Assert.IsTrue(tsc.HasAttachment);
 		}
 		[Test]
 		public void Should_Delete_Attachment()

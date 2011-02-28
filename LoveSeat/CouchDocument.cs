@@ -17,7 +17,7 @@ namespace LoveSeat
 		public string Rev { get; set; }
 
 		[JsonProperty(Constants.ATTACHMENTS)]
-		private Dictionary<string, CouchAttachment> Attachments;
+		internal Dictionary<string, CouchAttachment> Attachments;
 
 		[JsonIgnore]
 		public bool HasAttachment { get { return Attachments.Count > 0; } }
