@@ -28,5 +28,20 @@ namespace LoveSeat
 				yield return key;
 			yield break;
 		}
+
+		public override bool Equals(object obj)
+		{
+			ICouchDocument o = obj as ICouchDocument;
+			if(o == null)
+				return false;
+
+			return base.Equals(obj);
+		}
+
+		public override int GetHashCode()
+		{
+			//TODO: check this
+			return (Id + Rev).GetHashCode();
+		}
 	}
 }
