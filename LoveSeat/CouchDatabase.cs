@@ -305,6 +305,7 @@ namespace LoveSeat
 		#endregion
 
 		#region Documents Management
+
 		#region Primitives methods
 		/// <summary>
 		/// Creates a document when you intend for Couch to generate the id for you.
@@ -495,12 +496,24 @@ namespace LoveSeat
 
 			ObjectSerializer<TDocument> serializer = new ObjectSerializer<TDocument>();
 
+			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			if(auditableCouchDocument != null)
+			{
+				auditableCouchDocument.Creating();
+			}
+
 			CreateDocument(doc.Id, serializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
 					doc.Id = value[Constants.ID].Value<string>();
 					doc.Rev = value[Constants.REV].Value<string>();
+					
+					if (auditableCouchDocument != null)
+					{
+						auditableCouchDocument.Created();
+					}
+
 					result.Return(doc);
 				},
 				e => result.Throw(e)
@@ -527,12 +540,22 @@ namespace LoveSeat
 
 			ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
 
+			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			if (auditableCouchDocument != null)
+			{
+				auditableCouchDocument.Updating();
+			}
+
 			UpdateDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
 					doc.Id = value[Constants.ID].Value<string>();
 					doc.Rev = value[Constants.REV].Value<string>();
+					if (auditableCouchDocument != null)
+					{
+						auditableCouchDocument.Updated();
+					}
 					result.Return(doc);
 				},
 				e => result.Throw(e)
@@ -599,8 +622,21 @@ namespace LoveSeat
 			if (result == null)
 				throw new ArgumentNullException("result");
 
+			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			if (auditableCouchDocument != null)
+			{
+				auditableCouchDocument.Deleting();
+			}
+
 			DeleteDocument(doc.Id, doc.Rev, new Result<string>()).WhenDone(
-				a => result.Return(JObject.Parse(a)),
+				a =>
+					{
+						if (auditableCouchDocument != null)
+						{
+							auditableCouchDocument.Deleted();
+						}
+						result.Return(JObject.Parse(a));
+					},
 				e => result.Throw(e)
 			);
 			return result;

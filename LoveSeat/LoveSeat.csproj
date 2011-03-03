@@ -82,6 +82,7 @@
     <Compile Include="CouchView.cs" />
     <Compile Include="CouchDocument.cs" />
     <Compile Include="CouchUser.cs" />
+    <Compile Include="Interfaces\IAuditableDocument.cs" />
     <Compile Include="Interfaces\ICouchDocument.cs" />
     <Compile Include="Interfaces\IKeyOptions.cs" />
     <Compile Include="Interfaces\IListResult.cs" />
