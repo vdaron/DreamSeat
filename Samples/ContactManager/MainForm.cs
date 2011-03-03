@@ -65,15 +65,10 @@ namespace ContactManager
 			theContactsListBox.Delete(id);
 		}
 
-		private void theContactDetails_NewContact(object sender, Contact aContact)
+		/*private void theContactDetails_ErrorUpdatedContact(object sender, Contact aContact)
 		{
 			theContactDetails.CurrentContact = aContact;
-		}
-		
-		private void theContactDetails_UpdatedContact(object sender, Contact aContact)
-		{
-			theContactDetails.CurrentContact = aContact;
-		}
+		}*/
 
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
 		{

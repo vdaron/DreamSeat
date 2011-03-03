@@ -13,11 +13,15 @@ using Newtonsoft.Json.Linq;
 namespace ContactManager
 {
 	
+	//public delegate void ErrorUpdatedContactDelegate(object aSender, Contact aContact);
+
 
 	public partial class ContactDetails : UserControl
 	{
 		private Contact theContact;
 		private CouchDatabase theDatabase;
+		
+		//public event ErrorUpdatedContactDelegate ErrorUpdatedContact;
 
 		public ContactDetails()
 		{
@@ -98,7 +102,12 @@ namespace ContactManager
 			}
 			else
 			{
-				theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
+				try{
+					theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
+				}catch(Exception exc){
+					Console.WriteLine("### Error, please go it again ###\n"+exc);
+					//ErrorUpdatedContact(this,theContact);
+				}
 			}
 		}
 		
