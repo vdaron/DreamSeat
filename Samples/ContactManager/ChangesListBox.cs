@@ -52,14 +52,18 @@ namespace ContactManager
 				ChangeOptions changes = new ChangeOptions();
 				changes.Heartbeat = 10000;
 				changes.Since  = 1;
-				try{
-					if(File.Exists("sequence.txt")){
+				try
+				{
+					if(File.Exists("sequence.txt"))
+					{
 						changes.Since  = Int32.Parse(File.ReadAllText("sequence.txt"));
 					}
-				}catch(Exception e){
+				}
+				catch(Exception e)
+				{
 					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n"+e);
 				}
-				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => changement(y))));
+				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => Changement(y))));
 			}
 		}
 
@@ -72,33 +76,39 @@ namespace ContactManager
 			}
 		}
 		
-		private void changement(CouchChangeResult r){
+		private void Changement(CouchChangeResult r)
+		{
 			//add to the list of changes
 			Items.Add(r);
+
 			//record the sequence number of the change so when we run the application we
 			//tell that we only need changes > this number. 
 			//(Otherwise you get a change message for every doc in the db at the startup)
-			
-			try{
+			try
+			{
 				File.WriteAllText("sequence.txt",r.Sequence.ToString());
-			}catch(Exception e){
+			}
+			catch(Exception e)
+			{
 				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
 			}
 			
 			//verifiy type of change announced so we know if we need to refresh a contact
-			if(r.Id.StartsWith("_design")){
+			if(r.Id.StartsWith("_design"))
 				return;
-			}
 			
-			if(r.Deleted){
-				ContactDeleted(this,r.Id);
-				return;
+			if(r.Deleted)
+			{
+				OnContactDeleted(r.Id);
 			}
-			//get the latest version of this document
-			Coroutine.Invoke(ContactChangedLoader, r.Id, new Result<Contact>()).WhenDone(
-				a => BeginInvoke((MethodInvoker)(() => ContactChanged(this,a))),
-				ErrorManagement.ProcessException
-				);
+			else
+			{
+				//get the latest version of this document
+				Coroutine.Invoke(ContactChangedLoader, r.Id, new Result<Contact>()).WhenDone(
+					a => BeginInvoke((MethodInvoker)(() => OnContactChanged(a))),
+					ErrorManagement.ProcessException
+					);
+			}
 		}
 		
 		public Yield ContactChangedLoader(string id, Result<Contact> aResult){
@@ -111,6 +121,18 @@ namespace ContactManager
 				yield break;
 			}
 			aResult.Return(docRes.Value);
+		}
+
+		private void OnContactDeleted(string contactId)
+		{
+			if (ContactDeleted != null)
+				ContactDeleted(this, contactId);
+		}
+
+		private void OnContactChanged(Contact aContact)
+		{
+			if (ContactChanged != null)
+				ContactChanged(this, aContact);
 		}
 	}
 }

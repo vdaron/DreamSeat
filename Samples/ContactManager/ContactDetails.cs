@@ -69,16 +69,6 @@ namespace ContactManager
 				theEmailsTextBox.Text = String.Empty;
 			}
 		}
-		
-		public void Change(Contact contactChanged){
-			if(theContact!=null && theContact.Equals(contactChanged)){
-				CurrentContact = contactChanged;
-			}
-		}
-		
-		public void Delete(string id){
-			CurrentContact = null;
-		}
 
 		private void theSaveButton_Click(object sender, EventArgs e)
 		{

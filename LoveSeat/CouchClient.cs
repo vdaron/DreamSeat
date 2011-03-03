@@ -30,7 +30,15 @@ namespace LoveSeat
 			: this(Constants.LOCALHOST, Constants.DEFAULT_PORT, username, password)
 		{
 		}
-
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="host"></param>
+		/// <param name="port"></param>
+		public CouchClient(string host, int port)
+			: this(host, port, null, null)
+		{
+		}
 		/// <summary>
 		/// Constructs the CouchClient and gets an authentication cookie (10 min)
 		/// </summary>

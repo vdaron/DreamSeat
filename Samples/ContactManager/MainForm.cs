@@ -11,8 +11,6 @@ using MindTouch.Tasking;
 
 namespace ContactManager
 {
-	using Yield = IEnumerator<IYield>;
-	
 	public partial class MainForm : Form
 	{
 		private CouchClient theClient;
@@ -30,7 +28,8 @@ namespace ContactManager
 
 		private void MainForm_Load(object sender, EventArgs e)
 		{
-			theClient = new CouchClient(Settings.Host,Settings.Port,Settings.Username,Settings.Password);
+			theClient = new CouchClient(Settings.Host, Settings.Port, Settings.Username, Settings.Password);
+
 			theClient.GetDatabase(Settings.DatabaseName, new Result<CouchDatabase>()).WhenDone(
 				a => BeginInvoke((MethodInvoker) (() => DatabaseLoaded(a))),
 				ErrorManagement.ProcessException
@@ -45,11 +44,6 @@ namespace ContactManager
 			theContactDetails.Database = theDatabase;
 		}
 
-		private static void ManageException(Exception e)
-		{
-			
-		}
-
 		private void theContactsListBox_SelectedContactChanged(object aSender, Contact aContact)
 		{
 			theContactDetails.CurrentContact = aContact;
@@ -57,20 +51,19 @@ namespace ContactManager
 		
 		private void theChangesListBox_ContactChanged(object aSender, Contact aContact)
 		{
-			theContactDetails.Change(aContact);
+			if ((theContactDetails.CurrentContact != null) && (theContactDetails.CurrentContact.Id == aContact.Id))
+				theContactDetails.CurrentContact = aContact;
+
 			theContactsListBox.Change(aContact);
 		}
 		
 		private void theChangesListBox_ContactDeleted(object aSender, string id)
 		{
-			theContactDetails.Delete(id);
+			if((theContactDetails.CurrentContact != null)&&(theContactDetails.CurrentContact.Id == id))
+				theContactDetails.CurrentContact = null;
+
 			theContactsListBox.Delete(id);
 		}
-
-		/*private void theContactDetails_ErrorUpdatedContact(object sender, Contact aContact)
-		{
-			theContactDetails.CurrentContact = aContact;
-		}*/
 
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -79,14 +72,15 @@ namespace ContactManager
 		
 		private void compactToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Coroutine.Invoke(Compacter,new Result());
-		}
-			                 
-		private Yield Compacter(Result result){
-			yield return theDatabase.Compact(result);
-			if(result.HasException){
-				Console.WriteLine("### A problem occured while compacting the data, please contact ###\n"+result.Exception);
-			}
+			theDatabase.Compact(new Result()).WhenDone(
+				a =>
+					{
+						if(a.HasException)
+							Console.WriteLine("### A problem occured while compacting the data, please contact ###\n" + a.Exception);
+						else
+							Console.WriteLine("Compact started");
+					}
+				);
 		}
 	}
 }
