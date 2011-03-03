@@ -92,12 +92,13 @@ namespace ContactManager
 	
 		public void DisplayContacts(ViewResult<string,string, Contact> o)
 		{
-			Console.WriteLine("lzzzz");
+			Console.WriteLine("### Display Contacts");
 			Items.Clear();
 			foreach(var row in o.Rows)
 			{
 				Items.Add(row.Doc);
 			}
+			Sort();
 		}
 
 		private void ContactsListBox_Format(object sender, ListControlConvertEventArgs e)
@@ -116,11 +117,14 @@ namespace ContactManager
 				SelectedContactChanged(this, c);
 		}
 		
-		public void change(Contact contactChanged){
-				
+		public void Change(Contact contactChanged){
 			if(!Items.Contains(contactChanged)){
-				Console.WriteLine("### Ajout! "+Items.Contains(contactChanged)+"###");
 				Items.Add(contactChanged);
+				Sort();
+			}else{
+				Items.Remove(contactChanged);
+				Items.Add(contactChanged);
+				Sort();
 			}
 		}
 

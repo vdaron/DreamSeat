@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -47,6 +48,14 @@ namespace ContactManager
 				Items.Clear();
 				ChangeOptions changes = new ChangeOptions();
 				changes.Heartbeat = 10000;
+				changes.Since  = 1;
+				try{
+					if(File.Exists("sequence.txt")){
+						changes.Since  = Int32.Parse(File.ReadAllText("sequence.txt"));
+					}
+				}catch(Exception e){
+					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt");
+				}
 				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => changement(y))));
 			}
 		}
@@ -63,7 +72,21 @@ namespace ContactManager
 		private void changement(CouchChangeResult r){
 			//add to the list of changes
 			Items.Add(r);
-			//verifiy type of change announced
+			//record the sequence number of the change so when we run the application we
+			//tell that we only need changes > this number. 
+			//(Otherwise you get a change message for every doc in the db at the startup)
+			
+			try{
+				File.WriteAllText("sequence.txt",r.Sequence.ToString());
+			}catch(Exception e){
+				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt");
+			}
+			
+			//verifiy type of change announced so we know if we need to refresh a contact
+			if(r.Id.StartsWith("_design")){
+				return;
+			}
+			//get the latest version of this document
 			Coroutine.Invoke(ContactChangedLoader, r.Id, new Result<Contact>()).WhenDone(
 				a => BeginInvoke((MethodInvoker)(() => ContactChanged(this,a))),
 				ErrorManagement.ProcessException

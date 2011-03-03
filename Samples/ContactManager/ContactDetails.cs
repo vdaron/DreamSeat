@@ -11,14 +11,16 @@ using MindTouch.Tasking;
 
 namespace ContactManager
 {
-	public delegate void NewOrChangedContactDelegate(object sender, Contact aContact);
+	public delegate void NewContactDelegate(object sender, Contact aContact);
+	public delegate void UpdatedContactDelegate(object sender, Contact aContact);
 
 	public partial class ContactDetails : UserControl
 	{
 		private Contact theContact;
 		private CouchDatabase theDatabase;
 
-		public event NewOrChangedContactDelegate NewOrChangedContact;
+		public event NewContactDelegate NewContact;
+		public event UpdatedContactDelegate UpdatedContact;
 
 		public ContactDetails()
 		{
@@ -66,9 +68,11 @@ namespace ContactManager
 			}
 		}
 		
-		public void change(Contact contactChanged){
-			if(CurrentContact.Equals(contactChanged))
-				RefreshContact();
+		public void Change(Contact contactChanged){
+			if(theContact!=null && theContact.Equals(contactChanged)){
+				Console.WriteLine("### Current contact refreshed ###");
+				CurrentContact = contactChanged;
+			}
 		}
 
 		private void theSaveButton_Click(object sender, EventArgs e)
@@ -82,7 +86,7 @@ namespace ContactManager
 			theContact.FirstName = theFirstNameTextBox.Text;
 			theContact.LastName = theLastNameTextBox.Text;
 			theContact.EmailAddresses.Clear();
-			foreach (var email in theEmailsTextBox.Text.Split('\n'))
+			foreach (var email in theEmailsTextBox.Text.Trim().Split('\n'))
 			{
 				theContact.EmailAddresses.Add(email.Trim());
 			}
@@ -96,8 +100,10 @@ namespace ContactManager
 				theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
 			}
 
-			if (NewOrChangedContact != null)
-				NewOrChangedContact(this, theContact);
+			if (isNew && NewContact != null)
+				NewContact(this, theContact);
+			if(!isNew && UpdatedContact!=null)
+				UpdatedContact(this,theContact);
 		}
 	}
 }

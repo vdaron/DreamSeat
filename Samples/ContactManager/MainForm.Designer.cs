@@ -147,7 +147,8 @@
 			this.theContactDetails.Name = "theContactDetails";
 			this.theContactDetails.Size = new System.Drawing.Size(379, 235);
 			this.theContactDetails.TabIndex = 0;
-			this.theContactDetails.NewOrChangedContact += new ContactManager.NewOrChangedContactDelegate(this.theContactDetails_newOrChangedContact);
+			this.theContactDetails.NewContact += new ContactManager.NewContactDelegate(this.theContactDetails_newContact);
+			this.theContactDetails.UpdatedContact += new ContactManager.UpdatedContactDelegate(this.theContactDetails_updatedContact);
 			// 
 			// theChangesListBox
 			// 

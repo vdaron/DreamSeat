@@ -6,7 +6,7 @@ using LoveSeat;
 
 namespace LoveSeat
 {
-	public class CouchDocument : ICouchDocument, IEquatable<CouchDocument>, IComparer<CouchDocument>
+	public class CouchDocument : ICouchDocument
 	{
 		public CouchDocument()
 		{
@@ -31,14 +31,12 @@ namespace LoveSeat
 			yield break;
 		}
 		
-		public bool Equals(CouchDocument aDocument){
-			Console.WriteLine(this.Id.Equals(aDocument.Id));
+		public override bool Equals(object o){
+			CouchDocument aDocument = o as CouchDocument;
+			if(aDocument == null)
+				return false;
+			Console.WriteLine("### Methode Equals CouchDocument Resultat: "+this.Id.Equals(aDocument.Id)+" ###");
 			return this.Id.Equals(aDocument.Id);
-		}
-		
-		public int Compare(CouchDocument x, CouchDocument y){
-			Console.WriteLine(x.Id.CompareTo(y.Id));
-			return x.Id.CompareTo(y.Id);
 		}
 	
 	}
