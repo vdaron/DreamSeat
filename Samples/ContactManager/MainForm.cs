@@ -11,6 +11,8 @@ using MindTouch.Tasking;
 
 namespace ContactManager
 {
+	using Yield = IEnumerator<IYield>;
+	
 	public partial class MainForm : Form
 	{
 		private CouchClient theClient;
@@ -73,6 +75,18 @@ namespace ContactManager
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			theContactDetails.CurrentContact = null;
+		}
+		
+		private void compactToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			Coroutine.Invoke(Compacter,new Result());
+		}
+			                 
+		private Yield Compacter(Result result){
+			yield return theDatabase.Compact(result);
+			if(result.HasException){
+				Console.WriteLine("### A problem occured while compacting the data, please contact ###\n"+result.Exception);
+			}
 		}
 	}
 }

@@ -118,7 +118,12 @@ namespace ContactManager
 			{
 				return;
 			}
-			Database.DeleteDocument(theContact,new Result<JObject>()).Wait();
+			try{
+				Database.DeleteDocument(theContact,new Result<JObject>()).Wait();
+			}catch(Exception exc){
+					Console.WriteLine("### Error, please go it again ###\n"+exc);
+					//ErrorUpdatedContact(this,theContact);
+			}
 		}
 	}
 }
