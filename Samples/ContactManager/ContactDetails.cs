@@ -55,6 +55,8 @@ namespace ContactManager
 			{
 				theFirstNameTextBox.Text = theContact.FirstName;
 				theLastNameTextBox.Text = theContact.LastName;
+				theCreationDateLabel.Text = theContact.CreationDate.ToString();
+				theLastUpdateDateLabel.Text = theContact.LastUpdateDate.ToString();
 				StringBuilder emails = new StringBuilder();
 				foreach(var email in theContact.EmailAddresses)
 				{
@@ -67,6 +69,8 @@ namespace ContactManager
 				theFirstNameTextBox.Text = String.Empty;
 				theLastNameTextBox.Text = String.Empty;
 				theEmailsTextBox.Text = String.Empty;
+				theCreationDateLabel.Text = String.Empty;
+				theLastUpdateDateLabel.Text = String.Empty;
 			}
 		}
 

@@ -30,13 +30,20 @@ namespace LoveSeat
 				yield return key;
 			yield break;
 		}
-		
-		public override bool Equals(object o){
-			CouchDocument aDocument = o as CouchDocument;
-			if(aDocument == null)
+
+		public override bool Equals(object obj)
+		{
+			ICouchDocument o = obj as ICouchDocument;
+			if(o == null)
 				return false;
-			return this.Id.Equals(aDocument.Id);
+
+			return o.Id == Id && o.Rev == Rev;
 		}
-	
+
+		public override int GetHashCode()
+		{
+			//TODO: check this
+			return (Id + Rev).GetHashCode();
+		}
 	}
 }

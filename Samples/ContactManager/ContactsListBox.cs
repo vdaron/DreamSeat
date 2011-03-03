@@ -103,10 +103,7 @@ namespace ContactManager
 		private void ContactsListBox_Format(object sender, ListControlConvertEventArgs e)
 		{
 			Contact c = e.ListItem as Contact;
-			if (c == null)
-				e.Value = e.ListItem.ToString();
-			else
-				e.Value = String.Format("{0}, {1}", c.LastName, c.FirstName);
+			e.Value = c == null ? e.ListItem.ToString() : String.Format("{0}, {1}", c.LastName, c.FirstName);
 		}
 
 		private void ContactsListBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -116,22 +113,27 @@ namespace ContactManager
 				SelectedContactChanged(this, c);
 		}
 		
-		public void Change(Contact contactChanged){
-			if(!Items.Contains(contactChanged)){
+		public void Change(Contact contactChanged)
+		{
+			if(!Items.Contains(contactChanged))
+			{
 				Items.Add(contactChanged);
 				Sort();
-			}else{
+			}
+			else
+			{
 				Items.Remove(contactChanged);
 				Items.Add(contactChanged);
 				Sort();
 			}
 		}
 		
-		public void Delete(string id){
-			Contact theContact = new Contact();
-			theContact.Id = id;
-			if(Items.Contains(theContact)){
-				Items.Remove(theContact);
+		public void Delete(string id)
+		{
+			foreach(Contact c in from Contact c in Items where c.Id == id select c)
+			{
+				Items.Remove(c);
+				break;
 			}
 		}
 
