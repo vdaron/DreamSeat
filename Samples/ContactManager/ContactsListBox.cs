@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Data;
@@ -47,7 +48,7 @@ namespace ContactManager
 			}
 		}
 
-		private Yield LoadContactsHelper(Result<ViewResult<string,string, Contact>> aResult)
+		public Yield LoadContactsHelper(Result<ViewResult<string,string, Contact>> aResult)
 		{
 			Result<bool> exists = new Result<bool>();
 			yield return theDatabase.DocumentExists("_design/contactview", exists);
@@ -89,8 +90,9 @@ namespace ContactManager
 			aResult.Return(viewRes.Value);
 		}
 	
-		private void DisplayContacts(ViewResult<string,string, Contact> o)
+		public void DisplayContacts(ViewResult<string,string, Contact> o)
 		{
+			Console.WriteLine("lzzzz");
 			Items.Clear();
 			foreach(var row in o.Rows)
 			{
@@ -113,12 +115,20 @@ namespace ContactManager
 			if ((c != null) && (SelectedContactChanged != null))
 				SelectedContactChanged(this, c);
 		}
+		
+		public void change(Contact contactChanged){
+				
+			if(!Items.Contains(contactChanged)){
+				Console.WriteLine("### Ajout! "+Items.Contains(contactChanged)+"###");
+				Items.Add(contactChanged);
+			}
+		}
 
 		internal void ReloadContacts()
 		{
 			Items.Clear();
 			Items.Add("Loading Contacts");
-
+			
 			Coroutine.Invoke(LoadContactsHelper, new Result<ViewResult<string,string, Contact>>()).WhenDone(
 				a => BeginInvoke((MethodInvoker)(() => DisplayContacts(a))),
 				ErrorManagement.ProcessException

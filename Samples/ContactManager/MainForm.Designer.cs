@@ -39,11 +39,11 @@
 			this.theContactDetails = new ContactManager.ContactDetails();
 			this.theChangesListBox = new ContactManager.ChangesListBox();
 			this.menuStrip1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
+			//((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
+			//((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
 			this.splitContainer2.Panel1.SuspendLayout();
 			this.splitContainer2.Panel2.SuspendLayout();
 			this.splitContainer2.SuspendLayout();
@@ -147,7 +147,7 @@
 			this.theContactDetails.Name = "theContactDetails";
 			this.theContactDetails.Size = new System.Drawing.Size(379, 235);
 			this.theContactDetails.TabIndex = 0;
-			this.theContactDetails.ContactChanged += new ContactManager.ContactChangedDelegate(this.theContactDetails_ContactChanged);
+			this.theContactDetails.NewOrChangedContact += new ContactManager.NewOrChangedContactDelegate(this.theContactDetails_newOrChangedContact);
 			// 
 			// theChangesListBox
 			// 
@@ -162,6 +162,7 @@
 			this.theChangesListBox.Name = "theChangesListBox";
 			this.theChangesListBox.Size = new System.Drawing.Size(574, 93);
 			this.theChangesListBox.TabIndex = 0;
+			this.theChangesListBox.ContactChanged += new ContactManager.ContactChangedDelegate(this.theChangesListBox_ContactChanged);
 			// 
 			// MainForm
 			// 
@@ -178,11 +179,11 @@
 			this.menuStrip1.PerformLayout();
 			this.splitContainer1.Panel1.ResumeLayout(false);
 			this.splitContainer1.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
+		//	((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
 			this.splitContainer2.Panel1.ResumeLayout(false);
 			this.splitContainer2.Panel2.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
+		//	((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
 			this.splitContainer2.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();

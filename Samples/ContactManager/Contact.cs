@@ -18,5 +18,6 @@ namespace ContactManager
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
 		public List<string> EmailAddresses { get; set; }
+		
 	}
 }

@@ -11,14 +11,14 @@ using MindTouch.Tasking;
 
 namespace ContactManager
 {
-	public delegate void ContactChangedDelegate(object sender, Contact aContact);
+	public delegate void NewOrChangedContactDelegate(object sender, Contact aContact);
 
 	public partial class ContactDetails : UserControl
 	{
 		private Contact theContact;
 		private CouchDatabase theDatabase;
 
-		public event ContactChangedDelegate ContactChanged;
+		public event NewOrChangedContactDelegate NewOrChangedContact;
 
 		public ContactDetails()
 		{
@@ -65,6 +65,11 @@ namespace ContactManager
 				theEmailsTextBox.Text = String.Empty;
 			}
 		}
+		
+		public void change(Contact contactChanged){
+			if(CurrentContact.Equals(contactChanged))
+				RefreshContact();
+		}
 
 		private void theSaveButton_Click(object sender, EventArgs e)
 		{
@@ -91,8 +96,8 @@ namespace ContactManager
 				theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
 			}
 
-			if (ContactChanged != null)
-				ContactChanged(this, theContact);
+			if (NewOrChangedContact != null)
+				NewOrChangedContact(this, theContact);
 		}
 	}
 }

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using LoveSeat.Interfaces;
 using Newtonsoft.Json;
+using System;
+using LoveSeat;
 
 namespace LoveSeat
 {
-	public class CouchDocument : ICouchDocument
+	public class CouchDocument : ICouchDocument, IEquatable<CouchDocument>, IComparer<CouchDocument>
 	{
 		public CouchDocument()
 		{
@@ -28,5 +30,16 @@ namespace LoveSeat
 				yield return key;
 			yield break;
 		}
+		
+		public bool Equals(CouchDocument aDocument){
+			Console.WriteLine(this.Id.Equals(aDocument.Id));
+			return this.Id.Equals(aDocument.Id);
+		}
+		
+		public int Compare(CouchDocument x, CouchDocument y){
+			Console.WriteLine(x.Id.CompareTo(y.Id));
+			return x.Id.CompareTo(y.Id);
+		}
+	
 	}
 }

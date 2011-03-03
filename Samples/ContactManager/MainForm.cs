@@ -52,10 +52,17 @@ namespace ContactManager
 		{
 			theContactDetails.CurrentContact = aContact;
 		}
-
-		private void theContactDetails_ContactChanged(object sender, Contact aContact)
+		
+		private void theChangesListBox_ContactChanged(object aSender, Contact aContact)
 		{
-			theContactsListBox.ReloadContacts();
+			Console.WriteLine("### Contact Changed ###");
+			theContactDetails.change(aContact);
+			theContactsListBox.change(aContact);
+		}
+
+		private void theContactDetails_newOrChangedContact(object sender, Contact aContact)
+		{
+			theContactDetails.CurrentContact = aContact;
 		}
 
 		private void newToolStripMenuItem_Click(object sender, EventArgs e)
