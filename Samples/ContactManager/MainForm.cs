@@ -55,17 +55,22 @@ namespace ContactManager
 		
 		private void theChangesListBox_ContactChanged(object aSender, Contact aContact)
 		{
-			Console.WriteLine("### Contact Changed ###");
 			theContactDetails.Change(aContact);
 			theContactsListBox.Change(aContact);
 		}
+		
+		private void theChangesListBox_ContactDeleted(object aSender, string id)
+		{
+			theContactDetails.Delete(id);
+			theContactsListBox.Delete(id);
+		}
 
-		private void theContactDetails_newContact(object sender, Contact aContact)
+		private void theContactDetails_NewContact(object sender, Contact aContact)
 		{
 			theContactDetails.CurrentContact = aContact;
 		}
 		
-		private void theContactDetails_updatedContact(object sender, Contact aContact)
+		private void theContactDetails_UpdatedContact(object sender, Contact aContact)
 		{
 			theContactDetails.CurrentContact = aContact;
 		}

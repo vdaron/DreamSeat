@@ -34,6 +34,7 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.theSaveButton = new System.Windows.Forms.Button();
+			this.theDeleteButton = new System.Windows.Forms.Button();
 			this.label3 = new System.Windows.Forms.Label();
 			this.theEmailsTextBox = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
@@ -105,6 +106,18 @@
 			this.theSaveButton.UseVisualStyleBackColor = true;
 			this.theSaveButton.Click += new System.EventHandler(this.theSaveButton_Click);
 			// 
+			// theDeleteButton
+			// 
+			this.theDeleteButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.theDeleteButton.Enabled = false;
+			this.theDeleteButton.Location = new System.Drawing.Point(309-80, 177);
+			this.theDeleteButton.Name = "theDeleteButton";
+			this.theDeleteButton.Size = new System.Drawing.Size(75, 23);
+			this.theDeleteButton.TabIndex = 1;
+			this.theDeleteButton.Text = "Delete";
+			this.theDeleteButton.UseVisualStyleBackColor = true;
+			this.theDeleteButton.Click += new System.EventHandler(this.theDeleteButton_Click);
+			// 
 			// label3
 			// 
 			this.label3.AutoSize = true;
@@ -129,6 +142,7 @@
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.theSaveButton);
+			this.Controls.Add(this.theDeleteButton);
 			this.Controls.Add(this.groupBox1);
 			this.Name = "ContactDetails";
 			this.Size = new System.Drawing.Size(387, 203);
@@ -146,6 +160,7 @@
 		private System.Windows.Forms.TextBox theLastNameTextBox;
 		private System.Windows.Forms.TextBox theFirstNameTextBox;
 		private System.Windows.Forms.Button theSaveButton;
+		private System.Windows.Forms.Button theDeleteButton;
 		private System.Windows.Forms.TextBox theEmailsTextBox;
 		private System.Windows.Forms.Label label3;
 	}

@@ -92,7 +92,6 @@ namespace ContactManager
 	
 		public void DisplayContacts(ViewResult<string,string, Contact> o)
 		{
-			Console.WriteLine("### Display Contacts");
 			Items.Clear();
 			foreach(var row in o.Rows)
 			{
@@ -125,6 +124,14 @@ namespace ContactManager
 				Items.Remove(contactChanged);
 				Items.Add(contactChanged);
 				Sort();
+			}
+		}
+		
+		public void Delete(string id){
+			Contact theContact = new Contact();
+			theContact.Id = id;
+			if(Items.Contains(theContact)){
+				Items.Remove(theContact);
 			}
 		}
 

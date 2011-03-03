@@ -8,19 +8,16 @@ using System.Text;
 using System.Windows.Forms;
 using LoveSeat;
 using MindTouch.Tasking;
+using Newtonsoft.Json.Linq;
 
 namespace ContactManager
 {
-	public delegate void NewContactDelegate(object sender, Contact aContact);
-	public delegate void UpdatedContactDelegate(object sender, Contact aContact);
+	
 
 	public partial class ContactDetails : UserControl
 	{
 		private Contact theContact;
 		private CouchDatabase theDatabase;
-
-		public event NewContactDelegate NewContact;
-		public event UpdatedContactDelegate UpdatedContact;
 
 		public ContactDetails()
 		{
@@ -34,6 +31,7 @@ namespace ContactManager
 			{
 				theDatabase = value;
 				theSaveButton.Enabled = true;
+				theDeleteButton.Enabled = true;
 			}
 		}
 
@@ -70,9 +68,12 @@ namespace ContactManager
 		
 		public void Change(Contact contactChanged){
 			if(theContact!=null && theContact.Equals(contactChanged)){
-				Console.WriteLine("### Current contact refreshed ###");
 				CurrentContact = contactChanged;
 			}
+		}
+		
+		public void Delete(string id){
+			CurrentContact = null;
 		}
 
 		private void theSaveButton_Click(object sender, EventArgs e)
@@ -99,11 +100,16 @@ namespace ContactManager
 			{
 				theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
 			}
-
-			if (isNew && NewContact != null)
-				NewContact(this, theContact);
-			if(!isNew && UpdatedContact!=null)
-				UpdatedContact(this,theContact);
+		}
+		
+		private void theDeleteButton_Click(object sender, EventArgs e)
+		{
+			bool isNotSelected = theContact == null;
+			if(isNotSelected)
+			{
+				return;
+			}
+			Database.DeleteDocument(theContact,new Result<JObject>()).Wait();
 		}
 	}
 }

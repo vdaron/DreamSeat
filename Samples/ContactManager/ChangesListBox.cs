@@ -17,10 +17,13 @@ namespace ContactManager
 	
 	public delegate void ContactChangedDelegate(object aSender, Contact aContact);
 	
+	public delegate void ContactDeletedDelegate(object aSender, string id);
+	
 	public partial class ChangesListBox : ListBox
 	{
 		private CouchDatabase theDatabase;
 		public event ContactChangedDelegate ContactChanged;
+		public event ContactDeletedDelegate ContactDeleted;
 		private CouchContinuousChanges theContinuousChangeManager;
 
 		public ChangesListBox()
@@ -54,7 +57,7 @@ namespace ContactManager
 						changes.Since  = Int32.Parse(File.ReadAllText("sequence.txt"));
 					}
 				}catch(Exception e){
-					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt");
+					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n"+e);
 				}
 				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => changement(y))));
 			}
@@ -79,11 +82,16 @@ namespace ContactManager
 			try{
 				File.WriteAllText("sequence.txt",r.Sequence.ToString());
 			}catch(Exception e){
-				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt");
+				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
 			}
 			
 			//verifiy type of change announced so we know if we need to refresh a contact
 			if(r.Id.StartsWith("_design")){
+				return;
+			}
+			
+			if(r.Deleted){
+				ContactDeleted(this,r.Id);
 				return;
 			}
 			//get the latest version of this document
@@ -102,7 +110,6 @@ namespace ContactManager
 				aResult.Throw(docRes.Exception);
 				yield break;
 			}
-			Console.WriteLine("### docRes.Value: "+docRes.Value+" ###");
 			aResult.Return(docRes.Value);
 		}
 	}

@@ -20,6 +20,8 @@ namespace LoveSeat
 		public int Sequence { get; protected set; }
 		[JsonProperty(Constants.CHANGES)]
 		public JObject[] Changes { get; protected set; }
+		[JsonProperty(Constants.DELETED)]
+		public bool Deleted { get; protected set; }
 	}
 
 	public class CouchChanges<T>  where T : ICouchDocument

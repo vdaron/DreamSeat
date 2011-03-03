@@ -147,8 +147,6 @@
 			this.theContactDetails.Name = "theContactDetails";
 			this.theContactDetails.Size = new System.Drawing.Size(379, 235);
 			this.theContactDetails.TabIndex = 0;
-			this.theContactDetails.NewContact += new ContactManager.NewContactDelegate(this.theContactDetails_newContact);
-			this.theContactDetails.UpdatedContact += new ContactManager.UpdatedContactDelegate(this.theContactDetails_updatedContact);
 			// 
 			// theChangesListBox
 			// 
@@ -164,6 +162,8 @@
 			this.theChangesListBox.Size = new System.Drawing.Size(574, 93);
 			this.theChangesListBox.TabIndex = 0;
 			this.theChangesListBox.ContactChanged += new ContactManager.ContactChangedDelegate(this.theChangesListBox_ContactChanged);
+			this.theChangesListBox.ContactDeleted += new ContactManager.ContactDeletedDelegate(this.theChangesListBox_ContactDeleted);
+
 			// 
 			// MainForm
 			// 

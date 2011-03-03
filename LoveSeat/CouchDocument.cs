@@ -35,7 +35,6 @@ namespace LoveSeat
 			CouchDocument aDocument = o as CouchDocument;
 			if(aDocument == null)
 				return false;
-			Console.WriteLine("### Methode Equals CouchDocument Resultat: "+this.Id.Equals(aDocument.Id)+" ###");
 			return this.Id.Equals(aDocument.Id);
 		}
 	

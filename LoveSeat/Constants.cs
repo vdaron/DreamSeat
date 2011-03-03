@@ -74,6 +74,7 @@
 
 		public const string _CHANGES = "_changes";
 		public const string CHANGES = "changes";
+		public const string DELETED = "deleted";
 		public const string FEED = "feed";
 		public const string FEED_CONTINUOUS = "continuous";
 		public const string FEED_NORMAL = "normal";
