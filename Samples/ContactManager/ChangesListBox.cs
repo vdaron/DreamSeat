@@ -51,18 +51,7 @@ namespace ContactManager
 				Items.Clear();
 				ChangeOptions changes = new ChangeOptions();
 				changes.Heartbeat = 10000;
-				changes.Since  = 1;
-				try
-				{
-					if(File.Exists("sequence.txt"))
-					{
-						changes.Since  = Int32.Parse(File.ReadAllText("sequence.txt"));
-					}
-				}
-				catch(Exception e)
-				{
-					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n"+e);
-				}
+				changes.Since = GetSequence();
 				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => Changement(y))));
 			}
 		}
@@ -76,6 +65,34 @@ namespace ContactManager
 			}
 		}
 		
+		private int GetSequence(){
+			int seqNumber = 1;
+			try
+				{
+					if(File.Exists("sequence.txt"))
+					{
+						seqNumber = Int32.Parse(File.ReadAllText("sequence.txt"));
+						return seqNumber;
+ 					}
+				}
+				catch(Exception e)
+				{
+					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n"+e);
+					return seqNumber;
+				}
+			return seqNumber;
+		}
+		private void SetSequence(int seq){
+			try
+			{
+				File.WriteAllText("sequence.txt",seq.ToString());
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
+			}
+		}
+		
 		private void Changement(CouchChangeResult r)
 		{
 			//add to the list of changes
@@ -84,14 +101,7 @@ namespace ContactManager
 			//record the sequence number of the change so when we run the application we
 			//tell that we only need changes > this number. 
 			//(Otherwise you get a change message for every doc in the db at the startup)
-			try
-			{
-				File.WriteAllText("sequence.txt",r.Sequence.ToString());
-			}
-			catch(Exception e)
-			{
-				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
-			}
+			SetSequence(r.Sequence);
 			
 			//verifiy type of change announced so we know if we need to refresh a contact
 			if(r.Id.StartsWith("_design"))
@@ -104,23 +114,11 @@ namespace ContactManager
 			else
 			{
 				//get the latest version of this document
-				Coroutine.Invoke(ContactChangedLoader, r.Id, new Result<Contact>()).WhenDone(
+				theDatabase.GetDocument<Contact>(r.Id,new Result<Contact>()).WhenDone(
 					a => BeginInvoke((MethodInvoker)(() => OnContactChanged(a))),
 					ErrorManagement.ProcessException
 					);
 			}
-		}
-		
-		public Yield ContactChangedLoader(string id, Result<Contact> aResult){
-			var docRes = new Result<Contact>();
-			yield return docRes = theDatabase.GetDocument<Contact>(id,docRes);
-
-			if(docRes.HasException)
-			{
-				aResult.Throw(docRes.Exception);
-				yield break;
-			}
-			aResult.Return(docRes.Value);
 		}
 
 		private void OnContactDeleted(string contactId)

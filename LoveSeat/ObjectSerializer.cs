@@ -12,12 +12,14 @@ namespace LoveSeat
 		{
 			return (objectType == typeof(JDocument)) ||(objectType == typeof(JObject));
 		}
-
-		public override object ReadJson(JsonReader reader, System.Type objectType, JsonSerializer serializer)
+		
+		
+		public override object ReadJson (JsonReader reader, System.Type objectType, JsonSerializer serializer)
 		{
 			return objectType == typeof(JDocument) ? new JDocument(JObject.Load(reader)) : JObject.Load(reader);
 		}
-
+			
+		
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
 		{
 			if (value is JObject)
@@ -44,7 +46,7 @@ namespace LoveSeat
 		public ObjectSerializer()
 		{
 			theSettings = new JsonSerializerSettings();
-			var converters = new List<JsonConverter> { new IsoDateTimeConverter(),new JsonDocumentConverter() };
+			var converters = new List<JsonConverter> { new IsoDateTimeConverter(), new JsonDocumentConverter()};
 			theSettings.Converters = converters;
 			theSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 			theSettings.NullValueHandling = NullValueHandling.Ignore;
@@ -52,7 +54,7 @@ namespace LoveSeat
 
 		public virtual T Deserialize(string json)
 		{
-			return JsonConvert.DeserializeObject<T>(json, theSettings);
+			return JsonConvert.DeserializeObject<T>(json);
 		}
 		public virtual string Serialize(T obj)
 		{

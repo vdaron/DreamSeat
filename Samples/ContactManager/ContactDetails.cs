@@ -46,6 +46,10 @@ namespace ContactManager
 			{
 				theContact = value;
 				RefreshContact();
+				if(theContact==null)
+					this.theDeleteButton.Enabled = false;
+				else
+					this.theDeleteButton.Enabled = true;
 			}
 		}
 
@@ -92,12 +96,12 @@ namespace ContactManager
 
 			if(isNew)
 			{
-				theContact = Database.CreateDocument(theContact, new Result<Contact>()).Wait();
+				theContact = Database.CreateDocument<Contact>(theContact, new Result<Contact>()).Wait();
 			}
 			else
 			{
 				try{
-					theContact = Database.UpdateDocument(theContact, new Result<Contact>()).Wait();
+					theContact = Database.UpdateDocument<Contact>(theContact, new Result<Contact>()).Wait();
 				}catch(Exception exc){
 					Console.WriteLine("### Error, please go it again ###\n"+exc);
 					//ErrorUpdatedContact(this,theContact);
