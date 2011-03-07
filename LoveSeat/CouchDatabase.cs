@@ -580,7 +580,7 @@ namespace LoveSeat
 							try
 							{
 								ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
-								Console.WriteLine(a.ToText());
+								//Console.WriteLine(a.ToText());
 								TDocument res = objectSerializer.Deserialize(a.ToText());
 								// If object inherit BaseDocument, id and rev are set during Deserialiation
 								if (!(res is CouchDocument))

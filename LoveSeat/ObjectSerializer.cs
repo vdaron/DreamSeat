@@ -54,7 +54,7 @@ namespace LoveSeat
 
 		public virtual T Deserialize(string json)
 		{
-			return JsonConvert.DeserializeObject<T>(json);
+			return JsonConvert.DeserializeObject<T>(json, theSettings);
 		}
 		public virtual string Serialize(T obj)
 		{

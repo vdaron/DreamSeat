@@ -7,7 +7,7 @@ using LoveSeat.Interfaces;
 
 namespace ContactManager
 {
-	public class Contact : CouchDocument, IAuditableDocument
+	public class Contact : CouchDocument //, IAuditableDocument
 	{
 		public Contact()
 		{

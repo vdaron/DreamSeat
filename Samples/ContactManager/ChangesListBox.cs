@@ -14,6 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace ContactManager
 {
 	using Yield = IEnumerator<IYield>;
+    using System.Runtime.CompilerServices;
 	
 	public delegate void ContactChangedDelegate(object aSender, Contact aContact);
 	
@@ -92,9 +93,11 @@ namespace ContactManager
 				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
 			}
 		}
-		
+
+   
 		private void Changement(CouchChangeResult r)
 		{
+            
 			//add to the list of changes
 			Items.Add(r);
 
@@ -118,6 +121,19 @@ namespace ContactManager
 					a => BeginInvoke((MethodInvoker)(() => OnContactChanged(a))),
 					ErrorManagement.ProcessException
 					);
+
+                //en synchrone aucun soucis ->
+            /*    Result<Contact> res = new Result<Contact>();
+                theDatabase.GetDocument<Contact>(r.Id, res).Wait();
+                if (res.HasException)
+                {
+                    //blabla
+                    Console.WriteLine("Exception");
+                }
+                else
+                {
+                    OnContactChanged(res.Value);
+                }*/
 			}
 		}
 
@@ -129,6 +145,7 @@ namespace ContactManager
 
 		private void OnContactChanged(Contact aContact)
 		{
+            Console.WriteLine("ici la");
 			if (ContactChanged != null)
 				ContactChanged(this, aContact);
 		}
