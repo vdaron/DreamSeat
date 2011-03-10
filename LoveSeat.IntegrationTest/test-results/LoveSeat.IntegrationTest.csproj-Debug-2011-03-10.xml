@@ -1,0 +1,719 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TestRecord xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <UnitTestResult>
+      <TestDate>2011-03-10T15:50:17</TestDate>
+      <Status>Success Failure Ignored</Status>
+      <TotalFailures>2</TotalFailures>
+      <TotalSuccess>4</TotalSuccess>
+      <TotalIgnored>35</TotalIgnored>
+      <Time />
+      <Message>Child test failed</Message>
+    </UnitTestResult>
+  </Results>
+  <Tests>
+    <TestRecord Name="LoveSeat">
+      <Results>
+        <UnitTestResult>
+          <TestDate>2011-03-10T15:50:17</TestDate>
+          <Status>Success Failure Ignored</Status>
+          <TotalFailures>2</TotalFailures>
+          <TotalSuccess>4</TotalSuccess>
+          <TotalIgnored>35</TotalIgnored>
+          <Time />
+          <Message>Child test failed</Message>
+        </UnitTestResult>
+      </Results>
+      <Tests>
+        <TestRecord Name="IntegrationTest">
+          <Results>
+            <UnitTestResult>
+              <TestDate>2011-03-10T15:50:17</TestDate>
+              <Status>Success Failure Ignored</Status>
+              <TotalFailures>2</TotalFailures>
+              <TotalSuccess>4</TotalSuccess>
+              <TotalIgnored>35</TotalIgnored>
+              <Time />
+              <Message>Child test failed</Message>
+            </UnitTestResult>
+          </Results>
+          <Tests>
+            <TestRecord Name="CouchClientTest">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2011-03-10T15:50:17</TestDate>
+                  <Status>Ignored</Status>
+                  <TotalFailures>0</TotalFailures>
+                  <TotalSuccess>0</TotalSuccess>
+                  <TotalIgnored>35</TotalIgnored>
+                  <Time />
+                  <Message>Invalid TestFixtureSetUp method signature</Message>
+                </UnitTestResult>
+              </Results>
+              <Tests>
+                <TestRecord Name="CreateShow">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="CreateViewDocument">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="GetChanges">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="GetChangesWithDocument">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="GetContinuousChanges">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="GetContinuousChangesWithDocument">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Create_Admin_User">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Create_And_Read_ConfigValue">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Create_Document_From_String">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Create_Document_From_String_WIthId_GeneratedByCouchDb">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Create_User">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Delete_Admin_User">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Delete_Attachment">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Delete_Document">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Determine_If_Doc_Has_Attachment">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Get_304_If_ETag_Matches">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Get_Attachment">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Get_Database_Info">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Get_Results_Quickly">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Read_Configs">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Read_ConfigSection">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Restart_Server">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Return_Attachment_Names">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Return_Etag_In_ViewResults">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Return_View_Results">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Return_View_Results_As_JObject">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Return_View_Results_With_Documents">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Run_TestView">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Save_Existing_Document">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Start_Compact">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Start_CompactView">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="Should_Trigger_Replication">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="ShouldCreateAttachmentInSubCouchDocumentClass">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="TestBasicAuthentication">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="TestCookieAuthentication">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Ignored</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>1</TotalIgnored>
+                      <Time />
+                      <Message>Invalid TestFixtureSetUp method signature</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+              </Tests>
+            </TestRecord>
+            <TestRecord Name="NewtonSoftTests">
+              <Results>
+                <UnitTestResult>
+                  <TestDate>2011-03-10T15:50:17</TestDate>
+                  <Status>Success Failure</Status>
+                  <TotalFailures>2</TotalFailures>
+                  <TotalSuccess>4</TotalSuccess>
+                  <TotalIgnored>0</TotalIgnored>
+                  <Time />
+                  <Message>Child test failed</Message>
+                </UnitTestResult>
+              </Results>
+              <Tests>
+                <TestRecord Name="JArray_Should_Support_Complex_Types">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Success</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>1</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>Test successful
+
+Execution time: 0.07ms</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="KeyOptions_Should_Produce_A_Complex_Array_For_Multiple_Values">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Failure</Status>
+                      <TotalFailures>1</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>  Expected string length 25 but was 33. Strings differ at index 3.
+  Expected: "[1,"2011-01-01T00:00:00"]"
+  But was:  "[1,%222011-01-01T00%3a00%3a00%22]"
+  --------------^
+</Message>
+                      <StackTrace>  at NUnit.Framework.Assert.That (System.Object actual, NUnit.Framework.Constraints.Constraint constraint, System.String message, System.Object[] args) [0x0002c] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:2207 
+  at NUnit.Framework.Assert.AreEqual (System.Object expected, System.Object actual, System.String message, System.Object[] args) [0x00000] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:886 
+  at NUnit.Framework.Assert.AreEqual (System.Object expected, System.Object actual) [0x00000] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:913 
+  at LoveSeat.IntegrationTest.NewtonSoftTests.KeyOptions_Should_Produce_A_Complex_Array_For_Multiple_Values () [0x00036] in /home/danny/Projects/LoveSeat/LoveSeat.IntegrationTest/NewtonSoftTests.cs:67 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x000d0] in /usr/src/packages/BUILD/mono-2.10.1/mcs/class/corlib/System.Reflection/MonoMethod.cs:226 </StackTrace>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="KeyOptions_Should_Produce_IsoTime">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Failure</Status>
+                      <TotalFailures>1</TotalFailures>
+                      <TotalSuccess>0</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>  Expected string length 26 but was 34. Strings differ at index 4.
+  Expected: "[{},"2011-01-01T00:00:00"]"
+  But was:  "[{},%222011-01-01T00%3a00%3a00%22]"
+  ---------------^
+</Message>
+                      <StackTrace>  at NUnit.Framework.Assert.That (System.Object actual, NUnit.Framework.Constraints.Constraint constraint, System.String message, System.Object[] args) [0x0002c] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:2207 
+  at NUnit.Framework.Assert.AreEqual (System.Object expected, System.Object actual, System.String message, System.Object[] args) [0x00000] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:886 
+  at NUnit.Framework.Assert.AreEqual (System.Object expected, System.Object actual) [0x00000] in /usr/src/packages/BUILD/mono-2.10.1/mcs/nunit24/NUnitFramework/framework/Assert.cs:913 
+  at LoveSeat.IntegrationTest.NewtonSoftTests.KeyOptions_Should_Produce_IsoTime () [0x00035] in /home/danny/Projects/LoveSeat/LoveSeat.IntegrationTest/NewtonSoftTests.cs:87 
+  at (wrapper managed-to-native) System.Reflection.MonoMethod:InternalInvoke (System.Reflection.MonoMethod,object,object[],System.Exception&amp;)
+  at System.Reflection.MonoMethod.Invoke (System.Object obj, BindingFlags invokeAttr, System.Reflection.Binder binder, System.Object[] parameters, System.Globalization.CultureInfo culture) [0x000d0] in /usr/src/packages/BUILD/mono-2.10.1/mcs/class/corlib/System.Reflection/MonoMethod.cs:226 </StackTrace>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="KeyOptions_Should_Produce_Single_Value_For_A_Single_Array">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Success</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>1</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="KeyOptions_Should_Produce_Squirley_Brackets_for_CouchValueEmpty">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Success</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>1</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>Test successful
+
+Execution time: 0.00ms</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+                <TestRecord Name="SouldSerializeWithoutDefaultConstructor">
+                  <Results>
+                    <UnitTestResult>
+                      <TestDate>2011-03-10T15:50:17</TestDate>
+                      <Status>Success</Status>
+                      <TotalFailures>0</TotalFailures>
+                      <TotalSuccess>1</TotalSuccess>
+                      <TotalIgnored>0</TotalIgnored>
+                      <Time />
+                      <Message>Test successful
+
+Execution time: 0.36ms</Message>
+                      <ConsoleOutput />
+                      <ConsoleError />
+                    </UnitTestResult>
+                  </Results>
+                </TestRecord>
+              </Tests>
+            </TestRecord>
+          </Tests>
+        </TestRecord>
+      </Tests>
+    </TestRecord>
+  </Tests>
+</TestRecord>
