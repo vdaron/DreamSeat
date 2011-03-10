@@ -37,11 +37,6 @@ namespace LoveSeat.IntegrationTest
 		private const string baseDatabase = "love-seat-test-base";
 		private const string replicateDatabase = "love-seat-test-repli";
 
-		private static readonly string host = ConfigurationManager.AppSettings["Host"];
-		private static readonly int port = int.Parse(ConfigurationManager.AppSettings["Port"]);
-		private static readonly string username = ConfigurationManager.AppSettings["UserName"];
-		private static readonly string password = ConfigurationManager.AppSettings["Password"];
-
 		[TestFixtureSetUp]
 #if NUNIT
 		public static void Setup()
@@ -49,8 +44,7 @@ namespace LoveSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient(username, password);
-			//client.Logon(username, password, new Result<bool>()).Wait();
+			client = new CouchClient();
 
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -89,32 +83,11 @@ namespace LoveSeat.IntegrationTest
 		}
 
 		[Test]
-		[Ignore]
-		public void TestCookieAuthentication()
-		{
-			CouchClient client = new CouchClient();
-			client.Logon(username, password, new Result<bool>()).Wait();
-			Assert.IsTrue(client.IsLogged(new Result<bool>()).Wait());
-			client.Logoff(new Result<bool>()).Wait();
-			Assert.IsFalse(client.IsLogged(new Result<bool>()).Wait());
-		}
-
-		[Test]
-		public void TestBasicAuthentication()
-		{
-			CouchClient client = new CouchClient(username,password);
-
-			CouchDatabase db = client.GetDatabase(baseDatabase);
-			db.CreateDocument(new CouchDocument());
-			
-		}
-
-		[Test]
 		public void Should_Trigger_Replication()
 		{
 			string dbname = "test-replicate-db-created";
 			
-			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://"+username+":"+password+"@"+ host + ":5984/" + replicateDatabase){ Continuous = true });
+			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://localhost:5984/" + replicateDatabase){ Continuous = true });
 			Assert.IsTrue(obj != null);
 
 			var obj2 = client.TriggerReplication(new ReplicationOptions(baseDatabase,dbname){CreateTarget = true});
@@ -196,7 +169,6 @@ namespace LoveSeat.IntegrationTest
 			var bdoc = db.GetDocument<CouchDocument>("upload");
 			Assert.IsTrue(bdoc.GetAttachmentNames().Contains("martin.txt"));
 		}
-
 		[Test]
 		public void Should_Create_And_Read_ConfigValue()
 		{
@@ -220,18 +192,6 @@ namespace LoveSeat.IntegrationTest
 			Dictionary<string, Dictionary<string, string>> config = client.GetConfig(new Result<Dictionary<string, Dictionary<string, string>>>()).Wait();
 			Assert.IsTrue(config.Count > 0);
 		}
-
-		[Test]
-		public void Should_Delete_Admin_User()
-		{
-			client.DeleteAdminUser("Leela");
-		}
-		[Test]
-		public void Should_Create_Admin_User()
-		{
-			client.CreateAdminUser("Leela", "Turanga");
-		}
-
 		[Test]
 		public void Should_Get_Attachment()
 		{
@@ -250,7 +210,6 @@ namespace LoveSeat.IntegrationTest
 				Assert.IsTrue(result == "This is a text document");
 			}
 		}
-
 		[Test]
 		public void ShouldCreateAttachmentInSubCouchDocumentClass()
 		{
@@ -327,7 +286,6 @@ namespace LoveSeat.IntegrationTest
 			Assert.IsNotNull(info);
 			Assert.AreEqual(baseDatabase, info.Name);
 		}
-
 		[Test]
 		public void Should_Return_View_Results()
 		{
@@ -367,14 +325,6 @@ namespace LoveSeat.IntegrationTest
 			JObject result = db.GetView("testviewitem", "testview", new Result<JObject>()).Wait();
 			Assert.IsNotNull(result);
 			Assert.IsNotNull(result["rows"]);
-		}
-
-		[Test]
-		[Ignore]
-		public void Should_Create_User()
-		{
-			CouchDatabase db = client.GetDatabase("_users");
-			CouchUser user = db.GetDocument<CouchUser>("org.couchdb.user:Professor", new Result<CouchUser>()).Wait();
 		}
 		[Test]
 		public void CreateViewDocument()

@@ -405,8 +405,7 @@ namespace LoveSeat
 		public void CreateAdminUser(string username, string password)
 		{
 			SetConfigValue("admins", username, password, new Result()).Wait();
-			SetConfigValue("bobo", "user", "password", new Result()).Wait();
-
+			BasePlug.WithCredentials(username, password);// Logon(username, password, new Result<bool>()).Wait();
 			CouchUser user = new CouchUser {Name = username};
 
 			ObjectSerializer<CouchUser> serializer = new ObjectSerializer<CouchUser>();
