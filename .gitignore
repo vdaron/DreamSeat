@@ -30,3 +30,5 @@ _ReSharper*/
 *.orig
 *.pidb
 *.userprefs
+
+/LoveSeat.IntegrationTest/test-results
