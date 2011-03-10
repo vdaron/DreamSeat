@@ -14,12 +14,12 @@ using Newtonsoft.Json.Linq;
 namespace ContactManager
 {
 	using Yield = IEnumerator<IYield>;
-    using System.Runtime.CompilerServices;
-	
+	using System.Runtime.CompilerServices;
+
 	public delegate void ContactChangedDelegate(object aSender, Contact aContact);
-	
+
 	public delegate void ContactDeletedDelegate(object aSender, string id);
-	
+
 	public partial class ChangesListBox : ListBox
 	{
 		private CouchDatabase theDatabase;
@@ -43,11 +43,11 @@ namespace ContactManager
 				DatabaseLoaded();
 			}
 		}
-	
+
 
 		private void DatabaseLoaded()
 		{
-			if(theDatabase != null)
+			if (theDatabase != null)
 			{
 				Items.Clear();
 				ChangeOptions changes = new ChangeOptions();
@@ -60,44 +60,46 @@ namespace ContactManager
 		private static void ChangesListBoxFormat(object sender, ListControlConvertEventArgs e)
 		{
 			CouchChangeResult change = e.ListItem as CouchChangeResult;
-			if((change != null)&&(change.Changes.Length >= 1))
+			if ((change != null) && (change.Changes.Length >= 1))
 			{
 				e.Value = String.Format("{0:0000}\t{1}\t{2}", change.Sequence, change.Id, change.Changes[0].ToString());
 			}
 		}
-		
-		private int GetSequence(){
+
+		private int GetSequence()
+		{
 			int seqNumber = 1;
 			try
+			{
+				if (File.Exists("sequence.txt"))
 				{
-					if(File.Exists("sequence.txt"))
-					{
-						seqNumber = Int32.Parse(File.ReadAllText("sequence.txt"));
-						return seqNumber;
- 					}
-				}
-				catch(Exception e)
-				{
-					Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n"+e);
+					seqNumber = Int32.Parse(File.ReadAllText("sequence.txt"));
 					return seqNumber;
 				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("There was a problem while reading the sequence number from sequence.txt\n" + e);
+				return seqNumber;
+			}
 			return seqNumber;
 		}
-		private void SetSequence(int seq){
+		private void SetSequence(int seq)
+		{
 			try
 			{
-				File.WriteAllText("sequence.txt",seq.ToString());
+				File.WriteAllText("sequence.txt", seq.ToString());
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
-				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n"+e);
+				Console.WriteLine("There was a problem while writing the sequence number to sequence.txt\n" + e);
 			}
 		}
 
-   
+
 		private void Changement(CouchChangeResult r)
 		{
-            
+
 			//add to the list of changes
 			Items.Add(r);
 
@@ -105,35 +107,35 @@ namespace ContactManager
 			//tell that we only need changes > this number. 
 			//(Otherwise you get a change message for every doc in the db at the startup)
 			SetSequence(r.Sequence);
-			
+
 			//verifiy type of change announced so we know if we need to refresh a contact
-			if(r.Id.StartsWith("_design"))
+			if (r.Id.StartsWith("_design"))
 				return;
-			
-			if(r.Deleted)
+
+			if (r.Deleted)
 			{
 				OnContactDeleted(r.Id);
 			}
 			else
 			{
 				//get the latest version of this document
-				theDatabase.GetDocument<Contact>(r.Id,new Result<Contact>()).WhenDone(
+				theDatabase.GetDocument<Contact>(r.Id, new Result<Contact>()).WhenDone(
 					a => BeginInvoke((MethodInvoker)(() => OnContactChanged(a))),
 					ErrorManagement.ProcessException
 					);
 
-                //en synchrone aucun soucis ->
-            /*    Result<Contact> res = new Result<Contact>();
-                theDatabase.GetDocument<Contact>(r.Id, res).Wait();
-                if (res.HasException)
-                {
-                    //blabla
-                    Console.WriteLine("Exception");
-                }
-                else
-                {
-                    OnContactChanged(res.Value);
-                }*/
+				//en synchrone aucun soucis ->
+				/*    Result<Contact> res = new Result<Contact>();
+					theDatabase.GetDocument<Contact>(r.Id, res).Wait();
+					if (res.HasException)
+					{
+						//blabla
+						Console.WriteLine("Exception");
+					}
+					else
+					{
+						OnContactChanged(res.Value);
+					}*/
 			}
 		}
 
@@ -145,7 +147,7 @@ namespace ContactManager
 
 		private void OnContactChanged(Contact aContact)
 		{
-            Console.WriteLine("ici la");
+			Console.WriteLine("ici la");
 			if (ContactChanged != null)
 				ContactChanged(this, aContact);
 		}

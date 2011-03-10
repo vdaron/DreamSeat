@@ -44,7 +44,6 @@ namespace LoveSeat
 		}
 	}
 
-
 	internal interface IObjectSerializer<T>
 	{
 		T Deserialize(string json);

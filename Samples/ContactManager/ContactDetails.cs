@@ -13,7 +13,7 @@ using System.IO;
 
 namespace ContactManager
 {
-	
+
 	//public delegate void ErrorUpdatedContactDelegate(object aSender, Contact aContact);
 
 
@@ -21,7 +21,7 @@ namespace ContactManager
 	{
 		private Contact theContact;
 		private CouchDatabase theDatabase;
-		
+
 		//public event ErrorUpdatedContactDelegate ErrorUpdatedContact;
 
 		public ContactDetails()
@@ -47,7 +47,7 @@ namespace ContactManager
 			{
 				theContact = value;
 				RefreshContact();
-				if(theContact==null)
+				if (theContact == null)
 					this.theDeleteButton.Enabled = false;
 				else
 					this.theDeleteButton.Enabled = true;
@@ -56,27 +56,27 @@ namespace ContactManager
 
 		private void RefreshContact()
 		{
-			if(theContact != null)
+			if (theContact != null)
 			{
 				theFirstNameTextBox.Text = theContact.FirstName;
 				theLastNameTextBox.Text = theContact.LastName;
 				theCreationDateLabel.Text = theContact.CreationDate.ToString();
 				theLastUpdateDateLabel.Text = theContact.LastUpdateDate.ToString();
 				StringBuilder emails = new StringBuilder();
-				foreach(var email in theContact.EmailAddresses)
+				foreach (var email in theContact.EmailAddresses)
 				{
 					emails.AppendLine(email);
 				}
 				theEmailsTextBox.Text = emails.ToString();
 
-                if (theContact.HasAttachment)
-                {
-                    this.imageAvatar.Image = Image.FromStream(Database.GetAttachment(theContact, theContact.GetAttachmentNames().First()));
-                }
-                else
-                {
-                    this.imageAvatar.Image = null;
-                }
+				if (theContact.HasAttachment)
+				{
+					this.imageAvatar.Image = Image.FromStream(Database.GetAttachment(theContact, theContact.GetAttachmentNames().First()));
+				}
+				else
+				{
+					this.imageAvatar.Image = null;
+				}
 			}
 			else
 			{
@@ -85,14 +85,14 @@ namespace ContactManager
 				theEmailsTextBox.Text = String.Empty;
 				theCreationDateLabel.Text = String.Empty;
 				theLastUpdateDateLabel.Text = String.Empty;
-                imageAvatar.Image = null;
+				imageAvatar.Image = null;
 			}
 		}
 
 		private void theSaveButton_Click(object sender, EventArgs e)
 		{
 			bool isNew = theContact == null;
-			if(isNew)
+			if (isNew)
 			{
 				theContact = new Contact();
 			}
@@ -105,60 +105,64 @@ namespace ContactManager
 				theContact.EmailAddresses.Add(email.Trim());
 			}
 
-			if(isNew)
+			if (isNew)
 			{
 				theContact = Database.CreateDocument<Contact>(theContact, new Result<Contact>()).Wait();
-                if (openFileDialog.FileName.Trim() != "")
-                {
-                    JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
-                    Console.WriteLine("### Result attachement:" +
-                                      j.ToString() + " ###");
-                }
+				if (openFileDialog.FileName.Trim() != "")
+				{
+					JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
+					Console.WriteLine("### Result attachement:" + j.ToString() + " ###");
+				}
 			}
 			else
 			{
-				try{
+				try
+				{
 					theContact = Database.UpdateDocument<Contact>(theContact, new Result<Contact>()).Wait();
-                    if (openFileDialog.FileName.Trim() != "")
-                    {
-                        JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
-                        Console.WriteLine("### Result attachement:" +
-                                          j.ToString() + " ###");
-                    }
-                    
-				}catch(Exception exc){
-					Console.WriteLine("### Error, please go it again ###\n"+exc);
+					if (openFileDialog.FileName.Trim() != "")
+					{
+						JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
+						Console.WriteLine("### Result attachement:" + j.ToString() + " ###");
+					}
+
+				}
+				catch (Exception exc)
+				{
+					Console.WriteLine("### Error, please go it again ###\n" + exc);
 					//ErrorUpdatedContact(this,theContact);
 				}
 			}
 		}
-		
+
 		private void theDeleteButton_Click(object sender, EventArgs e)
 		{
 			bool isNotSelected = theContact == null;
-			if(isNotSelected)
+			if (isNotSelected)
 			{
 				return;
 			}
-			try{
-				Database.DeleteDocument(theContact,new Result<JObject>()).Wait();
-			}catch(Exception exc){
-					Console.WriteLine("### Error, please go it again ###\n"+exc);
-					//ErrorUpdatedContact(this,theContact);
+			try
+			{
+				Database.DeleteDocument(theContact, new Result<JObject>()).Wait();
+			}
+			catch (Exception exc)
+			{
+				Console.WriteLine("### Error, please go it again ###\n" + exc);
+				//ErrorUpdatedContact(this,theContact);
 			}
 		}
 
-        private void theAvatarButton_Click(object sender, EventArgs e)
-        {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                //Database.
-                using (FileStream stream = File.OpenRead(openFileDialog.FileName))
-                {
-                    imageAvatar.Image = Image.FromStream(stream);
-                }
-                
-            }
-        }
+		private void theAvatarButton_Click(object sender, EventArgs e)
+		{
+			if (openFileDialog.ShowDialog() == DialogResult.OK)
+			{
+				//Database.
+				using (FileStream stream = File.OpenRead(openFileDialog.FileName))
+				{
+					imageAvatar.Image = Image.FromStream(stream);
+				}
+
+			}
+		}
 	}
 }
