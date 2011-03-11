@@ -29,7 +29,7 @@ namespace LoveSeat.Support
             }
             if (objects.Count == 1)
             {
-                return HttpUtility.UrlEncode(objects[0].ToString(Formatting.None, new IsoDateTimeConverter()));
+                return objects[0].ToString(Formatting.None, new IsoDateTimeConverter());
             }
             
             string result = "[";
@@ -42,7 +42,7 @@ namespace LoveSeat.Support
                 if(item.ToString().Equals("{}"))
                     result += item.ToString(Formatting.None, new IsoDateTimeConverter());
                 else
-                    result += HttpUtility.UrlEncode(item.ToString(Formatting.None, new IsoDateTimeConverter()));
+                    result += item.ToString(Formatting.None, new IsoDateTimeConverter());
             }
             result += "]";
             return result;
