@@ -29,5 +29,8 @@ namespace LoveSeat
 		
 		[JsonProperty(Constants.LISTS)]
 		public Dictionary<string,string> Lists { get; private set; }
+
+		[JsonProperty(Constants.VALIDATE_DOC_UPDATE)]
+		public string ValidateDocUpdate { get; set; }
 	}
 }

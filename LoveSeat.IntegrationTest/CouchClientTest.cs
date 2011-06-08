@@ -469,7 +469,6 @@ namespace LoveSeat.IntegrationTest
 				Assert.AreEqual(result.Id, id);
 			}
 		}
-
 		[Test]
 		public void CreateShow()
 		{
@@ -482,6 +481,22 @@ namespace LoveSeat.IntegrationTest
 			CouchDesignDocument doc = new CouchDesignDocument("showdoc");
 			doc.Shows.Add("simple", "function(doc, req) {return '<h1>' + doc.title + '</h1>';}");
 			db.CreateDocument(doc);
+		}
+		[Test]
+		public void CreateValidateDocUpdate()
+		{
+			const string validationFunction = "function(newDoc, oldDoc, userCtx) {}";
+
+			var db = client.GetDatabase(baseDatabase);
+
+			CouchDesignDocument doc = new CouchDesignDocument("validationFunction");
+			doc.ValidateDocUpdate = validationFunction;
+			db.CreateDocument(doc);
+
+			JDocument jd = db.GetDocument<JDocument>(doc.Id);
+			Assert.AreEqual(validationFunction, jd["validate_doc_update"].Value<string>());
+
+			db.DeleteDocument(jd);
 		}
 	}
 	public class Company
