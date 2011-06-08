@@ -12,7 +12,7 @@ namespace LoveSeat.Interfaces
         bool? InclusiveEnd { get; set; }
         int? GroupLevel { get; set; }
         bool? Descending { get; set; }
-        bool? Stale { get; set; }
+        Stale? Stale { get; set; }
         string Etag { get; set; }
         string StartKeyDocId { get; set; }
         string EndKeyDocId { get; set; }

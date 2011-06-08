@@ -35,8 +35,20 @@ namespace LoveSeat.Support
 				plug = plug.With(Constants.GROUP_LEVEL, options.GroupLevel.Value);
 			if (options.Descending.HasValue)
 				plug = plug.With(Constants.DESCENDING, options.Descending.Value);
-			if (options.Stale.HasValue && options.Stale.Value)
-				plug = plug.With(Constants.STALE, Constants.OK);
+			if (options.Stale.HasValue)
+			{
+				switch (options.Stale.Value)
+				{
+					case Stale.Normal:
+						plug = plug.With(Constants.STALE, Constants.OK);
+						break;
+					case Stale.UpdateAfter:
+						plug = plug.With(Constants.STALE, Constants.UPDATE_AFTER);
+						break;
+					default:
+						throw new ArgumentOutOfRangeException("Invalid Stale Option");
+				}
+			}
 			if (!string.IsNullOrEmpty(options.StartKeyDocId))
 				plug = plug.With(Constants.STARTKEY_DOCID, options.StartKeyDocId);
 			if (!string.IsNullOrEmpty(options.EndKeyDocId))

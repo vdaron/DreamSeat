@@ -3,7 +3,11 @@ using LoveSeat.Support;
 
 namespace LoveSeat
 {
-
+	public enum Stale
+	{
+		Normal,
+		UpdateAfter
+	}
 
 	public class ViewOptions : IViewOptions
 	{
@@ -35,7 +39,7 @@ namespace LoveSeat
 		public bool? InclusiveEnd { get; set; }
 		public int? GroupLevel { get; set; }
 		public bool? Descending { get; set; }
-		public bool? Stale { get; set; }
+		public Stale? Stale { get; set; }
 		public string Etag { get; set; }
 	}
 }

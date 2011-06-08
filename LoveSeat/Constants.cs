@@ -65,6 +65,7 @@
 		public const string GROUP_LEVEL = "group_level";
 		public const string DESCENDING = "descending";
 		public const string STALE = "stale";
+		public const string UPDATE_AFTER = "update_after";
 		public const string OK = "ok";
 		public const string STARTKEY_DOCID = "startkey_docid";
 		public const string ENDKEY_DOCID = "endkey_docid";

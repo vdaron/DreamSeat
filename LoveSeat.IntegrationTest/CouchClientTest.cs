@@ -498,6 +498,19 @@ namespace LoveSeat.IntegrationTest
 
 			db.DeleteDocument(jd);
 		}
+		[Test]
+		public void ViewStaleOptions()
+		{
+			ViewOptions viewOptions = new ViewOptions();
+			viewOptions.Stale = StaleOption.Normal;
+
+			Plug p = Plug.New("http://localhost").With(viewOptions);
+			Assert.AreEqual("http://localhost?stale=ok",p.ToString());
+
+			viewOptions.Stale = StaleOption.UpdateAfter;
+			Plug p2 = Plug.New("http://localhost").With(viewOptions);
+			Assert.AreEqual("http://localhost?stale=update_after", p2.ToString());
+		}
 	}
 	public class Company
 	{
