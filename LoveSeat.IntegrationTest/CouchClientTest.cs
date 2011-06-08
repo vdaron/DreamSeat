@@ -502,12 +502,12 @@ namespace LoveSeat.IntegrationTest
 		public void ViewStaleOptions()
 		{
 			ViewOptions viewOptions = new ViewOptions();
-			viewOptions.Stale = StaleOption.Normal;
+			viewOptions.Stale = Stale.Normal;
 
 			Plug p = Plug.New("http://localhost").With(viewOptions);
 			Assert.AreEqual("http://localhost?stale=ok",p.ToString());
 
-			viewOptions.Stale = StaleOption.UpdateAfter;
+			viewOptions.Stale = Stale.UpdateAfter;
 			Plug p2 = Plug.New("http://localhost").With(viewOptions);
 			Assert.AreEqual("http://localhost?stale=update_after", p2.ToString());
 		}
