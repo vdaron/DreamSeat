@@ -70,9 +70,9 @@ namespace LoveSeat
 		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
 		{
 			Plug p = BasePlug.At(Constants.REPLICATE);
-			ObjectSerializer<ReplicationOptions> serializer = new ObjectSerializer<ReplicationOptions>();
-			
-			p.Post(DreamMessage.Ok(MimeType.JSON, serializer.Serialize(options)), new Result<DreamMessage>()).WhenDone(
+
+			string json = options.ToString();
+			p.Post(DreamMessage.Ok(MimeType.JSON, json), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if((a.Status == DreamStatus.Accepted)||
