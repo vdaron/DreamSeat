@@ -32,3 +32,5 @@ _ReSharper*/
 *.userprefs
 
 /LoveSeat.IntegrationTest/test-results
+*.testsettings
+LoveSeat.vsmdi
