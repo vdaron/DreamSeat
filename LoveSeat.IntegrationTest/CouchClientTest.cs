@@ -44,7 +44,7 @@ namespace LoveSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient();
+			client = new CouchClient("192.168.1.3");
 
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -100,6 +100,21 @@ namespace LoveSeat.IntegrationTest
 			client.DeleteDatabase(dbname);
 			db = client.GetDatabase(dbname, false);
 			Assert.IsNull(db);
+		}
+		[Test]
+		public void Should_Trigger_Replication_using_replicator_db()
+		{
+			string dbname = "test-replicate-db-created";
+
+			CouchDatabase replDb = client.GetDatabase("_replicator");
+			CouchReplicationDocument doc = replDb.CreateDocument(new CouchReplicationDocument { Id = "B", Source = baseDatabase, Target = "http://localhost:5984/" + replicateDatabase });
+
+			doc = replDb.GetDocument<CouchReplicationDocument>("B");
+			Assert.IsNotEmpty(doc.ReplicationId);
+			Assert.IsNotEmpty(doc.ReplicationState);
+			Assert.IsTrue(doc.ReplicationStateTime.HasValue);
+
+			replDb.DeleteDocument(doc);
 		}
 		[Test]
 		public void Should_Create_Document_From_String()

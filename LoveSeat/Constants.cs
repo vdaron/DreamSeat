@@ -87,5 +87,9 @@
 		public const string HEARTBEAT = "heartbeat";
 		public const string SINCE = "since";
 		public const string TIMEOUT = "timeout";
+
+		public const string REPLICATION_ID = "_replication_id";
+		public const string REPLICATION_STATE = "_replication_state";
+		public const string REPLICATION_STATE_TIME = "_replication_state_time";
 	}
 }

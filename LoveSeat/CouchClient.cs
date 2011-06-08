@@ -67,6 +67,7 @@ namespace LoveSeat
 		/// <param name="options">Replication Options</param>
 		/// <param name="result"></param>
 		/// <returns></returns>
+		[Obsolete("If using CouchDB >= 1.1 use CouchReplicationDocument")]
 		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
 		{
 			Plug p = BasePlug.At(Constants.REPLICATE);

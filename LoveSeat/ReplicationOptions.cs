@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
 
 namespace LoveSeat
 {
@@ -18,6 +19,7 @@ namespace LoveSeat
 		[JsonProperty(Constants.FILTER)]
 		public string Filter { get; set; }
 
+		[Obsolete("If using CouchDB >= 1.1 use CouchReplicationDocument")]
 		public ReplicationOptions(string source, string target)
 		{
 			Source = source;
