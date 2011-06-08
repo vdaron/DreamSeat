@@ -34,6 +34,14 @@ namespace LoveSeat
 		/// 
 		/// </summary>
 		/// <param name="host"></param>
+		public CouchClient(string host)
+			: this(host, Constants.DEFAULT_PORT, null, null)
+		{
+		}
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="host"></param>
 		/// <param name="port"></param>
 		public CouchClient(string host, int port)
 			: this(host, port, null, null)
