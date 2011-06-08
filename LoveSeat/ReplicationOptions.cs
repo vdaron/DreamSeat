@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace LoveSeat
 {
-	public class ReplicationOptions
+	public class ReplicationOptions : CouchDocument
 	{
 		[JsonProperty(Constants.SOURCE)]
-		public string Source { get; internal set; }
+		public string Source { get; set; }
 		[JsonProperty(Constants.TARGET)]
-		public string Target { get; internal set; }
+		public string Target { get; set; }
 		[JsonProperty(Constants.CONTINUOUS)]
 		public bool? Continuous { get; set; }
 		[JsonProperty(Constants.QUERY_PARAMS)]
@@ -22,12 +22,6 @@ namespace LoveSeat
 		{
 			Source = source;
 			Target = target;
-		}
-
-		public override string ToString()
-		{
-			JsonSerializerSettings settings = new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore};
-			return JsonConvert.SerializeObject(this, Formatting.None, settings);
 		}
 	}
 }
