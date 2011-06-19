@@ -19,6 +19,7 @@
 		public const string CONTENT_TYPE = "content_type";
 		public const string LENGTH = "length";
 		public const string DATA = "data";
+		public const string DIGEST = "digest";
 
 		public const string REPLICATE = "_replicate";
 		public const string CONFIG = "_config";
