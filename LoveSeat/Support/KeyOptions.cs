@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web;
+using System.Text;
 using LoveSeat.Interfaces;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -7,104 +7,31 @@ using Newtonsoft.Json.Linq;
 
 namespace LoveSeat.Support
 {
-    public class KeyOptions : IKeyOptions
-    {
-        private JArray objects;
+	public class KeyOptions : JArray
+	{
+		public KeyOptions(params object[] aValues)
+			:base(aValues)
+		{
+		}
 
-        public KeyOptions(params object[] objects) 
-        {           
-            this.objects = new JArray(objects);
-        }
+		public override string ToString()
+		{
+			if (Count == 0)
+				return String.Empty;
+			if (Count == 1)
+				return this[0].ToString(Formatting.None, new IsoDateTimeConverter());
 
-        public KeyOptions(JArray jArray)
-        {
-            objects = jArray;
-        }
-
-        public override string ToString()
-        {
-            if (objects.Count == 0)
-            {
-                return String.Empty;
-            }
-            if (objects.Count == 1)
-            {
-                return objects[0].ToString(Formatting.None, new IsoDateTimeConverter());
-            }
-            
-            string result = "[";
-            bool first = true;
-            foreach (var item in objects)
-            {
-                if (!first)
-                    result += ",";
-                first = false;
-                if(item.ToString().Equals("{}"))
-                    result += item.ToString(Formatting.None, new IsoDateTimeConverter());
-                else
-                    result += item.ToString(Formatting.None, new IsoDateTimeConverter());
-            }
-            result += "]";
-            return result;
-        }
-
-        public void Insert(int index, JToken item)
-        {
-            objects.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            objects.RemoveAt(index);
-        }
-
-        public bool Remove(JToken item)
-        {
-            return objects.Remove(item);
-        }
-
-        public int Count
-        {
-            get { return objects.Count; }
-        }
-
-        public bool HasValues
-        {
-            get { return objects.Count > 0; }
-        }
-
-        public void Add(JToken item)
-        {
-            objects.Add(item);
-        }
-
-        public void Add(object item)
-        {
-            if (item == CouchValue.Empty)
-            {
-                objects.Add(new JRaw("{}"));
-                return;
-            }
-            objects.Add(item);
-        }
-
-        public void Add(params object[] items)
-        {
-            foreach (var item in items)
-            {
-                Add(item);
-            }
-        }
-    }
-    public static class CouchValue
-    {
-        static object value = new object();
-        public static object Empty
-        {
-            get
-            {
-                return value;
-            }
-        }
-    }
+			StringBuilder result = new StringBuilder("[");
+			bool first = true;
+			foreach (var item in this)
+			{
+				if (!first)
+					result.Append(',');
+				first = false;
+				result.Append(item.ToString(Formatting.None, new IsoDateTimeConverter()));
+			}
+			result.Append(']');
+			return result.ToString();
+		}
+	}
 }

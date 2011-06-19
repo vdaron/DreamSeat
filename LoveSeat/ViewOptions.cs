@@ -20,16 +20,16 @@ namespace LoveSeat
 		/// <summary>
 		/// If you have a complex object as a string set this using a JRaw object()
 		/// </summary>
-		public IKeyOptions Key { get; set; }
+		public KeyOptions Key { get; set; }
 		/// <summary>
 		/// If you have a complex object as a string set this using a JRaw object()
 		/// </summary>
-		public IKeyOptions StartKey { get; set; }
+		public KeyOptions StartKey { get; set; }
 		public string StartKeyDocId { get; set; }
 		/// <summary>
 		/// If you have a complex object as a string set this using a JRaw object()
 		/// </summary>
-		public IKeyOptions EndKey { get; set; }
+		public KeyOptions EndKey { get; set; }
 		public string EndKeyDocId { get; set; }
 		public int? Limit { get; set; }
 		public int? Skip { get; set; }

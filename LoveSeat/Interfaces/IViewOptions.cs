@@ -1,10 +1,12 @@
+using LoveSeat.Support;
+
 namespace LoveSeat.Interfaces
 {
     public interface IViewOptions
     {
-        IKeyOptions Key { get; set; }
-        IKeyOptions StartKey { get; set; }
-        IKeyOptions EndKey { get; set; }
+        KeyOptions Key { get; set; }
+        KeyOptions StartKey { get; set; }
+        KeyOptions EndKey { get; set; }
         int? Limit { get; set; }
         int? Skip { get; set; }
         bool? Reduce { get; set; }
