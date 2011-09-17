@@ -45,7 +45,7 @@ namespace DreamSeat.Support
 							break;
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -58,7 +58,7 @@ namespace DreamSeat.Support
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -77,7 +77,7 @@ namespace DreamSeat.Support
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}

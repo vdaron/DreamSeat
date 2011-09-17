@@ -527,8 +527,4 @@ namespace DreamSeat.IntegrationTest
 			Assert.AreEqual("http://localhost?stale=update_after", p2.ToString());
 		}
 	}
-	public class Company
-	{
-		public string Name { get; set; }
-	}
 }

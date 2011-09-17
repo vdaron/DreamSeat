@@ -4,12 +4,7 @@ namespace DreamSeat
 {
 	public class CouchView
 	{
-		internal CouchView() { }
-
-		public CouchView(string map)
-			:this(map,null)
-		{}
-		public CouchView(string map, string reduce)
+		public CouchView(string map = null, string reduce = null)
 		{
 			Map = map;
 			Reduce = reduce;

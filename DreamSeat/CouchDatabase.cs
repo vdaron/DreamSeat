@@ -38,7 +38,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -68,7 +68,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -103,7 +103,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -141,7 +141,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -176,7 +176,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -213,7 +213,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -253,7 +253,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -354,7 +354,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -391,7 +391,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -420,7 +420,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -453,7 +453,7 @@ namespace DreamSeat
 							break;
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -472,7 +472,7 @@ namespace DreamSeat
 
 			BasePlug.AtPath(XUri.EncodeFragment(id)).Head(new Result<DreamMessage>()).WhenDone(
 				a => result.Return(a.IsSuccessful),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -514,7 +514,7 @@ namespace DreamSeat
 
 					result.Return(doc);
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -556,7 +556,7 @@ namespace DreamSeat
 					}
 					result.Return(doc);
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -603,7 +603,7 @@ namespace DreamSeat
 							break;
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -636,7 +636,7 @@ namespace DreamSeat
 						}
 						result.Return(JObject.Parse(a));
 					},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -735,7 +735,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -766,7 +766,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -801,7 +801,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -853,7 +853,7 @@ namespace DreamSeat
 
 			GetDocument(id,new Result<CouchDocument>()).WhenDone(
 				a => AddAttachment(id, a.Rev, attachment, filename, result),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -913,7 +913,7 @@ namespace DreamSeat
 
 			GetDocument(docId, new Result<CouchDocument>()).WhenDone(
 				a => GetAttachment(docId, a.Rev, attachmentName, result),
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -936,7 +936,7 @@ namespace DreamSeat
 
 			GetDocument(id, new Result<CouchDocument>()).WhenDone(
 				a => DeleteAttachment(a.Id, a.Rev, attachmentName, result),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -957,8 +957,8 @@ namespace DreamSeat
 				throw new ArgumentNullException("result");
 
 			DeleteAttachment(doc.Id, doc.Rev, attachmentName, result).WhenDone(
-				a => result.Return(a),
-				e => result.Throw(e)
+				result.Return,
+				result.Throw
 			);
 			return result;
 		}
@@ -1016,7 +1016,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 				);
 			return result;
 		}
@@ -1041,7 +1041,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 				);
 			return result;
 		}
@@ -1089,7 +1089,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -1109,7 +1109,7 @@ namespace DreamSeat
 
 			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
 				a => result.Return(GetViewResult<TKey, TValue>(a)),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -1131,7 +1131,7 @@ namespace DreamSeat
 
 			GetView(viewId,viewName,options,new Result<DreamMessage>()).WhenDone(
 				a => result.Return(GetViewResult<TKey, TValue, TDocument>(a)),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -1159,7 +1159,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -1186,7 +1186,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -1206,7 +1206,7 @@ namespace DreamSeat
 
 			GetView(viewId, viewName, options, new Result<DreamMessage>()).WhenDone(
 				a => result.Return(JObject.Parse(a.ToText())),
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}

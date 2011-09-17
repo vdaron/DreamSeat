@@ -15,46 +15,17 @@ namespace DreamSeat
 	public class CouchClient : CouchBase
 	{
 		/// <summary>
-		/// This is only intended for use if your CouchDb is in Admin Party
-		/// </summary>
-		public CouchClient()
-			: this(Constants.LOCALHOST, Constants.DEFAULT_PORT, null, null)
-		{
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="username"></param>
-		/// <param name="password"></param>
-		public CouchClient(string username, string password)
-			: this(Constants.LOCALHOST, Constants.DEFAULT_PORT, username, password)
-		{
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="host"></param>
-		public CouchClient(string host)
-			: this(host, Constants.DEFAULT_PORT, null, null)
-		{
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="host"></param>
-		/// <param name="port"></param>
-		public CouchClient(string host, int port)
-			: this(host, port, null, null)
-		{
-		}
-		/// <summary>
 		/// Constructs the CouchClient and gets an authentication cookie (10 min)
 		/// </summary>
 		/// <param name="host">The hostname of the CouchDB instance</param>
 		/// <param name="port">The port of the CouchDB instance</param>
 		/// <param name="username">The username of the CouchDB instance</param>
 		/// <param name="password">The password of the CouchDB instance</param>
-		public CouchClient(string host, int port, string username, string password)
+		public CouchClient(
+			string host = Constants.LOCALHOST,
+			int port = Constants.DEFAULT_PORT,
+			string username = null,
+			string password = null)
 			: base(new XUri(String.Format("http://{0}:{1}",host,port)), username, password)
 		{
 		}
@@ -86,7 +57,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -109,7 +80,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -124,7 +95,7 @@ namespace DreamSeat
 		{
 			BasePlug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
 				a => result.Return(a.Status == DreamStatus.Ok),
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -150,7 +121,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -175,7 +146,7 @@ namespace DreamSeat
 						result.Throw(new CouchException(a));
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -202,7 +173,7 @@ namespace DreamSeat
 						{
 							CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
 								a => result.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(databaseName)))),
-								e => result.Throw(e)
+								result.Throw
 							);
 						}
 						else
@@ -211,7 +182,7 @@ namespace DreamSeat
 						}
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 
 			return result;
@@ -306,7 +277,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -328,7 +299,7 @@ namespace DreamSeat
 							break;
 					}
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -351,7 +322,7 @@ namespace DreamSeat
 								break;
 						}
 					},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -365,7 +336,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		}
@@ -379,7 +350,7 @@ namespace DreamSeat
 					else
 						result.Throw(new CouchException(a));
 				},
-				e => result.Throw(e)
+				result.Throw
 			);
 			return result;
 		} 

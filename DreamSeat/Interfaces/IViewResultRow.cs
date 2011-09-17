@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+﻿
 namespace DreamSeat.Interfaces
 {
 	public interface IViewResultRow<TKey>
