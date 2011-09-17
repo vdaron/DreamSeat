@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using LoveSeat;
-using LoveSeat.Interfaces;
+using DreamSeat;
+using DreamSeat.Interfaces;
 
 namespace ContactManager
 {
