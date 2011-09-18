@@ -100,7 +100,7 @@ namespace ContactManager
 			theContact.FirstName = theFirstNameTextBox.Text;
 			theContact.LastName = theLastNameTextBox.Text;
 			theContact.EmailAddresses.Clear();
-			foreach (var email in theEmailsTextBox.Text.Trim().Split('\n'))
+			foreach (var email in theEmailsTextBox.Text.Trim().Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries))
 			{
 				theContact.EmailAddresses.Add(email.Trim());
 			}
@@ -108,10 +108,9 @@ namespace ContactManager
 			if (isNew)
 			{
 				theContact = Database.CreateDocument<Contact>(theContact, new Result<Contact>()).Wait();
-				if (openFileDialog.FileName.Trim() != "")
+				if (imageAvatar.Image != null && openFileDialog.FileName.Trim() != String.Empty)
 				{
-					JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
-					Console.WriteLine("### Result attachement:" + j.ToString() + " ###");
+					Database.AddAttachment(theContact, openFileDialog.FileName, new Result<JObject>()).Wait();
 				}
 			}
 			else
@@ -119,17 +118,15 @@ namespace ContactManager
 				try
 				{
 					theContact = Database.UpdateDocument<Contact>(theContact, new Result<Contact>()).Wait();
-					if (openFileDialog.FileName.Trim() != "")
+					if (imageAvatar.Image != null && openFileDialog.FileName.Trim() != String.Empty)
 					{
-						JObject j = Database.AddAttachment(theContact, this.openFileDialog.FileName, new Result<JObject>()).Wait();
-						Console.WriteLine("### Result attachement:" + j.ToString() + " ###");
+						Database.AddAttachment(theContact, openFileDialog.FileName, new Result<JObject>()).Wait();
 					}
 
 				}
 				catch (Exception exc)
 				{
-					Console.WriteLine("### Error, please go it again ###\n" + exc);
-					//ErrorUpdatedContact(this,theContact);
+					//TODO
 				}
 			}
 		}

@@ -53,7 +53,7 @@ namespace ContactManager
 		{
 			if ((theContactDetails.CurrentContact != null) && (theContactDetails.CurrentContact.Id == aContact.Id))
 				theContactDetails.CurrentContact = aContact;
-			theContactsListBox.Change(aContact);
+			theContactsListBox.UpdateContact(aContact);
 		}
 		
 		private void theChangesListBox_ContactDeleted(object aSender, string id)

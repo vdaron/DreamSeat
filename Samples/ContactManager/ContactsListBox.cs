@@ -40,6 +40,37 @@ namespace ContactManager
 			}
 		}
 
+		public void UpdateContact(Contact aContact)
+		{
+			for (int i = 0; i < Items.Count; i++)
+			{
+				if (((Contact)Items[i]).Id == aContact.Id)
+				{
+					Items.Remove(Items[i]);
+					break;
+				}
+			}
+
+			Items.Add(aContact);
+			Sort();
+		}
+
+		public void Delete(string id)
+		{
+			try
+			{
+				foreach (Contact c in from Contact c in Items where c.Id == id select c)
+				{
+					Items.Remove(c);
+					break;
+				}
+			}
+			catch (Exception)
+			{
+
+			}
+		}
+
 		private void DatabaseLoaded()
 		{
 			if(theDatabase != null)
@@ -48,7 +79,7 @@ namespace ContactManager
 			}
 		}
 
-		public Yield LoadContactsHelper(Result<ViewResult<string,string, Contact>> aResult)
+		private Yield LoadContactsHelper(Result<ViewResult<string,string, Contact>> aResult)
 		{
 			Result<bool> exists = new Result<bool>();
 			yield return theDatabase.DocumentExists("_design/contactview", exists);
@@ -89,8 +120,8 @@ namespace ContactManager
 			}
 			aResult.Return(viewRes.Value);
 		}
-	
-		public void DisplayContacts(ViewResult<string,string, Contact> o)
+
+		private void DisplayContacts(ViewResult<string,string, Contact> o)
 		{
 			Items.Clear();
 			foreach(var row in o.Rows)
@@ -112,32 +143,8 @@ namespace ContactManager
 			if ((c != null) && (SelectedContactChanged != null))
 				SelectedContactChanged(this, c);
 		}
-		
-		public void Change(Contact contactChanged)
-		{
-			if(!Items.Contains(contactChanged))
-			{
-				Items.Add(contactChanged);
-				Sort();
-			}
-			else
-			{
-				Items.Remove(contactChanged);
-				Items.Add(contactChanged);
-				Sort();
-			}
-		}
-		
-		public void Delete(string id)
-		{
-			foreach(Contact c in from Contact c in Items where c.Id == id select c)
-			{
-				Items.Remove(c);
-				break;
-			}
-		}
 
-		internal void ReloadContacts()
+		private void ReloadContacts()
 		{
 			Items.Clear();
 			Items.Add("Loading Contacts");

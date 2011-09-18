@@ -53,7 +53,7 @@ namespace ContactManager
 				ChangeOptions changes = new ChangeOptions();
 				changes.Heartbeat = 10000;
 				changes.Since = GetSequence();
-				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => Changement(y))));
+				theContinuousChangeManager = theDatabase.GetCoutinuousChanges(changes, (x, y) => BeginInvoke((MethodInvoker)(() => OnContactChanged(y))));
 			}
 		}
 
@@ -97,45 +97,33 @@ namespace ContactManager
 		}
 
 
-		private void Changement(CouchChangeResult r)
+		private void OnContactChanged(CouchChangeResult aChangeResult)
 		{
 
 			//add to the list of changes
-			Items.Add(r);
+			Items.Add(aChangeResult);
 
 			//record the sequence number of the change so when we run the application we
 			//tell that we only need changes > this number. 
 			//(Otherwise you get a change message for every doc in the db at the startup)
-			SetSequence(r.Sequence);
+			SetSequence(aChangeResult.Sequence);
 
 			//verifiy type of change announced so we know if we need to refresh a contact
-			if (r.Id.StartsWith("_design"))
+			if (aChangeResult.Id.StartsWith("_design"))
 				return;
 
-			if (r.Deleted)
+			if (aChangeResult.Deleted)
 			{
-				OnContactDeleted(r.Id);
+				OnContactDeleted(aChangeResult.Id);
 			}
 			else
 			{
+				Console.WriteLine("Retrieving last version of {0}",aChangeResult.Id);
 				//get the latest version of this document
-				theDatabase.GetDocument<Contact>(r.Id, new Result<Contact>()).WhenDone(
+				theDatabase.GetDocument(aChangeResult.Id, new Result<Contact>()).WhenDone(
 					a => BeginInvoke((MethodInvoker)(() => OnContactChanged(a))),
 					ErrorManagement.ProcessException
 					);
-
-				//en synchrone aucun soucis ->
-				/*    Result<Contact> res = new Result<Contact>();
-					theDatabase.GetDocument<Contact>(r.Id, res).Wait();
-					if (res.HasException)
-					{
-						//blabla
-						Console.WriteLine("Exception");
-					}
-					else
-					{
-						OnContactChanged(res.Value);
-					}*/
 			}
 		}
 
@@ -147,7 +135,6 @@ namespace ContactManager
 
 		private void OnContactChanged(Contact aContact)
 		{
-			Console.WriteLine("ici la");
 			if (ContactChanged != null)
 				ContactChanged(this, aContact);
 		}
