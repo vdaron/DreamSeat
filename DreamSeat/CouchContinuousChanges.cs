@@ -5,8 +5,8 @@ using MindTouch.Dream;
 
 namespace DreamSeat
 {
-	public delegate void CouchChangeDelegate(object sender, CouchChangeResult result);
-	public delegate void CouchChangeDelegate<T>(object sender, CouchChangeResult<T> result) where T : ICouchDocument;
+	public delegate void CouchChangeDelegate(object aSender, CouchChangeResult aResult);
+	public delegate void CouchChangeDelegate<T>(object aSender, CouchChangeResult<T> aResult) where T : ICouchDocument;
 
 	public class CouchContinuousChanges : IDisposable
 	{
@@ -15,6 +15,11 @@ namespace DreamSeat
 
 		internal CouchContinuousChanges(DreamMessage aMessage, CouchChangeDelegate aCallback)
 		{
+			if (aMessage == null)
+				throw new ArgumentNullException("aMessage");
+			if (aCallback == null)
+				throw new ArgumentNullException("aCallback");
+
 			theReader = new AsyncStreamReader(aMessage.ToStream(), (x, y) => {
 				if (!String.IsNullOrEmpty(y.Line))
 				{
@@ -37,6 +42,11 @@ namespace DreamSeat
 
 		internal CouchContinuousChanges(DreamMessage aMessage, CouchChangeDelegate<T> aCallback)
 		{
+			if (aMessage == null)
+				throw new ArgumentNullException("aMessage");
+			if (aCallback == null)
+				throw new ArgumentNullException("aCallback");
+
 			theReader = new AsyncStreamReader(aMessage.ToStream(), (x, y) => {
 				if (!String.IsNullOrEmpty(y.Line))
 				{

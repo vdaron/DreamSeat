@@ -11,36 +11,36 @@ namespace DreamSeat
 {
 	public class CouchDatabase : CouchBase
 	{
-		public CouchDatabase(XUri databaseUri)
-			: base(databaseUri)
+		public CouchDatabase(XUri aDatabaseUri)
+			: base(aDatabaseUri)
 		{
 		}
 
-		public CouchDatabase(XUri databaseUri,string username,string password)
-			: base(databaseUri,username,password)
+		public CouchDatabase(XUri aDatabaseUri,string aUsername,string aPassword)
+			: base(aDatabaseUri,aUsername,aPassword)
 		{
 		}
 
 		/// <summary>
 		/// Retrieve DatabaseInformation
 		/// </summary>
-		/// <param name="result"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<CouchDatabaseInfo> GetInfo(Result<CouchDatabaseInfo> result)
+		public Result<CouchDatabaseInfo> GetInfo(Result<CouchDatabaseInfo> aResult)
 		{
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
 			BasePlug.Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if(a.Status == DreamStatus.Ok)
-						result.Return(JsonConvert.DeserializeObject<CouchDatabaseInfo>(a.ToText()));
+						aResult.Return(JsonConvert.DeserializeObject<CouchDatabaseInfo>(a.ToText()));
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		public CouchDatabaseInfo GetInfo()
 		{
@@ -50,27 +50,27 @@ namespace DreamSeat
 		/// <summary>
 		/// Request compaction of the specified database. Compaction compresses the disk database file
 		/// </summary>
-		/// <param name="result"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result Compact(Result result)
+		public Result Compact(Result aResult)
 		{
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
 			BasePlug.At(Constants.COMPACT).Post(DreamMessage.Ok(MimeType.JSON,String.Empty), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Accepted)
 					{
-						result.Return();
+						aResult.Return();
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		public void Compact()
 		{
@@ -81,182 +81,182 @@ namespace DreamSeat
 		/// Compacts the view indexes associated with the specified design document. You can use this in place of the full database compaction if
 		/// you know a specific set of view indexes have been affected by a recent database change
 		/// </summary>
-		/// <param name="documentViewId">Design Document id to compact</param>
-		/// <param name="result"></param>
+		/// <param name="aDocumentViewId">Design Document id to compact</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result CompactDocumentView(string documentViewId,Result result)
+		public Result CompactDocumentView(string aDocumentViewId,Result aResult)
 		{
-			if (String.IsNullOrEmpty(documentViewId))
-				throw new ArgumentNullException(documentViewId);
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(aDocumentViewId))
+				throw new ArgumentException("aDocumentViewId cannot be null nor empty"); 
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.At(Constants.COMPACT).At(XUri.EncodeFragment(documentViewId)).Post(DreamMessage.Ok(MimeType.JSON, String.Empty), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.COMPACT).At(XUri.EncodeFragment(aDocumentViewId)).Post(DreamMessage.Ok(MimeType.JSON, String.Empty), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Accepted)
 					{
-						result.Return();
+						aResult.Return();
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-		public void CompactDocumentView(string documentViewId)
+		public void CompactDocumentView(string aDocumentViewId)
 		{
-			CompactDocumentView(documentViewId, new Result()).Wait();
+			CompactDocumentView(aDocumentViewId, new Result()).Wait();
 		}
 
 		#region Change Management
 		/// <summary>
 		/// Request database changes
 		/// </summary>
-		/// <param name="options">Change options</param>
-		/// <param name="result"></param>
+		/// <param name="aChangeOptions">Change options</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<CouchChanges> GetChanges(ChangeOptions options, Result<CouchChanges> result)
+		public Result<CouchChanges> GetChanges(ChangeOptions aChangeOptions, Result<CouchChanges> aResult)
 		{
-			if (options == null)
-				throw new ArgumentNullException("options");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aChangeOptions == null)
+				throw new ArgumentNullException("aOptions");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			options.Feed = ChangeFeed.Normal;
+			aChangeOptions.Feed = ChangeFeed.Normal;
 
-			BasePlug.At(Constants._CHANGES).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants._CHANGES).With(aChangeOptions).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
 					{
 						ObjectSerializer<CouchChanges> serializer = new ObjectSerializer<CouchChanges>();
-						result.Return(serializer.Deserialize(a.ToText()));
+						aResult.Return(serializer.Deserialize(a.ToText()));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Request database changes including documents
 		/// </summary>
 		/// <typeparam name="T">Type of document used while returning changes</typeparam>
-		/// <param name="options">Change options</param>
-		/// <param name="result"></param>
+		/// <param name="aOptions">Change options</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<CouchChanges<T>> GetChanges<T>(ChangeOptions options, Result<CouchChanges<T>> result) where T : ICouchDocument
+		public Result<CouchChanges<T>> GetChanges<T>(ChangeOptions aOptions, Result<CouchChanges<T>> aResult) where T : ICouchDocument
 		{
-			if (options == null)
-				throw new ArgumentNullException("options");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aOptions == null)
+				throw new ArgumentNullException("aOptions");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			options.Feed = ChangeFeed.Normal;
-			options.IncludeDocs = true;
+			aOptions.Feed = ChangeFeed.Normal;
+			aOptions.IncludeDocs = true;
 
-			BasePlug.At(Constants._CHANGES).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants._CHANGES).With(aOptions).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
 					{
 						ObjectSerializer<CouchChanges<T>> serializer = new ObjectSerializer<CouchChanges<T>>();
-						result.Return(serializer.Deserialize(a.ToText()));
+						aResult.Return(serializer.Deserialize(a.ToText()));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Request continuous changes from database
 		/// </summary>
-		/// <param name="options">Change options</param>
-		/// <param name="callback">Callback used for each change notification</param>
-		/// <param name="result"></param>
+		/// <param name="aChangeOptions">Change options</param>
+		/// <param name="aCallback">Callback used for each change notification</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
 		public Result<CouchContinuousChanges> GetCoutinuousChanges(
-			ChangeOptions options,
-			CouchChangeDelegate callback,
-			Result<CouchContinuousChanges> result)
+			ChangeOptions aChangeOptions,
+			CouchChangeDelegate aCallback,
+			Result<CouchContinuousChanges> aResult)
 		{
-			if (options == null)
-				throw new ArgumentNullException("options");
-			if (callback == null)
-				throw new ArgumentNullException("callback");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aChangeOptions == null)
+				throw new ArgumentNullException("aChangeOptions");
+			if (aCallback == null)
+				throw new ArgumentNullException("aCallback");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			options.Feed = ChangeFeed.Continuous;
-			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			aChangeOptions.Feed = ChangeFeed.Continuous;
+			BasePlug.At(Constants._CHANGES).With(aChangeOptions).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.IsSuccessful)
 					{
-						result.Return(new CouchContinuousChanges(a, callback));
+						aResult.Return(new CouchContinuousChanges(a, aCallback));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Request continuous changes from database including Documents
 		/// </summary>
 		/// <typeparam name="T">>Type of document used while returning changes</typeparam>
-		/// <param name="options">Change options</param>
-		/// <param name="callback">Callback used for each change notification</param>
-		/// <param name="result"></param>
+		/// <param name="aChangeOptions">Change options</param>
+		/// <param name="aCallback">Callback used for each change notification</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
 		public Result<CouchContinuousChanges<T>> GetCoutinuousChanges<T>(
-			ChangeOptions options,
-			CouchChangeDelegate<T> callback,
-			Result<CouchContinuousChanges<T>> result) where T : ICouchDocument
+			ChangeOptions aChangeOptions,
+			CouchChangeDelegate<T> aCallback,
+			Result<CouchContinuousChanges<T>> aResult) where T : ICouchDocument
 		{
-			if (options == null)
-				throw new ArgumentNullException("options");
-			if (callback == null)
-				throw new ArgumentNullException("callback");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aChangeOptions == null)
+				throw new ArgumentNullException("aChangeOptions");
+			if (aCallback == null)
+				throw new ArgumentNullException("aCallback");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			options.Feed = ChangeFeed.Continuous;
-			options.IncludeDocs = true;
+			aChangeOptions.Feed = ChangeFeed.Continuous;
+			aChangeOptions.IncludeDocs = true;
 
-			BasePlug.At(Constants._CHANGES).With(options).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants._CHANGES).With(aChangeOptions).InvokeEx(Verb.GET, DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.IsSuccessful)
 					{
-						result.Return(new CouchContinuousChanges<T>(a, callback));
+						aResult.Return(new CouchContinuousChanges<T>(a, aCallback));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 
 		/// <summary>
@@ -264,40 +264,41 @@ namespace DreamSeat
 		/// </summary>
 		/// <param name="options">Change options</param>
 		/// <returns></returns>
-		public CouchChanges GetChanges(ChangeOptions options)
+		public CouchChanges GetChanges(ChangeOptions aChangeOptions)
 		{
-			return GetChanges(options, new Result<CouchChanges>()).Wait();
+			return GetChanges(aChangeOptions, new Result<CouchChanges>()).Wait();
 		}
+
 		/// <summary>
 		/// Request database changes including documents
 		/// </summary>
 		/// <typeparam name="T">Type of document used while returning changes</typeparam>
-		/// <param name="options">Change options</param>
+		/// <param name="aChangeOptions">Change options</param>
 		/// <returns></returns>
-		public CouchChanges<T> GetChanges<T>(ChangeOptions options) where T : ICouchDocument
+		public CouchChanges<T> GetChanges<T>(ChangeOptions aChangeOptions) where T : ICouchDocument
 		{
-			return GetChanges(options, new Result<CouchChanges<T>>()).Wait();
+			return GetChanges(aChangeOptions, new Result<CouchChanges<T>>()).Wait();
 		}
 		/// <summary>
 		/// Request continuous changes from database
 		/// </summary>
-		/// <param name="options">Change options</param>
-		/// <param name="callback">Callback used for each change notification</param>
+		/// <param name="aChangeOptions">Change options</param>
+		/// <param name="aCallback">Callback used for each change notification</param>
 		/// <returns></returns>
-		public CouchContinuousChanges GetCoutinuousChanges(ChangeOptions options, CouchChangeDelegate callback)
+		public CouchContinuousChanges GetCoutinuousChanges(ChangeOptions aChangeOptions, CouchChangeDelegate aCallback)
 		{
-			return GetCoutinuousChanges(options, callback, new Result<CouchContinuousChanges>()).Wait();
+			return GetCoutinuousChanges(aChangeOptions, aCallback, new Result<CouchContinuousChanges>()).Wait();
 		}
 		/// <summary>
 		/// Request continuous changes from database including Documents
 		/// </summary>
 		/// <typeparam name="T">>Type of document used while returning changes</typeparam>
-		/// <param name="options">Change options</param>
-		/// <param name="callback">Callback used for each change notification</param>
+		/// <param name="aChangeOptions">Change options</param>
+		/// <param name="aCallback">Callback used for each change notification</param>
 		/// <returns></returns>
-		public CouchContinuousChanges<T> GetCoutinuousChanges<T>(ChangeOptions options, CouchChangeDelegate<T> callback) where T : ICouchDocument
+		public CouchContinuousChanges<T> GetCoutinuousChanges<T>(ChangeOptions aChangeOptions, CouchChangeDelegate<T> aCallback) where T : ICouchDocument
 		{
-			return GetCoutinuousChanges(options, callback, new Result<CouchContinuousChanges<T>>()).Wait();
+			return GetCoutinuousChanges(aChangeOptions, aCallback, new Result<CouchContinuousChanges<T>>()).Wait();
 		}
 
 		#endregion
@@ -308,37 +309,37 @@ namespace DreamSeat
 		/// <summary>
 		/// Creates a document when you intend for Couch to generate the id for you.
 		/// </summary>
-		/// <param name="json">Json for creating the document</param>
-		/// <param name="result"></param>
+		/// <param name="aJson">Json for creating the document</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<string> CreateDocument(string json, Result<string> result)
+		public Result<string> CreateDocument(string aJson, Result<string> aResult)
 		{
-			return CreateDocument(null, json, result);
+			return CreateDocument(null, aJson, aResult);
 		}
 		/// <summary>
 		/// Creates a document using the json provided. 
 		/// No validation or smarts attempted here by design for simplicities sake
 		/// </summary>
-		/// <param name="id">Id of Document, if null or empty, id will be generated by the server</param>
-		/// <param name="json"></param>
-		/// <param name="result"></param>
+		/// <param name="anId">Id of Document, if null or empty, id will be generated by the server</param>
+		/// <param name="aJson"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<string> CreateDocument(string id, string json, Result<string> result)
+		public Result<string> CreateDocument(string anId, string aJson, Result<string> aResult)
 		{
-			if (String.IsNullOrEmpty(json))
-				throw new ArgumentNullException("json");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(aJson))
+				throw new ArgumentNullException("aJson");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			JObject jobj = JObject.Parse(json);
+			JObject jobj = JObject.Parse(aJson);
 			if (jobj.Value<object>(Constants._REV) != null)
 				jobj.Remove(Constants._REV);
 
 			Plug p = BasePlug;
 			string verb = Verb.POST;
-			if (!String.IsNullOrEmpty(id))
+			if (!String.IsNullOrEmpty(anId))
 			{
-				p = p.AtPath(XUri.EncodeFragment(id));
+				p = p.AtPath(XUri.EncodeFragment(anId));
 				verb = Verb.PUT;
 			}
 
@@ -347,134 +348,134 @@ namespace DreamSeat
 				{
 					if (a.Status == DreamStatus.Created)
 					{
-						result.Return(a.ToText());
+						aResult.Return(a.ToText());
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="rev"></param>
-		/// <param name="json"></param>
-		/// <param name="result"></param>
+		/// <param name="anId"></param>
+		/// <param name="aRev"></param>
+		/// <param name="aJson"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<string> UpdateDocument(string id, string rev, string json, Result<string> result)
+		public Result<string> UpdateDocument(string anId, string aRev, string aJson, Result<string> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (String.IsNullOrEmpty(json))
-				throw new ArgumentNullException("json");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("anId");
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (String.IsNullOrEmpty(aJson))
+				throw new ArgumentNullException("aJson");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			JObject jobj = JObject.Parse(json);
-			BasePlug.AtPath(XUri.EncodeFragment(id)).With(Constants.REV, rev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
+			JObject jobj = JObject.Parse(aJson);
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).With(Constants.REV, aRev).Put(DreamMessage.Ok(MimeType.JSON, jobj.ToString(Formatting.None)), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
 					{
-						result.Return(a.ToText());
+						aResult.Return(a.ToText());
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Delete the specified document
 		/// </summary>
-		/// <param name="id">id of the document</param>
-		/// <param name="rev">revision</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aRev">revision</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<string> DeleteDocument(string id, string rev, Result<string> result)
+		public Result<string> DeleteDocument(string anId, string aRev, Result<string> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("anId");
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).With(Constants.REV, rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).With(Constants.REV, aRev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return(a.ToText());
+						aResult.Return(a.ToText());
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Retrive a document based on doc id
 		/// </summary>
-		/// <param name="id">id of the document</param>
-		/// <param name="result">Jobject or </param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aResult">Jobject or </param>
 		/// <returns></returns>
-		public Result<string> GetDocument(string id, Result<string> result)
+		public Result<string> GetDocument(string anId, Result<string> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("anId");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					switch(a.Status)
 					{
 						case DreamStatus.Ok:
-							result.Return(a.ToText());
+							aResult.Return(a.ToText());
 							break;
 						case DreamStatus.NotFound:
-							result.Return((string)null);
+							aResult.Return((string)null);
 							break;
 						default:
-							result.Throw(new CouchException(a));
+							aResult.Throw(new CouchException(a));
 							break;
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Check if a document exists
 		/// </summary>
-		/// <param name="id">id of the document</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<bool> DocumentExists(string id,Result<bool> result)
+		public Result<bool> DocumentExists(string anId,Result<bool> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("anId");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).Head(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(a.IsSuccessful),
-				result.Throw
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).Head(new Result<DreamMessage>()).WhenDone(
+				a => aResult.Return(a.IsSuccessful),
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		#endregion
 
@@ -482,94 +483,94 @@ namespace DreamSeat
 		/// Create a document based on object based on ICouchDocument interface. If the ICouchDocument does not have an Id, CouchDB will generate the id for you
 		/// </summary>
 		/// <typeparam name="TDocument">ICouchDocument Type to return</typeparam>
-		/// <param name="doc">ICouchDocument to create</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">ICouchDocument to create</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<TDocument> CreateDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
+		public Result<TDocument> CreateDocument<TDocument>(TDocument aDoc, Result<TDocument> aResult) where TDocument : class, ICouchDocument
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
 			ObjectSerializer<TDocument> serializer = new ObjectSerializer<TDocument>();
 
-			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			IAuditableDocument auditableCouchDocument = aDoc as IAuditableDocument;
 			if(auditableCouchDocument != null)
 			{
 				auditableCouchDocument.Creating();
 			}
 
-			CreateDocument(doc.Id, serializer.Serialize(doc), new Result<string>()).WhenDone(
+			CreateDocument(aDoc.Id, serializer.Serialize(aDoc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
-					doc.Id = value[Constants.ID].Value<string>();
-					doc.Rev = value[Constants.REV].Value<string>();
+					aDoc.Id = value[Constants.ID].Value<string>();
+					aDoc.Rev = value[Constants.REV].Value<string>();
 					
 					if (auditableCouchDocument != null)
 					{
 						auditableCouchDocument.Created();
 					}
 
-					result.Return(doc);
+					aResult.Return(aDoc);
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Update a document
 		/// </summary>
 		/// <typeparam name="TDocument">Type of document</typeparam>
-		/// <param name="doc">Document to update</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">Document to update</param>
+		/// <param name="aResult"></param>
 		/// <returns>Updated document</returns>
-		public Result<TDocument> UpdateDocument<TDocument>(TDocument doc, Result<TDocument> result) where TDocument : class, ICouchDocument
+		public Result<TDocument> UpdateDocument<TDocument>(TDocument aDoc, Result<TDocument> aResult) where TDocument : class, ICouchDocument
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (result == null)
-				throw new ArgumentNullException("result");
-			if (String.IsNullOrEmpty(doc.Id))
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+			if (String.IsNullOrEmpty(aDoc.Id))
 				throw new ArgumentException("Document must have an id");
-			if (String.IsNullOrEmpty(doc.Rev))
+			if (String.IsNullOrEmpty(aDoc.Rev))
 				throw new ArgumentException("Document must have a revision");
 
 			ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
 
-			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			IAuditableDocument auditableCouchDocument = aDoc as IAuditableDocument;
 			if (auditableCouchDocument != null)
 			{
 				auditableCouchDocument.Updating();
 			}
 
-			UpdateDocument(doc.Id, doc.Rev, objectSerializer.Serialize(doc), new Result<string>()).WhenDone(
+			UpdateDocument(aDoc.Id, aDoc.Rev, objectSerializer.Serialize(aDoc), new Result<string>()).WhenDone(
 				a =>
 				{
 					JObject value = JObject.Parse(a);
-					doc.Id = value[Constants.ID].Value<string>();
-					doc.Rev = value[Constants.REV].Value<string>();
+					aDoc.Id = value[Constants.ID].Value<string>();
+					aDoc.Rev = value[Constants.REV].Value<string>();
 					if (auditableCouchDocument != null)
 					{
 						auditableCouchDocument.Updated();
 					}
-					result.Return(doc);
+					aResult.Return(aDoc);
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Retrieve Document using with specified id and deserialize result
 		/// </summary>
 		/// <typeparam name="TDocument">Object created during deserialization, must inherit ICouchDocument</typeparam>
-		/// <param name="id">id of the document</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<TDocument> GetDocument<TDocument>(string id, Result<TDocument> result) where TDocument : ICouchDocument
+		public Result<TDocument> GetDocument<TDocument>(string anId, Result<TDocument> aResult) where TDocument : ICouchDocument
 		{
-			BasePlug.AtPath(XUri.EncodeFragment(id)).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					switch (a.Status)
@@ -578,7 +579,6 @@ namespace DreamSeat
 							try
 							{
 								ObjectSerializer<TDocument> objectSerializer = new ObjectSerializer<TDocument>();
-								//Console.WriteLine(a.ToText());
 								TDocument res = objectSerializer.Deserialize(a.ToText());
 								// If object inherit BaseDocument, id and rev are set during Deserialiation
 								if (!(res is CouchDocument))
@@ -588,57 +588,57 @@ namespace DreamSeat
 									res.Id = idrev[Constants._ID].Value<string>();
 									res.Rev = idrev[Constants._REV].Value<string>();
 								}
-								result.Return(res);
+								aResult.Return(res);
 							}
 							catch (Exception ex)
 							{
-								result.Throw(ex);
+								aResult.Throw(ex);
 							}
 							break;
 						case DreamStatus.NotFound:
-							result.Return(default(TDocument));
+							aResult.Return(default(TDocument));
 							break;
 						default:
-							result.Throw(new CouchException(a));
+							aResult.Throw(new CouchException(a));
 							break;
 					}
 				},
-				result.Throw
-			);
+				aResult.Throw
+				);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Delete specified document
 		/// </summary>
-		/// <param name="doc">document to delete</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">document to delete</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> DeleteDocument(ICouchDocument doc, Result<JObject> result)
+		public Result<JObject> DeleteDocument(ICouchDocument aDoc, Result<JObject> aResult)
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			IAuditableDocument auditableCouchDocument = doc as IAuditableDocument;
+			IAuditableDocument auditableCouchDocument = aDoc as IAuditableDocument;
 			if (auditableCouchDocument != null)
 			{
 				auditableCouchDocument.Deleting();
 			}
 
-			DeleteDocument(doc.Id, doc.Rev, new Result<string>()).WhenDone(
+			DeleteDocument(aDoc.Id, aDoc.Rev, new Result<string>()).WhenDone(
 				a =>
 					{
 						if (auditableCouchDocument != null)
 						{
 							auditableCouchDocument.Deleted();
 						}
-						result.Return(JObject.Parse(a));
+						aResult.Return(JObject.Parse(a));
 					},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 
 		/// <summary>
@@ -646,53 +646,53 @@ namespace DreamSeat
 		/// This method is synchronous
 		/// </summary>
 		/// <typeparam name="TDocument">ICouchDocument Type to return</typeparam>
-		/// <param name="doc">ICouchDocument to create</param>
+		/// <param name="aDoc">ICouchDocument to create</param>
 		/// <returns></returns>
-		public TDocument CreateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
+		public TDocument CreateDocument<TDocument>(TDocument aDoc) where TDocument : class, ICouchDocument
 		{
-			return CreateDocument(doc, new Result<TDocument>()).Wait();
+			return CreateDocument(aDoc, new Result<TDocument>()).Wait();
 		}
 		/// <summary>
 		/// Update a document
 		/// This method is synchronous
 		/// </summary>
 		/// <typeparam name="TDocument">Type of document</typeparam>
-		/// <param name="doc">Document to update</param>
+		/// <param name="aDoc">Document to update</param>
 		/// <returns>Updated document</returns>
-		public TDocument UpdateDocument<TDocument>(TDocument doc) where TDocument : class, ICouchDocument
+		public TDocument UpdateDocument<TDocument>(TDocument aDoc) where TDocument : class, ICouchDocument
 		{
-			return UpdateDocument(doc, new Result<TDocument>()).Wait();
+			return UpdateDocument(aDoc, new Result<TDocument>()).Wait();
 		}
 		/// <summary>
 		/// Retrieve Document using with specified id and deserialize result
 		/// This method is synchronous
 		/// </summary>
 		/// <typeparam name="TDocument">Object created during deserialization, must inherit ICouchDocument</typeparam>
-		/// <param name="id">id of the document</param>
+		/// <param name="anId">id of the document</param>
 		/// <returns></returns>
-		public TDocument GetDocument<TDocument>(string id) where TDocument : class, ICouchDocument
+		public TDocument GetDocument<TDocument>(string anId) where TDocument : class, ICouchDocument
 		{
-			return GetDocument(id, new Result<TDocument>()).Wait();
+			return GetDocument(anId, new Result<TDocument>()).Wait();
 		}
 		/// <summary>
 		/// Delete specified document
 		/// This method is synchronous
 		/// </summary>
-		/// <param name="doc">document to delete</param>
+		/// <param name="aDoc">document to delete</param>
 		/// <returns></returns>
-		public void DeleteDocument(ICouchDocument doc)
+		public void DeleteDocument(ICouchDocument aDoc)
 		{
-			DeleteDocument(doc, new Result<JObject>()).Wait();
+			DeleteDocument(aDoc, new Result<JObject>()).Wait();
 		}
 		/// <summary>
 		/// Check id a document exists in Database
 		/// This method is synchronous
 		/// </summary>
-		/// <param name="id"></param>
+		/// <param name="anId"></param>
 		/// <returns></returns>
-		public bool DocumentExists(string id)
+		public bool DocumentExists(string anId)
 		{
-			return DocumentExists(id, new Result<bool>()).Wait();
+			return DocumentExists(anId, new Result<bool>()).Wait();
 		}
 		#endregion
 
@@ -810,240 +810,243 @@ namespace DreamSeat
 		/// <summary>
 		/// Add Attachment to the document
 		/// </summary>
-		/// <param name="id">id of the document</param>
-		/// <param name="rev">rev of the document</param>
-		/// <param name="attachment">attachment stream (will be closed)</param>
-		/// <param name="fileName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aRev">rev of the document</param>
+		/// <param name="anAttachment">attachment stream (will be closed)</param>
+		/// <param name="aFileName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> AddAttachment(string id, string rev, Stream attachment, string fileName, Result<JObject> result)
+		public Result<JObject> AddAttachment(string anId, string aRev, Stream anAttachment, string aFileName, Result<JObject> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (attachment == null)
-				throw new ArgumentNullException("attachment");
-			if (String.IsNullOrEmpty(fileName))
-				throw new ArgumentNullException("fileName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("anId");
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (anAttachment == null)
+				throw new ArgumentNullException("anAttachment");
+			if (String.IsNullOrEmpty(aFileName))
+				throw new ArgumentNullException("aFileName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			return AddAttachment(id, rev, attachment, attachment.Length, fileName, MimeType.FromFileExtension(fileName), result);
+			return AddAttachment(anId, aRev, anAttachment, anAttachment.Length, aFileName, MimeType.FromFileExtension(aFileName), aResult);
 		}
-
 		/// <summary>
 		/// Adds an attachment to a document.  If revision is not specified then the most recent will be fetched and used.  
 		/// Warning: if you need document update conflicts to occur please use the method that specifies the revision
 		/// </summary>
-		/// <param name="id">id of the couch Document</param>
-		/// <param name="attachment">Stream of the attachment. Will be closed once request is sent</param>
-		/// <param name="filename">Filename must be specifed</param>
-		/// <param name="result"></param>	
-		public Result<JObject> AddAttachment(string id, Stream attachment, string filename, Result<JObject> result)
+		/// <param name="anId">id of the couch Document</param>
+		/// <param name="anAttachment">Stream of the attachment. Will be closed once request is sent</param>
+		/// <param name="aFilename">Filename must be specifed</param>
+		/// <param name="aResult"></param>	
+		public Result<JObject> AddAttachment(string anId, Stream anAttachment, string aFilename, Result<JObject> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
+			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("id");
-			if (attachment == null)
-				throw new ArgumentNullException("attachment");
-			if (String.IsNullOrEmpty(filename))
-				throw new ArgumentNullException("fileName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (anAttachment == null)
+				throw new ArgumentNullException("anAttachment");
+			if (String.IsNullOrEmpty(aFilename))
+				throw new ArgumentNullException("aFileName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			GetDocument(id,new Result<CouchDocument>()).WhenDone(
-				a => AddAttachment(id, a.Rev, attachment, filename, result),
-				result.Throw
+			GetDocument(anId,new Result<CouchDocument>()).WhenDone(
+				a => AddAttachment(anId, a.Rev, anAttachment, aFilename, aResult),
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Add Attachment to the document to the specified document
 		/// </summary>
-		/// <param name="doc">Document</param>
-		/// <param name="filePath">File path</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">Document</param>
+		/// <param name="aFilePath">File path</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> AddAttachment(ICouchDocument doc, string filePath, Result<JObject> result)
+		public Result<JObject> AddAttachment(ICouchDocument aDoc, string aFilePath, Result<JObject> aResult)
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (String.IsNullOrEmpty(filePath))
-				throw new ArgumentNullException("filePath");
-			if (result == null)
-				throw new ArgumentNullException("result");
-			if (!File.Exists(filePath))
-				throw new FileNotFoundException("File not found", filePath);
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (String.IsNullOrEmpty(aFilePath))
+				throw new ArgumentNullException("aFilePath");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+			if (!File.Exists(aFilePath))
+				throw new FileNotFoundException("File not found", aFilePath);
 
-			return AddAttachment(doc.Id, doc.Rev, File.Open(filePath, FileMode.Open), Path.GetFileName(filePath), result);
+			return AddAttachment(aDoc.Id, aDoc.Rev, File.Open(aFilePath, FileMode.Open), Path.GetFileName(aFilePath), aResult);
 		}
 		/// <summary>
 		/// GetAttachment Stream of document
 		/// </summary>
-		/// <param name="doc">document</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">document</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<Stream> GetAttachment(ICouchDocument doc, string attachmentName, Result<Stream> result)
+		public Result<Stream> GetAttachment(ICouchDocument aDoc, string anAttachmentName, Result<Stream> aResult)
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (String.IsNullOrEmpty(attachmentName))
-				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (String.IsNullOrEmpty(anAttachmentName))
+				throw new ArgumentNullException("anAttachmentName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			return GetAttachment(doc.Id, doc.Rev, attachmentName, result);
+			return GetAttachment(aDoc.Id, aDoc.Rev, anAttachmentName, aResult);
 		}
 		/// <summary>
 		/// GetAttachment Stream of document with specified id
 		/// </summary>
-		/// <param name="docId">Document id</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="aDocId">Document id</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<Stream> GetAttachment(string docId, string attachmentName, Result<Stream> result)
+		public Result<Stream> GetAttachment(string aDocId, string anAttachmentName, Result<Stream> aResult)
 		{
-			if (String.IsNullOrEmpty(docId))
-				throw new ArgumentNullException("docId");
-			if (String.IsNullOrEmpty(attachmentName))
-				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(aDocId))
+				throw new ArgumentNullException("aDocId");
+			if (String.IsNullOrEmpty(anAttachmentName))
+				throw new ArgumentNullException("anAttachmentName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			GetDocument(docId, new Result<CouchDocument>()).WhenDone(
-				a => GetAttachment(docId, a.Rev, attachmentName, result),
-				result.Throw
+			GetDocument(aDocId, new Result<CouchDocument>()).WhenDone(
+				a => GetAttachment(aDocId, a.Rev, anAttachmentName, aResult),
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Delete Attachment
 		/// </summary>
-		/// <param name="id">id of the document</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the document</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> DeleteAttachment(string id, string attachmentName, Result<JObject> result)
+		public Result<JObject> DeleteAttachment(string anId, string anAttachmentName, Result<JObject> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
-				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(attachmentName))
-				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(anId))
+				throw new ArgumentNullException("aId");
+			if (String.IsNullOrEmpty(anAttachmentName))
+				throw new ArgumentNullException("anAttachmentName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			GetDocument(id, new Result<CouchDocument>()).WhenDone(
-				a => DeleteAttachment(a.Id, a.Rev, attachmentName, result),
-				result.Throw
+			GetDocument(anId, new Result<CouchDocument>()).WhenDone(
+				a => DeleteAttachment(a.Id, a.Rev, anAttachmentName, aResult),
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Delete Attachment
 		/// </summary>
-		/// <param name="doc">document</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="aDoc">document</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> DeleteAttachment(ICouchDocument doc, string attachmentName, Result<JObject> result)
+		public Result<JObject> DeleteAttachment(ICouchDocument aDoc, string anAttachmentName, Result<JObject> aResult)
 		{
-			if (doc == null)
-				throw new ArgumentNullException("doc");
-			if (String.IsNullOrEmpty(attachmentName))
-				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aDoc == null)
+				throw new ArgumentNullException("aDoc");
+			if (String.IsNullOrEmpty(anAttachmentName))
+				throw new ArgumentNullException("anAttachmentName");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			DeleteAttachment(doc.Id, doc.Rev, attachmentName, result).WhenDone(
-				result.Return,
-				result.Throw
+			DeleteAttachment(aDoc.Id, aDoc.Rev, anAttachmentName, aResult).WhenDone(
+				aResult.Return,
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 
-		public JObject AddAttachment(string id, string rev, Stream attachment, string fileName)
+		public JObject AddAttachment(string anId, string aRev, Stream anAttachment, string aFileName)
 		{
-			return AddAttachment(id, rev, attachment, fileName,new Result<JObject>()).Wait();
+			return AddAttachment(anId, aRev, anAttachment, aFileName, new Result<JObject>()).Wait();
 		}
-		public JObject AddAttachment(string id, Stream attachment, string fileName)
+		public JObject AddAttachment(string anId, Stream anAttachment, string aFileName)
 		{
-			return AddAttachment(id, attachment, fileName, new Result<JObject>()).Wait();
+			return AddAttachment(anId, anAttachment, aFileName, new Result<JObject>()).Wait();
 		}
-		public JObject AddAttachment(ICouchDocument doc, string filePath)
+		public JObject AddAttachment(ICouchDocument aDoc, string aFilePath)
 		{
-			return AddAttachment(doc, filePath, new Result<JObject>()).Wait();
+			return AddAttachment(aDoc, aFilePath, new Result<JObject>()).Wait();
 		}
-		public Stream GetAttachment(ICouchDocument doc, string attachmentName)
+		public Stream GetAttachment(ICouchDocument aDoc, string anAttachmentName)
 		{
-			return GetAttachment(doc, attachmentName, new Result<Stream>()).Wait();
+			return GetAttachment(aDoc, anAttachmentName, new Result<Stream>()).Wait();
 		}
-		public Stream GetAttachment(string docId, string attachmentName)
+		public Stream GetAttachment(string aDocId, string anAttachmentName)
 		{
-			return GetAttachment(docId, attachmentName, new Result<Stream>()).Wait();
+			return GetAttachment(aDocId, anAttachmentName, new Result<Stream>()).Wait();
 		}
-		public JObject DeleteAttachment(string id, string attachmentName)
+		public JObject DeleteAttachment(string anId, string anAttachmentName)
 		{
-			return DeleteAttachment(id, attachmentName, new Result<JObject>()).Wait();
+			return DeleteAttachment(anId, anAttachmentName, new Result<JObject>()).Wait();
 		}
-		public JObject DeleteAttachment(ICouchDocument doc, string attachmentName)
+		public JObject DeleteAttachment(ICouchDocument aDoc, string anAttachmentName)
 		{
-			return DeleteAttachment(doc, attachmentName, new Result<JObject>()).Wait();
+			return DeleteAttachment(aDoc, anAttachmentName, new Result<JObject>()).Wait();
 		}
 		#endregion
 
 		#region All Documents Special View
 		#region Asynchronous Methods
-		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(Result<ViewResult<TKey, TValue>> result)
+		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(Result<ViewResult<TKey, TValue>> aResult)
 		{
-			return GetAllDocuments(new ViewOptions(), result);
+			return GetAllDocuments(new ViewOptions(), aResult);
 		}
-		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(ViewOptions options, Result<ViewResult<TKey, TValue>> result)
+		public Result<ViewResult<TKey, TValue>> GetAllDocuments<TKey, TValue>(ViewOptions aViewOptions, Result<ViewResult<TKey, TValue>> aResult)
 		{
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aViewOptions == null)
+				throw new ArgumentNullException("aViewOptions");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.At(Constants.ALL_DOCS).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.ALL_DOCS).With(aViewOptions).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<TKey, TValue>(a));
+						aResult.Return(GetViewResult<TKey, TValue>(a));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 				);
-			return result;
+			return aResult;
 		}
-		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(Result<ViewResult<TKey, TValue, TDocument>> aResult) where TDocument : ICouchDocument
 		{
-			return GetAllDocuments(new ViewOptions(), result);
+			return GetAllDocuments(new ViewOptions(), aResult);
 		}
-		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions options, Result<ViewResult<TKey, TValue, TDocument>> result) where TDocument : ICouchDocument
+		public Result<ViewResult<TKey, TValue, TDocument>> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions aViewOptions, Result<ViewResult<TKey, TValue, TDocument>> aResult) where TDocument : ICouchDocument
 		{
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aViewOptions == null)
+				throw new ArgumentNullException("aViewOptions");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.At(Constants.ALL_DOCS).With(Constants.INCLUDE_DOCS, true).With(options).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.At(Constants.ALL_DOCS).With(Constants.INCLUDE_DOCS, true).With(aViewOptions).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok || a.Status == DreamStatus.NotModified)
 					{
-						result.Return(GetViewResult<TKey, TValue, TDocument>(a));
+						aResult.Return(GetViewResult<TKey, TValue, TDocument>(a));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 				);
-			return result;
+			return aResult;
 		}
 		#endregion
 		#region Synchronous Methods
@@ -1051,17 +1054,17 @@ namespace DreamSeat
 		{
 			return GetAllDocuments<TKey, TValue>(new ViewOptions());
 		}
-		public ViewResult<TKey, TValue> GetAllDocuments<TKey, TValue>(ViewOptions options)
+		public ViewResult<TKey, TValue> GetAllDocuments<TKey, TValue>(ViewOptions aViewOptions)
 		{
-			return GetAllDocuments(options, new Result<ViewResult<TKey, TValue>>()).Wait();
+			return GetAllDocuments(aViewOptions, new Result<ViewResult<TKey, TValue>>()).Wait();
 		}
 		public ViewResult<TKey, TValue, TDocument> GetAllDocuments<TKey, TValue, TDocument>() where TDocument : ICouchDocument
 		{
 			return GetAllDocuments<TKey, TValue, TDocument>(new ViewOptions());
 		}
-		public ViewResult<TKey, TValue, TDocument> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions options) where TDocument : ICouchDocument
+		public ViewResult<TKey, TValue, TDocument> GetAllDocuments<TKey, TValue, TDocument>(ViewOptions aViewOptions) where TDocument : ICouchDocument
 		{
-			return GetAllDocuments(options, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
+			return GetAllDocuments(aViewOptions, new Result<ViewResult<TKey, TValue, TDocument>>()).Wait();
 		}
 		#endregion
 		#endregion
@@ -1257,36 +1260,36 @@ namespace DreamSeat
 		#endregion
 		#endregion
 
-		private static ViewResult<TKey, TValue> GetViewResult<TKey, TValue>(DreamMessage a)
+		private static ViewResult<TKey, TValue> GetViewResult<TKey, TValue>(DreamMessage aDreamMessage)
 		{
 			ViewResult<TKey, TValue> val;
-			switch (a.Status)
+			switch (aDreamMessage.Status)
 			{
 				case DreamStatus.Ok:
 					ObjectSerializer<ViewResult<TKey, TValue>> objectSerializer = new ObjectSerializer<ViewResult<TKey, TValue>>();
-					val = objectSerializer.Deserialize(a.ToText());
+					val = objectSerializer.Deserialize(aDreamMessage.ToText());
 					val.Status = DreamStatus.Ok;
-					val.ETag = a.Headers.ETag;
+					val.ETag = aDreamMessage.Headers.ETag;
 					break;
 				default:
-					val = new ViewResult<TKey, TValue> { Status = a.Status };
+					val = new ViewResult<TKey, TValue> { Status = aDreamMessage.Status };
 					break;
 			}
 			return val;
 		}
-		private static ViewResult<TKey, TValue, TDocument> GetViewResult<TKey, TValue, TDocument>(DreamMessage a) where TDocument : ICouchDocument
+		private static ViewResult<TKey, TValue, TDocument> GetViewResult<TKey, TValue, TDocument>(DreamMessage aDreamMessage) where TDocument : ICouchDocument
 		{
 			ViewResult<TKey, TValue, TDocument> val;
-			switch (a.Status)
+			switch (aDreamMessage.Status)
 			{
 				case DreamStatus.Ok:
 					ObjectSerializer<ViewResult<TKey, TValue, TDocument>> objectSerializer = new ObjectSerializer<ViewResult<TKey, TValue, TDocument>>();
-					val = objectSerializer.Deserialize(a.ToText());
+					val = objectSerializer.Deserialize(aDreamMessage.ToText());
 					val.Status = DreamStatus.Ok;
-					val.ETag = a.Headers.ETag;
+					val.ETag = aDreamMessage.Headers.ETag;
 					break;
 				default:
-					val = new ViewResult<TKey, TValue, TDocument> { Status = a.Status };
+					val = new ViewResult<TKey, TValue, TDocument> { Status = aDreamMessage.Status };
 					break;
 			}
 			return val;
