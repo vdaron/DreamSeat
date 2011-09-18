@@ -40,7 +40,7 @@ DreamSeat usage
     // get document by ID (strongly typed POCO version)
     var myObj = db.GetDocument<MyObject>("12345");
 
-    // You can also use the asynchronous method signatures ascking to Wait()
+    // You can also use the asynchronous method signatures asking to Wait()
     var db2 = client.GetDatabase("Northwind", new Result<CouchDatabase>()).Wait();
 
 ### Asynchronous
