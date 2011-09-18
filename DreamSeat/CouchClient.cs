@@ -17,185 +17,206 @@ namespace DreamSeat
 		/// <summary>
 		/// Constructs the CouchClient and gets an authentication cookie (10 min)
 		/// </summary>
-		/// <param name="host">The hostname of the CouchDB instance</param>
-		/// <param name="port">The port of the CouchDB instance</param>
-		/// <param name="username">The username of the CouchDB instance</param>
-		/// <param name="password">The password of the CouchDB instance</param>
+		/// <param name="aHost">The hostname of the CouchDB instance</param>
+		/// <param name="aPort">The port of the CouchDB instance</param>
+		/// <param name="aUserName">The username of the CouchDB instance</param>
+		/// <param name="aPassword">The password of the CouchDB instance</param>
 		public CouchClient(
-			string host = Constants.LOCALHOST,
-			int port = Constants.DEFAULT_PORT,
-			string username = null,
-			string password = null)
-			: base(new XUri(String.Format("http://{0}:{1}",host,port)), username, password)
+			string aHost = Constants.LOCALHOST,
+			int aPort = Constants.DEFAULT_PORT,
+			string aUserName = null,
+			string aPassword = null)
+			: base(new XUri(String.Format("http://{0}:{1}",aHost,aPort)), aUserName, aPassword)
 		{
 		}
 
 		#region Asynchronous Methods
-
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
 		/// </summary>
-		/// <param name="options">Replication Options</param>
-		/// <param name="result"></param>
+		/// <param name="aReplicationOptions">Replication Options</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
 		[Obsolete("If using CouchDB >= 1.1 use CouchReplicationDocument")]
-		public Result<JObject> TriggerReplication(ReplicationOptions options, Result<JObject> result)
+		public Result<JObject> TriggerReplication(ReplicationOptions aReplicationOptions, Result<JObject> aResult)
 		{
+			if (aReplicationOptions == null)
+				throw new ArgumentNullException("aReplicationOptions");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
 			Plug p = BasePlug.At(Constants.REPLICATE);
 
-			string json = options.ToString();
+			string json = aReplicationOptions.ToString();
 			p.Post(DreamMessage.Ok(MimeType.JSON, json), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if((a.Status == DreamStatus.Accepted)||
 					   (a.Status == DreamStatus.Ok))
 					{
-						result.Return(JObject.Parse(a.ToText()));
+						aResult.Return(JObject.Parse(a.ToText()));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
-
 		/// <summary>
 		/// Restarts the CouchDB instance. You must be authenticated as a user with administration privileges for this to work.
 		/// </summary>
-		/// <param name="result"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result RestartServer(Result result)
+		public Result RestartServer(Result aResult)
 		{
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
 			BasePlug.At(Constants.RESTART).Post(DreamMessage.Ok(MimeType.JSON,String.Empty), new Result<DreamMessage>()).WhenDone(
 				a => {
 					if (a.Status == DreamStatus.Ok)
-						result.Return();
+						aResult.Return();
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
-		/// <param name="databaseName"></param>
-		/// <param name="result"></param>
+		/// <param name="aDatabaseName"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<bool> HasDatabase(string databaseName, Result<bool> result)
+		public Result<bool> HasDatabase(string aDatabaseName, Result<bool> aResult)
 		{
-			BasePlug.At(XUri.EncodeFragment(databaseName)).Head(new Result<DreamMessage>()).WhenDone(
-				a => result.Return(a.Status == DreamStatus.Ok),
-				result.Throw
+			if (String.IsNullOrEmpty(aDatabaseName))
+				throw new ArgumentException("DatabaseName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			BasePlug.At(XUri.EncodeFragment(aDatabaseName)).Head(new Result<DreamMessage>()).WhenDone(
+				a => aResult.Return(a.Status == DreamStatus.Ok),
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
-
 		/// <summary>
 		/// Creates a database
 		/// </summary>
-		/// <param name="databaseName">Name of new database</param>
-		/// <param name="result"></param>
+		/// <param name="aDatabaseName">Name of new database</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> CreateDatabase(string databaseName, Result<JObject> result)
+		public Result<JObject> CreateDatabase(string aDatabaseName, Result<JObject> aResult)
 		{
-			BasePlug.At(XUri.EncodeFragment(databaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			if (String.IsNullOrEmpty(aDatabaseName))
+				throw new ArgumentException("DatabaseName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			BasePlug.At(XUri.EncodeFragment(aDatabaseName)).Put(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
 					{
-						result.Return(JObject.Parse(a.ToText()));
+						aResult.Return(JObject.Parse(a.ToText()));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-
 		/// <summary>
 		/// Deletes the specified database
 		/// </summary>
-		/// <param name="databaseName">Database to delete</param>
-		/// <param name="result"></param>
+		/// <param name="aDatabaseName">Database to delete</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> DeleteDatabase(string databaseName, Result<JObject> result)
+		public Result<JObject> DeleteDatabase(string aDatabaseName, Result<JObject> aResult)
 		{
-			BasePlug.At(XUri.EncodeFragment(databaseName)).Delete(new Result<DreamMessage>()).WhenDone(
+			if (String.IsNullOrEmpty(aDatabaseName))
+				throw new ArgumentException("DatabaseName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			BasePlug.At(XUri.EncodeFragment(aDatabaseName)).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
 					{
-						result.Return(JObject.Parse(a.ToText()));
+						aResult.Return(JObject.Parse(a.ToText()));
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		///  Gets a Database
 		/// </summary>
-		/// <param name="databaseName">Name of the database</param>
+		/// <param name="aDatabaseName">Name of the database</param>
 		/// <param name="createIfNotExists">Flag specifying if the database must be created if not found</param>
-		/// <param name="result"></param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<CouchDatabase> GetDatabase(string databaseName, bool createIfNotExists, Result<CouchDatabase> result)
+		public Result<CouchDatabase> GetDatabase(string aDatabaseName, bool createIfNotExists, Result<CouchDatabase> aResult)
 		{
-			HasDatabase(databaseName, new Result<bool>()).WhenDone(
+			if (String.IsNullOrEmpty(aDatabaseName))
+				throw new ArgumentException("DatabaseName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+
+			HasDatabase(aDatabaseName, new Result<bool>()).WhenDone(
 				exists =>
 				{
 					if (exists)
 					{
-						result.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(databaseName))));
+						aResult.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(aDatabaseName))));
 					}
 					else
 					{
 						if (createIfNotExists)
 						{
-							CreateDatabase(databaseName, new Result<JObject>()).WhenDone(
-								a => result.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(databaseName)))),
-								result.Throw
+							CreateDatabase(aDatabaseName, new Result<JObject>()).WhenDone(
+								a => aResult.Return(new CouchDatabase(BasePlug.At(XUri.EncodeFragment(aDatabaseName)))),
+								aResult.Throw
 							);
 						}
 						else
 						{
-							result.Return((CouchDatabase)null);
+							aResult.Return((CouchDatabase)null);
 						}
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Gets a Database, if database didn't exists, it will be created
 		/// </summary>
-		/// <param name="databaseName">Name of the database</param>
-		/// <param name="result"></param>
+		/// <param name="aDatabaseName">Name of the database</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<CouchDatabase> GetDatabase(string databaseName, Result<CouchDatabase> result)
+		public Result<CouchDatabase> GetDatabase(string aDatabaseName, Result<CouchDatabase> aResult)
 		{
-			return GetDatabase(databaseName, true, result);
+			return GetDatabase(aDatabaseName, true, aResult);
 		}
 		#endregion
 
@@ -203,11 +224,11 @@ namespace DreamSeat
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
 		/// </summary>
-		/// <param name="options">Replication options</param>
+		/// <param name="aReplicationOptions">Replication options</param>
 		/// <returns></returns>
-		public JObject TriggerReplication(ReplicationOptions options)
+		public JObject TriggerReplication(ReplicationOptions aReplicationOptions)
 		{
-			return TriggerReplication(options, new Result<JObject>()).Wait();
+			return TriggerReplication(aReplicationOptions, new Result<JObject>()).Wait();
 		}
 		/// <summary>
 		/// Restarts the CouchDB instance. You must be authenticated as a user with administration privileges for this to work.
@@ -219,11 +240,11 @@ namespace DreamSeat
 		/// <summary>
 		/// Returns a bool indicating whether or not the database exists.
 		/// </summary>
-		/// <param name="databaseName"></param>
+		/// <param name="aDatabaseName"></param>
 		/// <returns></returns>
-		public bool HasDatabase(string databaseName)
+		public bool HasDatabase(string aDatabaseName)
 		{
-			return HasDatabase(databaseName, new Result<bool>()).Wait();
+			return HasDatabase(aDatabaseName, new Result<bool>()).Wait();
 		}
 		/// <summary>
 		/// Creates a database
@@ -265,94 +286,128 @@ namespace DreamSeat
 		#endregion
 
 		#region Configuration Management
-
 		#region Asynchronous Methods
-		public Result<Dictionary<string, Dictionary<string, string>>> GetConfig(Result<Dictionary<string, Dictionary<string, string>>> result)
+		public Result<Dictionary<string, Dictionary<string, string>>> GetConfig(Result<Dictionary<string, Dictionary<string, string>>> aResult)
 		{
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
 			BasePlug.At(Constants.CONFIG).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return(JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(a.ToText()));
+						aResult.Return(JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(a.ToText()));
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-		public Result<Dictionary<string, string>> GetConfigSection(string section, Result<Dictionary<string, string>> result)
+		public Result<Dictionary<string, string>> GetConfigSection(string aSection, Result<Dictionary<string, string>> aResult)
 		{
-			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			if (aSection == null)
+				throw new ArgumentNullException("aSection");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+			if (String.IsNullOrEmpty(aSection))
+				throw new ArgumentException("Section cannot be empty");
+
+			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(aSection)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					switch(a.Status)
 					{
 						case DreamStatus.Ok:
-							result.Return(JsonConvert.DeserializeObject<Dictionary<string, string>>(a.ToText()));
+							aResult.Return(JsonConvert.DeserializeObject<Dictionary<string, string>>(a.ToText()));
 							break;
 						case DreamStatus.NotFound:
-							result.Return(new Dictionary<string, string>());
+							aResult.Return(new Dictionary<string, string>());
 							break;
 						default:
-							result.Throw(new CouchException(a));
+							aResult.Throw(new CouchException(a));
 							break;
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-		public Result<string> GetConfigValue(string section, string keyName, Result<string> result)
+		public Result<string> GetConfigValue(string aSection, string aKeyName, Result<string> aResult)
 		{
-			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(section),XUri.EncodeFragment(keyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			if (String.IsNullOrEmpty(aSection))
+				throw new ArgumentException("aSection cannot be null nor empty");
+			if (String.IsNullOrEmpty(aKeyName))
+				throw new ArgumentException("aKeyName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+
+			BasePlug.At(Constants.CONFIG,XUri.EncodeFragment(aSection),XUri.EncodeFragment(aKeyName)).Get(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 					{
 						string value = a.ToText();
 						switch(a.Status)
 						{
 							case DreamStatus.Ok:
-								result.Return(value.Substring(1, value.Length - 3));// remove " and "\n
+								aResult.Return(value.Substring(1, value.Length - 3));// remove " and "\n
 								break;
 							case DreamStatus.NotFound:
-								result.Return((string)null);
+								aResult.Return((string)null);
 								break;
 							default:
-								result.Throw(new CouchException(a));
+								aResult.Throw(new CouchException(a));
 								break;
 						}
 					},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-		public Result SetConfigValue(string section, string keyName, string value, Result result)
+		public Result SetConfigValue(string aSection, string aKeyName, string aValue, Result aResult)
 		{
-			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + value + "\""), new Result<DreamMessage>()).WhenDone(
+			if (String.IsNullOrEmpty(aSection))
+				throw new ArgumentException("aSection cannot be null nor empty");
+			if (String.IsNullOrEmpty(aKeyName))
+				throw new ArgumentException("aKeyName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			if (aValue == null)
+				return DeleteConfigValue(aSection, aKeyName, aResult);
+
+			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(aSection), XUri.EncodeFragment(aKeyName)).Put(DreamMessage.Ok(MimeType.TEXT, "\"" + aValue + "\""), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return();
+						aResult.Return();
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
-		public Result DeleteConfigValue(string section, string keyName, Result result)
+		public Result DeleteConfigValue(string aSection, string aKeyName, Result aResult)
 		{
-			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(section), XUri.EncodeFragment(keyName)).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
+			if (String.IsNullOrEmpty(aSection))
+				throw new ArgumentException("aSection cannot be null nor empty");
+			if (String.IsNullOrEmpty(aKeyName))
+				throw new ArgumentException("aKeyName cannot be null nor empty");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			BasePlug.At(Constants.CONFIG, XUri.EncodeFragment(aSection), XUri.EncodeFragment(aKeyName)).Delete(DreamMessage.Ok(), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return();// remove " and "\n
+						aResult.Return();// remove " and "\n
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		} 
 		#endregion
 
@@ -361,46 +416,53 @@ namespace DreamSeat
 		{
 			return GetConfig(new Result<Dictionary<string, Dictionary<string, string>>>()).Wait();
 		}
-		public Dictionary<string, string> GetConfig(string section)
+		public Dictionary<string, string> GetConfig(string aSection)
 		{
-			return GetConfigSection(section, new Result<Dictionary<string, string>>()).Wait();
+			return GetConfigSection(aSection, new Result<Dictionary<string, string>>()).Wait();
 		}
-		public string GetConfigValue(string section, string keyName)
+		public string GetConfigValue(string aSection, string aKeyName)
 		{
-			return GetConfigValue(section, keyName, new Result<string>()).Wait();
+			return GetConfigValue(aSection, aKeyName, new Result<string>()).Wait();
 		}
-		public void SetConfigValue(string section, string keyName, string value)
+		public void SetConfigValue(string aSection, string aKeyName, string aValue)
 		{
-			SetConfigValue(section, keyName, value, new Result()).Wait();
+			SetConfigValue(aSection, aKeyName, aValue, new Result()).Wait();
 		}
-		public void DeleteConfigValue(string section, string keyName)
+		public void DeleteConfigValue(string aSection, string aKeyName)
 		{
-			DeleteConfigValue(section, keyName, new Result()).Wait();
+			DeleteConfigValue(aSection, aKeyName, new Result()).Wait();
 		} 
 		#endregion
-
 		#endregion
 
 		#region User Management
-		public void CreateAdminUser(string username, string password)
+		public void CreateAdminUser(string aUserName, string aPassword)
 		{
-			SetConfigValue("admins", username, password, new Result()).Wait();
-			BasePlug.WithCredentials(username, password);// Logon(username, password, new Result<bool>()).Wait();
-			CouchUser user = new CouchUser {Name = username};
+			if (String.IsNullOrEmpty(aUserName))
+				throw new ArgumentException("aUserName cannot be null nor empty");
+			if (String.IsNullOrEmpty(aPassword))
+				throw new ArgumentException("aPassword cannot be null nor empty");
+
+			SetConfigValue("admins", aUserName, aPassword, new Result()).Wait();
+			BasePlug.WithCredentials(aUserName, aPassword);// Logon(username, password, new Result<bool>()).Wait();
+			CouchUser user = new CouchUser {Name = aUserName};
 
 			ObjectSerializer<CouchUser> serializer = new ObjectSerializer<CouchUser>();
-			BasePlug.At("_users", HttpUtility.UrlEncode("org.couchdb.user:" + username)).Put(DreamMessage.Ok(MimeType.JSON, serializer.Serialize(user)), new Result<DreamMessage>()).Wait();
+			BasePlug.At("_users", HttpUtility.UrlEncode("org.couchdb.user:" + aUserName)).Put(DreamMessage.Ok(MimeType.JSON, serializer.Serialize(user)), new Result<DreamMessage>()).Wait();
 		}
 		/// <summary>
 		/// Deletes user  (if you have permission)
 		/// </summary>
-		/// <param name="user">User name</param>
-		public void DeleteAdminUser(string user)
+		/// <param name="aUser">User name</param>
+		public void DeleteAdminUser(string aUser)
 		{
-			DeleteConfigValue("admins", user, new Result()).Wait();
+			if (String.IsNullOrEmpty(aUser))
+				throw new ArgumentException("aUser cannot be null nor empty");
+
+			DeleteConfigValue("admins", aUser, new Result()).Wait();
 
 			var userDb = GetDatabase("_users");
-			var userId = "org.couchdb.user:" + user;
+			var userId = "org.couchdb.user:" + aUser;
 			var userDoc = userDb.GetDocument(userId, new Result<JDocument>()).Wait();
 			if (userDoc != null)
 			{
@@ -410,22 +472,29 @@ namespace DreamSeat
 		/// <summary>
 		/// Returns true/false depending on whether or not the user is contained in the _users database
 		/// </summary>
-		/// <param name="userId"></param>
+		/// <param name="aUserId"></param>
 		/// <returns></returns>
-		public bool HasUser(string userId)
+		public bool HasUser(string aUserId)
 		{
-			return GetUser(userId) != null;
+			if (String.IsNullOrEmpty(aUserId))
+				throw new ArgumentException("aUserId cannot be empty");
+
+			return GetUser(aUserId) != null;
 		}
+
 		/// <summary>
 		/// Get's the user.
 		/// </summary>
-		/// <param name="userId"></param>
+		/// <param name="aUserId"></param>
 		/// <returns></returns>
-		public JDocument GetUser(string userId)
+		public JDocument GetUser(string aUserId)
 		{
+			if (String.IsNullOrEmpty(aUserId))
+				throw new ArgumentException("aUser cannot be null nor empty");
+
 			var db = new CouchDatabase(BasePlug.At("_users"));
-			userId = "org.couchdb.user:" + HttpUtility.UrlEncode(userId);
-			return db.GetDocument(userId, new Result<JDocument>()).Wait();
+			aUserId = "org.couchdb.user:" + HttpUtility.UrlEncode(aUserId);
+			return db.GetDocument(aUserId, new Result<JDocument>()).Wait();
 		} 
 		#endregion
 	}
