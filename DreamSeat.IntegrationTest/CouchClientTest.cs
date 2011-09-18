@@ -277,20 +277,23 @@ namespace DreamSeat.IntegrationTest
 			Assert.AreEqual(DreamStatus.NotModified, cachedResult.Status);
 		}
 		[Test]
-		[Ignore]
-		public void Should_Get_Results_Quickly()
+		public void Should_Get_Results_Asychronously()
 		{
-			var db = client.GetDatabase("accounting");
-			var startTime = DateTime.Now;
-			var options = new ViewOptions { Limit = 20 };
-			//var result = db.View<Company>("companies_by_name", options, "accounting",new Result<ViewResult<Company>>()).Wait();
-			//foreach (var item in result.Items)
-			//{
-			//    Console.WriteLine(item.Name);
-			//}
-			//var endTime = DateTime.Now;
-			//double delay = (endTime - startTime).TotalMilliseconds;
-			//Assert.IsTrue(delay < 80);
+			string obj = @"{""test"": ""prop""}";
+			CouchDatabase db = client.GetDatabase(baseDatabase);
+			db.CreateDocument("TEST", obj, new Result<string>()).Wait();
+
+			string val1 = null;
+			string val2 = null;
+
+			Result<string> res1 = new Result<string>();
+			Result<string> res2 = new Result<string>();
+			db.GetDocument("TEST", res1);
+			db.GetDocument("TEST", res2);
+
+			res2.Wait();
+			res1.Wait();
+
 		}
 		[Test]
 		public void Should_Get_Database_Info()
