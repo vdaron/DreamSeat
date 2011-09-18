@@ -32,13 +32,16 @@ DreamSeat usage
 
     // assumes localhost:5984 and Admin Party if constructor is left blank
     var client = new CouchClient();
-    var db = client.GetDatabase("Northwind", new Result<CouchDatabase>()).Wait();
+    var db = client.GetDatabase("Northwind");
     
     // get document by ID (return a object derived from [JObject](http://james.newtonking.com/projects/json/help/html/T_Newtonsoft_Json_Linq_JObject.htm))
-    var doc = GetDocument<JDocument>(string id, new Result<JDocument>()).Wait();
+    var doc = GetDocument<JDocument>(string id);
 
     // get document by ID (strongly typed POCO version)
-    var myObj = db.GetDocument<MyObject>("12345"); 
+    var myObj = db.GetDocument<MyObject>("12345");
+
+    // You can also use the asynchronous method signatures ascking to Wait()
+    var db2 = client.GetDatabase("Northwind", new Result<CouchDatabase>()).Wait();
 
 ### Asynchronous
 
