@@ -2,7 +2,7 @@ DreamSeat
 ========
 
 DreamSeat is a [CouchDB](http://couchdb.apache.org/) client for the .NET plateform. 
-It is based on [DreamSeat](https://github.com/soitgoes/DreamSeat) from [Martin Murphy](https://github.com/soitgoes).
+It is based on [LoveSeat](https://github.com/soitgoes/DreamSeat) from [Martin Murphy](https://github.com/soitgoes).
 
 DreamSeat is also base on :
 
