@@ -20,10 +20,15 @@ namespace DreamSeat
 		public string Filter { get; set; }
 
 		[Obsolete("If using CouchDB >= 1.1 use CouchReplicationDocument")]
-		public ReplicationOptions(string source, string target)
+		public ReplicationOptions(string aSource, string aTarget)
 		{
-			Source = source;
-			Target = target;
+			if (aSource == null)
+				throw new ArgumentNullException("aSource");
+			if (aTarget == null)
+				throw new ArgumentNullException("aTarget");
+
+			Source = aSource;
+			Target = aTarget;
 		}
 
 		public override string ToString()

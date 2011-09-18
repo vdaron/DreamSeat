@@ -28,12 +28,12 @@ namespace DreamSeat
 		public JDocument()
 		{
 		}
-		public JDocument(JObject jobj)
-			: base(jobj)
+		public JDocument(JObject aJobj)
+			: base(aJobj)
 		{
 		}
-		public JDocument(string json)
-			: base(Parse(json))
+		public JDocument(string aJson)
+			: base(Parse(aJson))
 		{
 		}
 

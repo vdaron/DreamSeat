@@ -9,45 +9,62 @@ namespace DreamSeat
 {
 	internal class JsonDocumentConverter : JsonConverter
 	{
-		public override bool CanConvert(Type objectType)
+		public override bool CanConvert(Type aType)
 		{
-			return (objectType == typeof(JDocument)) || (objectType.IsSubclassOf(typeof(JDocument)));
-		}
-		
-		
-		public override object ReadJson (JsonReader reader, Type objectType, JsonSerializer serializer)
-		{
+			if (aType == null)
+				throw new ArgumentNullException("aType");
 
-			return objectType == typeof(JDocument) ? new JDocument(JObject.Load(reader)) : Activator.CreateInstance(objectType,JObject.Load(reader));
+			return (aType == typeof(JDocument)) || (aType.IsSubclassOf(typeof(JDocument)));
 		}
-			
-		
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+		public override object ReadJson (JsonReader aReader, Type aType, JsonSerializer aSerializer)
 		{
-				((JDocument)value).WriteTo(writer);
+			if (aReader == null)
+				throw new ArgumentNullException("aReader");
+			if (aType == null)
+				throw new ArgumentNullException("aType");
+
+			return aType == typeof(JDocument) ? new JDocument(JObject.Load(aReader)) : Activator.CreateInstance(aType,JObject.Load(aReader));
+		}
+		public override void WriteJson(JsonWriter aWriter, object aValue, JsonSerializer aSerializer)
+		{
+			if (aWriter == null)
+				throw new ArgumentNullException("aWriter");
+			if (aValue == null)
+				throw new ArgumentNullException("aValue");
+
+			((JDocument)aValue).WriteTo(aWriter);
 		}
 	}
 
 	internal class JObjectConverter : JsonConverter
 	{
-		public override bool CanConvert(Type objectType)
+		public override bool CanConvert(Type aType)
 		{
-			return objectType == typeof(JObject);
+			return aType == typeof(JObject);
 		}
-		public override object ReadJson(JsonReader reader, Type objectType, JsonSerializer serializer)
+		public override object ReadJson(JsonReader aReader, Type aType, JsonSerializer aSerializer)
 		{
-			return JObject.Load(reader);
+			if (aReader == null)
+				throw new ArgumentNullException("aReader");
+			if (aType == null)
+				throw new ArgumentNullException("aType");
+			return JObject.Load(aReader);
 		}
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+
+		public override void WriteJson(JsonWriter aWriter, object aValue, JsonSerializer aSerializer)
 		{
-			((JObject)value).WriteTo(writer);
+			if (aWriter == null)
+				throw new ArgumentNullException("aWriter");
+			if (aValue == null)
+				throw new ArgumentNullException("aValue");
+			((JObject)aValue).WriteTo(aWriter);
 		}
 	}
 
 	internal interface IObjectSerializer<T>
 	{
-		T Deserialize(string json);
-		string Serialize(T obj);
+		T Deserialize(string aJson);
+		string Serialize(T anObj);
 	}
 
 	internal class ObjectSerializer<T> : IObjectSerializer<T>
@@ -63,13 +80,13 @@ namespace DreamSeat
 			theSettings.NullValueHandling = NullValueHandling.Ignore;
 		}
 
-		public virtual T Deserialize(string json)
+		public virtual T Deserialize(string aJson)
 		{
-			return JsonConvert.DeserializeObject<T>(json, theSettings);
+			return JsonConvert.DeserializeObject<T>(aJson, theSettings);
 		}
-		public virtual string Serialize(T obj)
+		public virtual string Serialize(T anObj)
 		{
-			return JsonConvert.SerializeObject(obj, Formatting.Indented, theSettings);
+			return JsonConvert.SerializeObject(anObj, Formatting.Indented, theSettings);
 		}
 	}
 }

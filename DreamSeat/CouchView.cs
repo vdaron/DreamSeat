@@ -4,10 +4,10 @@ namespace DreamSeat
 {
 	public class CouchView
 	{
-		public CouchView(string map = null, string reduce = null)
+		public CouchView(string aMap = null, string aReduce = null)
 		{
-			Map = map;
-			Reduce = reduce;
+			Map = aMap;
+			Reduce = aReduce;
 		}
 
 		[JsonProperty("map")]
