@@ -8,15 +8,20 @@ namespace DreamSeat.Support
 	public class LineReceivedEventArgs : EventArgs
 	{
 		public string Line { get; private set; }
-		public LineReceivedEventArgs(string line)
+		public LineReceivedEventArgs(string aLine)
 		{
-			Line = line.Trim();
+			Line = aLine.Trim();
 		}
 	}
 
 	public class AsyncStreamReader : IDisposable
 	{
-		private readonly byte[] theReadBuffer = new byte[1024];//TODO: Fix this.
+		//TODO: Fix this.
+		//Mindtouch Dream always creates a BufferedStream, a larger buffer creates a delay
+		//Pending Pull Request : https://github.com/MindTouch/DReAM/pull/4
+		//Corresponding Ticket in Mindtouch Bug Tracker :http://youtrack.developer.mindtouch.com/issue/DR-31
+		private readonly byte[] theReadBuffer = new byte[1];
+
 		private readonly List<byte> theTempLineBytes = new List<byte>();
 		private readonly EventHandler<LineReceivedEventArgs> theLineReaded;
 		private readonly Stream theBaseStream;
@@ -25,21 +30,22 @@ namespace DreamSeat.Support
 		private bool isDisposed;
 		private int theTempListIndex;
 
-		public AsyncStreamReader(Stream stream, EventHandler<LineReceivedEventArgs> lineReceived):this(stream, Encoding.UTF8, lineReceived)
+		public AsyncStreamReader(Stream aStream, EventHandler<LineReceivedEventArgs> aLineReceivedCallback):
+			this(aStream, Encoding.UTF8, aLineReceivedCallback)
 		{
 		}
-		public AsyncStreamReader(Stream stream, Encoding encoding, EventHandler<LineReceivedEventArgs> lineReceived)
+		public AsyncStreamReader(Stream aStream, Encoding anEncoding, EventHandler<LineReceivedEventArgs> aLineReceivedCallback)
 		{
-			if (stream == null)
-				throw new ArgumentNullException("stream");
-			if (encoding == null)
-				throw new ArgumentNullException("encoding");
-			if (!stream.CanRead)
+			if (aStream == null)
+				throw new ArgumentNullException("aStream");
+			if (anEncoding == null)
+				throw new ArgumentNullException("anEncoding");
+			if (!aStream.CanRead)
 				throw new ArgumentException("Stream does not support reading");
 
-			theBaseStream = stream;
-			theEncoding = encoding;
-			theLineReaded = lineReceived;
+			theBaseStream = aStream;
+			theEncoding = anEncoding;
+			theLineReaded = aLineReceivedCallback;
 			theBaseStream.BeginRead(theReadBuffer, 0, theReadBuffer.Length, AsyncCallback, null);
 		}
 
