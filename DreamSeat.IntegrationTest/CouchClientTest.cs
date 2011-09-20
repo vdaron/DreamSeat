@@ -101,20 +101,53 @@ namespace DreamSeat.IntegrationTest
 			db = client.GetDatabase(dbname, false);
 			Assert.IsNull(db);
 		}
+
+		[Test]
+		public void GetDatabaseInfo()
+		{
+			CouchDatabase baseDb = client.GetDatabase(baseDatabase);
+			CouchDatabaseInfo couchDatabaseInfo = baseDb.GetInfo();
+
+			Assert.AreEqual(baseDatabase, couchDatabaseInfo.Name);
+			Assert.AreEqual(false, couchDatabaseInfo.CompactRunning);
+			Assert.AreNotEqual(0, couchDatabaseInfo.DiskFormatVersion);
+			Assert.AreNotEqual(0, couchDatabaseInfo.DiskSize);
+			Assert.AreNotEqual(0, couchDatabaseInfo.DocCount);
+			Assert.AreNotEqual(0, couchDatabaseInfo.DocDeletedCount);
+			Assert.AreNotEqual(0, couchDatabaseInfo.InstanceStartTimeMs);
+			Assert.AreNotEqual(DateTime.MinValue, couchDatabaseInfo.InstanceStartTime);
+		}
 		[Test]
 		public void Should_Trigger_Replication_using_replicator_db()
 		{
-			string dbname = "test-replicate-db-created";
-
 			CouchDatabase replDb = client.GetDatabase("_replicator");
-			CouchReplicationDocument doc = replDb.CreateDocument(new CouchReplicationDocument { Id = "B", Source = baseDatabase, Target = "http://localhost:5984/" + replicateDatabase });
 
-			doc = replDb.GetDocument<CouchReplicationDocument>("B");
-			Assert.IsNotEmpty(doc.ReplicationId);
-			Assert.IsNotEmpty(doc.ReplicationState);
-			Assert.IsTrue(doc.ReplicationStateTime.HasValue);
+			ICouchDocument existingDoc = replDb.GetDocument<JDocument>("C");
+			if (existingDoc != null)
+				replDb.DeleteDocument(existingDoc);
 
-			replDb.DeleteDocument(doc);
+			CouchReplicationDocument doc = replDb.CreateDocument(
+				new CouchReplicationDocument
+					{
+						Id = "C", 
+						Source = baseDatabase, 
+						Target = "http://localhost:5984/" + replicateDatabase,
+						Continuous = true,
+						UserContext = new UserContext { Name = "bob", Roles = new[] { "role1", "role2" } }
+					});
+
+			CouchReplicationDocument doc2 = replDb.GetDocument<CouchReplicationDocument>("C");
+			Assert.IsNotEmpty(doc2.ReplicationId);
+			Assert.IsNotEmpty(doc2.ReplicationState);
+			Assert.IsTrue(doc2.Continuous);
+			Assert.IsTrue(doc2.ReplicationStateTime.HasValue);
+			Assert.IsNotNull(doc2.UserContext);
+			Assert.AreEqual("bob",doc2.UserContext.Name);
+			Assert.AreEqual(2, doc2.UserContext.Roles.Length);
+			Assert.AreEqual("role1", doc2.UserContext.Roles[0]);
+			Assert.AreEqual("role2", doc2.UserContext.Roles[1]);
+
+			replDb.DeleteDocument(doc2);
 		}
 		[Test]
 		public void Should_Create_Document_From_String()

@@ -12,10 +12,10 @@ namespace DreamSeat
 			Shows = new Dictionary<string, string>();
 			Lists = new Dictionary<string, string>();
 		}
-		public CouchDesignDocument(string id)
+		public CouchDesignDocument(string aDesignDocId)
 			:this()
 		{
-			Id = Constants.DESIGN + "/" + id;
+			Id = Constants.DESIGN + "/" + aDesignDocId;
 		}
 
 		[JsonProperty(Constants.LANGUAGE)]
