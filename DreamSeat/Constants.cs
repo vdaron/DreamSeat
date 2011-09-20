@@ -53,6 +53,8 @@
 		public const string QUERY_PARAMS = "query_params";
 		public const string CREATE_TARGET = "create_target";
 		public const string FILTER = "filter";
+		public const string USER_CONTEXT = "user_ctx";
+		public const string DOC_IDS = "doc_ids";
 
 		public const string KEY = "key";
 		public const string STARTKEY = "startkey";
