@@ -697,8 +697,8 @@ namespace DreamSeat
 		#endregion
 
 		#region Attachment Management
-		#region Primitives methods
 
+		#region Primitives methods
 		/// <summary>
 		/// Adds an attachment to the documnet.  Rev must be specified on this signature.  If you want to attach no matter what then use the method without the rev param
 		/// </summary>
@@ -807,16 +807,18 @@ namespace DreamSeat
 			return result;
 		}
 		#endregion
+
 		/// <summary>
 		/// Add Attachment to the document
 		/// </summary>
 		/// <param name="anId">id of the document</param>
 		/// <param name="aRev">rev of the document</param>
 		/// <param name="anAttachment">attachment stream (will be closed)</param>
+		/// <param name="anAttachmentLength"></param>
 		/// <param name="aFileName">Attachment file name</param>
 		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> AddAttachment(string anId, string aRev, Stream anAttachment, string aFileName, Result<JObject> aResult)
+		public Result<JObject> AddAttachment(string anId, string aRev, Stream anAttachment, long anAttachmentLength, string aFileName, Result<JObject> aResult)
 		{
 			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("anId");
@@ -826,10 +828,28 @@ namespace DreamSeat
 				throw new ArgumentNullException("anAttachment");
 			if (String.IsNullOrEmpty(aFileName))
 				throw new ArgumentNullException("aFileName");
+			if (anAttachmentLength < 0)
+				throw new ArgumentOutOfRangeException("anAttachmentLength");
 			if (aResult == null)
 				throw new ArgumentNullException("aResult");
 
-			return AddAttachment(anId, aRev, anAttachment, anAttachment.Length, aFileName, MimeType.FromFileExtension(aFileName), aResult);
+			return AddAttachment(anId, aRev, anAttachment, anAttachmentLength, aFileName, MimeType.FromFileExtension(aFileName), aResult);
+		}
+		/// <summary>
+		/// Add Attachment to the document
+		/// </summary>
+		/// <param name="anId">id of the document</param>
+		/// <param name="aRev">rev of the document</param>
+		/// <param name="anAttachment">attachment stream (must be seekable, will be closed)</param>
+		/// <param name="aFileName">Attachment file name</param>
+		/// <param name="aResult"></param>
+		/// <returns></returns>
+		public Result<JObject> AddAttachment(string anId, string aRev, Stream anAttachment, string aFileName, Result<JObject> aResult)
+		{
+			if(!anAttachment.CanSeek)
+				throw new ArgumentException("Stream must be seekable");
+
+			return AddAttachment(anId, aRev, anAttachment, anAttachment.Length, aFileName, aResult);
 		}
 		/// <summary>
 		/// Adds an attachment to a document.  If revision is not specified then the most recent will be fetched and used.  
@@ -837,9 +857,10 @@ namespace DreamSeat
 		/// </summary>
 		/// <param name="anId">id of the couch Document</param>
 		/// <param name="anAttachment">Stream of the attachment. Will be closed once request is sent</param>
+		/// <param name="anAttachmentLength">Size of attachment, set to -1 to use Stream.Length (Stream must be seakable)</param>
 		/// <param name="aFilename">Filename must be specifed</param>
 		/// <param name="aResult"></param>	
-		public Result<JObject> AddAttachment(string anId, Stream anAttachment, string aFilename, Result<JObject> aResult)
+		public Result<JObject> AddAttachment(string anId, Stream anAttachment, long anAttachmentLength, string aFilename, Result<JObject> aResult)
 		{
 			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("id");
@@ -851,7 +872,7 @@ namespace DreamSeat
 				throw new ArgumentNullException("aResult");
 
 			GetDocument(anId,new Result<CouchDocument>()).WhenDone(
-				a => AddAttachment(anId, a.Rev, anAttachment, aFilename, aResult),
+				a => AddAttachment(anId, a.Rev, anAttachment, anAttachmentLength, aFilename, aResult),
 				aResult.Throw
 			);
 			return aResult;
@@ -874,7 +895,7 @@ namespace DreamSeat
 			if (!File.Exists(aFilePath))
 				throw new FileNotFoundException("File not found", aFilePath);
 
-			return AddAttachment(aDoc.Id, aDoc.Rev, File.Open(aFilePath, FileMode.Open), Path.GetFileName(aFilePath), aResult);
+			return AddAttachment(aDoc.Id, aDoc.Rev, File.Open(aFilePath, FileMode.Open), -1, Path.GetFileName(aFilePath), aResult);
 		}
 		/// <summary>
 		/// GetAttachment Stream of document
@@ -964,11 +985,22 @@ namespace DreamSeat
 
 		public JObject AddAttachment(string anId, string aRev, Stream anAttachment, string aFileName)
 		{
-			return AddAttachment(anId, aRev, anAttachment, aFileName, new Result<JObject>()).Wait();
+			return AddAttachment(anId, aRev, anAttachment, anAttachment.Length, aFileName, new Result<JObject>()).Wait();
 		}
+
+		public JObject AddAttachment(string anId, string aRev, Stream anAttachment,long anAttachmentLength, string aFileName)
+		{
+			return AddAttachment(anId, aRev, anAttachment, anAttachmentLength, aFileName, new Result<JObject>()).Wait();
+		}
+
 		public JObject AddAttachment(string anId, Stream anAttachment, string aFileName)
 		{
-			return AddAttachment(anId, anAttachment, aFileName, new Result<JObject>()).Wait();
+			return AddAttachment(anId, anAttachment, anAttachment.Length, aFileName, new Result<JObject>()).Wait();
+		}
+
+		public JObject AddAttachment(string anId, Stream anAttachment, long anAttachmentLength, string aFileName)
+		{
+			return AddAttachment(anId, anAttachment, anAttachmentLength, aFileName, new Result<JObject>()).Wait();
 		}
 		public JObject AddAttachment(ICouchDocument aDoc, string aFilePath)
 		{
