@@ -857,7 +857,7 @@ namespace DreamSeat
 		/// </summary>
 		/// <param name="anId">id of the couch Document</param>
 		/// <param name="anAttachment">Stream of the attachment. Will be closed once request is sent</param>
-		/// <param name="anAttachmentLength">Size of attachment, set to -1 to use Stream.Length (Stream must be seakable)</param>
+		/// <param name="anAttachmentLength">Size of attachment</param>
 		/// <param name="aFilename">Filename must be specifed</param>
 		/// <param name="aResult"></param>	
 		public Result<JObject> AddAttachment(string anId, Stream anAttachment, long anAttachmentLength, string aFilename, Result<JObject> aResult)
@@ -877,6 +877,19 @@ namespace DreamSeat
 			);
 			return aResult;
 		}
+		/// <summary>
+		/// Adds an attachment to a document.  If revision is not specified then the most recent will be fetched and used.  
+		/// Warning: if you need document update conflicts to occur please use the method that specifies the revision
+		/// </summary>
+		/// <param name="anId">id of the couch Document</param>
+		/// <param name="anAttachment">Stream of the attachment. Must be seekable and will be closed once request is sent</param>
+		/// <param name="aFilename">Filename must be specifed</param>
+		/// <param name="aResult"></param>	
+		public Result<JObject> AddAttachment(string anId, Stream anAttachment, string aFilename, Result<JObject> aResult)
+		{
+			return AddAttachment(anId, anAttachment, anAttachment.Length, aFilename, aResult);
+		}
+
 		/// <summary>
 		/// Add Attachment to the document to the specified document
 		/// </summary>
