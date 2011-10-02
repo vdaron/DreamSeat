@@ -34,7 +34,7 @@ DreamSeat usage
     var client = new CouchClient();
     var db = client.GetDatabase("Northwind");
     
-    // get document by ID (return a object derived from JObject)
+    // get document by ID (return a object derived from [JObject](http://james.newtonking.com/projects/json/help/html/T_Newtonsoft_Json_Linq_JObject.htm))
     var doc = GetDocument<JDocument>(string id);
 
     // get document by ID (strongly typed POCO version)
