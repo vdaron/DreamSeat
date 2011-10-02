@@ -702,109 +702,109 @@ namespace DreamSeat
 		/// <summary>
 		/// Adds an attachment to the documnet.  Rev must be specified on this signature.  If you want to attach no matter what then use the method without the rev param
 		/// </summary>
-		/// <param name="id">id of the couch Document</param>
-		/// <param name="rev">revision _rev of the Couch Document</param>
-		/// <param name="attachment">Stream of the attachment. Will be closed once request is sent</param>
-		/// <param name="attachmentLength">Length of the Stream.</param>
-		/// <param name="fileName">filename of the attachment</param>
-		/// <param name="contentType">Content Type of the document</param>
-		/// <param name="result"></param>
+		/// <param name="anId">id of the couch Document</param>
+		/// <param name="aRev">revision _rev of the Couch Document</param>
+		/// <param name="anAttachment">Stream of the attachment. Will be closed once request is sent</param>
+		/// <param name="anAttachmentLength">Length of the Stream.</param>
+		/// <param name="aFileName">filename of the attachment</param>
+		/// <param name="aContentType">Content Type of the document</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> AddAttachment(string id, string rev, Stream attachment, long attachmentLength, string fileName, MimeType contentType, Result<JObject> result)
+		public Result<JObject> AddAttachment(string anId, string aRev, Stream anAttachment, long anAttachmentLength, string aFileName, MimeType aContentType, Result<JObject> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
+			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (attachment == null)
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (anAttachment == null)
 				throw new ArgumentNullException("attachment");
-			if (attachmentLength < 0)
+			if (anAttachmentLength < 0)
 				throw new ArgumentOutOfRangeException("attachmentLength");
-			if (String.IsNullOrEmpty(fileName))
-				throw new ArgumentNullException("fileName");
-			if (contentType == null)
-				throw new ArgumentNullException("contentType");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (String.IsNullOrEmpty(aFileName))
+				throw new ArgumentNullException("aFileName");
+			if (aContentType == null)
+				throw new ArgumentNullException("aContentType");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(fileName)).With(Constants.REV, rev).Put(DreamMessage.Ok(contentType, attachmentLength, attachment), new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).At(XUri.EncodeFragment(aFileName)).With(Constants.REV, aRev).Put(DreamMessage.Ok(aContentType, anAttachmentLength, anAttachment), new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Created)
-						result.Return(JObject.Parse(a.ToText()));
+						aResult.Return(JObject.Parse(a.ToText()));
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Delete an attachment
 		/// </summary>
-		/// <param name="id">Id of the document</param>
-		/// <param name="rev">Revision of the document</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="anId">Id of the document</param>
+		/// <param name="aRev">Revision of the document</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<JObject> DeleteAttachment(string id, string rev, string attachmentName, Result<JObject> result)
+		public Result<JObject> DeleteAttachment(string anId, string aRev, string anAttachmentName, Result<JObject> aResult)
 		{
-			if (String.IsNullOrEmpty(id))
+			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("id");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (String.IsNullOrEmpty(attachmentName))
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (String.IsNullOrEmpty(anAttachmentName))
 				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(id)).At(XUri.EncodeFragment(attachmentName)).With(Constants.REV, rev).Delete(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).At(XUri.EncodeFragment(anAttachmentName)).With(Constants.REV, aRev).Delete(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
-						result.Return(JObject.Parse(a.ToText()));
+						aResult.Return(JObject.Parse(a.ToText()));
 					else
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 				},
-				result.Throw
+				aResult.Throw
 			);
-			return result;
+			return aResult;
 		}
 		/// <summary>
 		/// Retrieve an attachment
 		/// </summary>
-		/// <param name="docId">Id of the document</param>
-		/// <param name="rev">Revision of the document</param>
-		/// <param name="attachmentName">Attachment file name</param>
-		/// <param name="result"></param>
+		/// <param name="anId">Id of the document</param>
+		/// <param name="aRev">Revision of the document</param>
+		/// <param name="anAttachmentName">Attachment file name</param>
+		/// <param name="aResult"></param>
 		/// <returns></returns>
-		public Result<Stream> GetAttachment(string docId, string rev, string attachmentName, Result<Stream> result)
+		public Result<Stream> GetAttachment(string anId, string aRev, string anAttachmentName, Result<Stream> aResult)
 		{
-			if (String.IsNullOrEmpty(docId))
+			if (String.IsNullOrEmpty(anId))
 				throw new ArgumentNullException("docId");
-			if (String.IsNullOrEmpty(rev))
-				throw new ArgumentNullException("rev");
-			if (String.IsNullOrEmpty(attachmentName))
+			if (String.IsNullOrEmpty(aRev))
+				throw new ArgumentNullException("aRev");
+			if (String.IsNullOrEmpty(anAttachmentName))
 				throw new ArgumentNullException("attachmentName");
-			if (result == null)
-				throw new ArgumentNullException("result");
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
 
-			BasePlug.AtPath(XUri.EncodeFragment(docId)).At(XUri.EncodeFragment(attachmentName)).Get(new Result<DreamMessage>()).WhenDone(
+			BasePlug.AtPath(XUri.EncodeFragment(anId)).At(XUri.EncodeFragment(anAttachmentName)).Get(new Result<DreamMessage>()).WhenDone(
 				a =>
 				{
 					if (a.Status == DreamStatus.Ok)
 					{
-						result.Return(a.ToStream());
+						aResult.Return(a.ToStream());
 					}
 					else
 					{
-						result.Throw(new CouchException(a));
+						aResult.Throw(new CouchException(a));
 					}
 				},
-				result.Throw
+				aResult.Throw
 			);
 
-			return result;
+			return aResult;
 		}
 		#endregion
 
