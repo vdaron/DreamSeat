@@ -9,13 +9,17 @@ namespace DreamSeat.Support
 	{
 		protected Plug BasePlug;
 
+		protected CouchBase(Plug aPlug)
+		{
+			BasePlug = aPlug;
+		}
+
 		protected CouchBase(XUri aBaseUri, string aUserName = null, string aPassword = null)
 		{
 			if (aBaseUri == null)
 				throw new ArgumentNullException("aBaseUri");
 
-			BasePlug = Plug.New(aBaseUri);
-			BasePlug = BasePlug.WithCredentials(aUserName, aPassword);
+			BasePlug = Plug.New(aBaseUri).WithCredentials(aUserName, aPassword);
 		}
 
 		/// <summary>

@@ -16,8 +16,13 @@ namespace DreamSeat
 		{
 		}
 
-		public CouchDatabase(XUri aDatabaseUri,string aUsername,string aPassword)
-			: base(aDatabaseUri,aUsername,aPassword)
+		public CouchDatabase(XUri aDatabaseUri, string aUsername, string aPassword)
+			: base(aDatabaseUri, aUsername, aPassword)
+		{
+		}
+
+		public CouchDatabase(Plug aDatabasePlug)
+			: base(aDatabasePlug)
 		{
 		}
 
