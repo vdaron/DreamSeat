@@ -34,8 +34,8 @@ namespace DreamSeat.IntegrationTest
 		}
 
 		private static CouchClient client;
-		private const string baseDatabase = "love-seat-test-base";
-		private const string replicateDatabase = "love-seat-test-repli";
+		private const string baseDatabase = "dream-seat-test-base";
+		private const string replicateDatabase = "dream-seat-test-repli";
 		private const string couchdbHostName = "192.168.56.1";
 
 		[TestFixtureSetUp]
@@ -108,8 +108,8 @@ namespace DreamSeat.IntegrationTest
 		{
 			IEnumerable<string> database = client.GetAllDatabases();
 			Assert.IsNotNull(database);
-			Assert.IsTrue(database.Contains("love-seat-test-base"));
-			Assert.IsTrue(database.Contains("love-seat-test-repli"));
+			Assert.IsTrue(database.Contains(baseDatabase));
+			Assert.IsTrue(database.Contains(replicateDatabase));
 		}
 		[Test]
 		public void GetDatabaseInfo()
