@@ -218,6 +218,35 @@ namespace DreamSeat
 		{
 			return GetDatabase(aDatabaseName, true, aResult);
 		}
+
+		/// <summary>
+		/// Retrieve list of available databases on the server
+		/// </summary>
+		/// <param name="aResult"></param>
+		/// <returns></returns>
+		public Result<IEnumerable<string>> GetAllDatabases(Result<IEnumerable<string>> aResult)
+		{
+			if (aResult == null)
+				throw new ArgumentNullException("aResult");
+
+			BasePlug.At("_all_dbs").Get(new Result<DreamMessage>()).WhenDone(
+				a =>
+					{
+						if (a.Status == DreamStatus.Ok)
+						{
+							var d = JArray.Parse(a.ToText());
+							aResult.Return(d.Values<string>());
+						}
+						else
+						{
+							aResult.Throw(new CouchException(a));
+						}
+					},
+				aResult.Throw
+			);
+
+			return aResult;
+		}
 		#endregion
 
 		#region Synchronous Methods
@@ -282,6 +311,14 @@ namespace DreamSeat
 		public CouchDatabase GetDatabase(string databaseName, bool createIfNotExists)
 		{
 			return GetDatabase(databaseName, createIfNotExists, new Result<CouchDatabase>()).Wait();
+		}
+		/// <summary>
+		/// Retrieve list of available databases on the server
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<string> GetAllDatabases()
+		{
+			return GetAllDatabases(new Result<IEnumerable<string>>()).Wait();
 		}
 		#endregion
 

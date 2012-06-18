@@ -36,6 +36,7 @@ namespace DreamSeat.IntegrationTest
 		private static CouchClient client;
 		private const string baseDatabase = "love-seat-test-base";
 		private const string replicateDatabase = "love-seat-test-repli";
+		private const string couchdbHostName = "192.168.56.1";
 
 		[TestFixtureSetUp]
 #if NUNIT
@@ -44,7 +45,7 @@ namespace DreamSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient();
+			client = new CouchClient(aHost: couchdbHostName);
 
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -86,8 +87,8 @@ namespace DreamSeat.IntegrationTest
 		public void Should_Trigger_Replication()
 		{
 			string dbname = "test-replicate-db-created";
-			
-			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase,"http://localhost:5984/" + replicateDatabase){ Continuous = true });
+
+			var obj = client.TriggerReplication(new ReplicationOptions(baseDatabase, String.Format("http://{0}:5984/{1}", couchdbHostName, replicateDatabase)) { Continuous = true });
 			Assert.IsTrue(obj != null);
 
 			var obj2 = client.TriggerReplication(new ReplicationOptions(baseDatabase,dbname){CreateTarget = true});
@@ -102,6 +103,14 @@ namespace DreamSeat.IntegrationTest
 			Assert.IsNull(db);
 		}
 
+		[Test]
+		public void GetDatabases()
+		{
+			IEnumerable<string> database = client.GetAllDatabases();
+			Assert.IsNotNull(database);
+			Assert.IsTrue(database.Contains("love-seat-test-base"));
+			Assert.IsTrue(database.Contains("love-seat-test-repli"));
+		}
 		[Test]
 		public void GetDatabaseInfo()
 		{
@@ -131,10 +140,13 @@ namespace DreamSeat.IntegrationTest
 					{
 						Id = "C", 
 						Source = baseDatabase, 
-						Target = "http://localhost:5984/" + replicateDatabase,
+						Target = String.Format("http://{0}:5984/{1}",couchdbHostName,replicateDatabase),
 						Continuous = true,
 						UserContext = new UserContext { Name = "bob", Roles = new[] { "role1", "role2" } }
 					});
+
+			//Sleep two second to ensure the replicationid is set by couchdb
+			System.Threading.Thread.Sleep(2000);
 
 			CouchReplicationDocument doc2 = replDb.GetDocument<CouchReplicationDocument>("C");
 			Assert.IsNotEmpty(doc2.ReplicationId);
