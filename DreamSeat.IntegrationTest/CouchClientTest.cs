@@ -479,9 +479,6 @@ namespace DreamSeat.IntegrationTest
 						Assert.IsNotNull(y.Id);
 						Assert.IsTrue(y.Sequence > 0);
 					}
-					catch (Exception e)
-					{
-					}
 					finally
 					{
 						evt.Set();
@@ -512,10 +509,6 @@ namespace DreamSeat.IntegrationTest
 						id = y.Doc.Id;
 						Assert.IsNotNull(y.Id);
 						Assert.IsTrue(y.Sequence > 0);
-					}
-					catch (Exception ex)
-					{
-
 					}
 					finally
 					{
