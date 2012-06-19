@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <licenseUrl>https://github.com/vdaron/DreamSeat/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/vdaron/DreamSeat</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>$description$</description>
+    <releaseNotes>First nuget package.</releaseNotes>
+    <copyright>Copyright © Martin Murphy - Vincent Daron 2010-2012</copyright>
+    <tags>Apache CouchDb Dream Mindtouch Asynchronous</tags>
+	<dependencies>
+      <dependency id="Newtonsoft.Json.dll" version="1.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\Libraries\mindtouch.dream.dll" target="lib/4.0" /> 
+	<file src="..\Libraries\Newtonsoft.Json.dll" target="lib/4.0" /> 
+  </files>
+</package>
