@@ -13,12 +13,10 @@
     <releaseNotes>First nuget package.</releaseNotes>
     <copyright>Copyright © Martin Murphy - Vincent Daron 2010-2012</copyright>
     <tags>Apache CouchDb Dream Mindtouch Asynchronous</tags>
-	<dependencies>
-      <dependency id="Newtonsoft.Json.dll" version="1.0" />
-    </dependencies>
   </metadata>
   <files>
-    <file src="..\Libraries\mindtouch.dream.dll" target="lib/4.0" /> 
-	<file src="..\Libraries\Newtonsoft.Json.dll" target="lib/4.0" /> 
+    <file src="..\Libraries\mindtouch.dream.dll" target="lib/net40" /> 
+	<file src="..\Libraries\log4net.dll" target="lib/net40" /> 
+	<file src="..\Libraries\Autofac.dll" target="lib/net40" /> 
   </files>
 </package>
