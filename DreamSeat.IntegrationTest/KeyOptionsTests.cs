@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DreamSeat.Support;
+using Newtonsoft.Json.Linq;
 
 #if NUNIT
 using NUnit.Framework;
-using DreamSeat.Support;
-using Newtonsoft.Json.Linq;
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;

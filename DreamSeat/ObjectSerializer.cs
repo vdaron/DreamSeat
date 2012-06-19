@@ -16,7 +16,7 @@ namespace DreamSeat
 
 			return (aType == typeof(JDocument)) || (aType.IsSubclassOf(typeof(JDocument)));
 		}
-		public override object ReadJson (JsonReader aReader, Type aType, JsonSerializer aSerializer)
+		public override object ReadJson(JsonReader aReader, Type aType, object existingValue, JsonSerializer serializer)
 		{
 			if (aReader == null)
 				throw new ArgumentNullException("aReader");
@@ -42,7 +42,7 @@ namespace DreamSeat
 		{
 			return aType == typeof(JObject);
 		}
-		public override object ReadJson(JsonReader aReader, Type aType, JsonSerializer aSerializer)
+		public override object ReadJson(JsonReader aReader, Type aType, object existingValue, JsonSerializer serializer)
 		{
 			if (aReader == null)
 				throw new ArgumentNullException("aReader");

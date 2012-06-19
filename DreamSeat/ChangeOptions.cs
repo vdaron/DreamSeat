@@ -12,7 +12,7 @@
 		/// <summary>
 		/// Include the document with the result
 		/// </summary>
-		internal bool? IncludeDocs { get; set; }
+		public bool? IncludeDocs { get; set; }
 
 		/// <summary>
 		/// Type of feed

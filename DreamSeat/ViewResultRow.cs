@@ -1,16 +1,18 @@
 ﻿using DreamSeat.Interfaces;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DreamSeat
 {
 	public class ViewResultRow<TKey> : IViewResultRow<TKey>
 	{
+		[JsonProperty(Constants.ID)]
 		public string Id
 		{
 			get;
 			internal set;
 		}
-
+		[JsonProperty(Constants.KEY)]
 		public TKey Key
 		{
 			get;
@@ -21,6 +23,7 @@ namespace DreamSeat
 		ViewResultRow<TKey>, 
 		IViewResultRow<TKey,TValue>
 	{
+		[JsonProperty(Constants.VALUE)]
 		public TValue Value
 		{
 			get;
@@ -32,6 +35,7 @@ namespace DreamSeat
 		IViewResultRow<TKey, TValue, TDocument> 
 		where TDocument : ICouchDocument
 	{
+		[JsonProperty(Constants.DOC)]
 		public TDocument Doc
 		{
 			get;

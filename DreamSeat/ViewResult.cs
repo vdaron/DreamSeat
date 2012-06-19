@@ -7,13 +7,13 @@ namespace DreamSeat
 {
 	public abstract class BaseViewResult : IBaseViewResult
 	{
-		[JsonProperty("total_rows")]
+		[JsonProperty(Constants.TOTAL_ROWS)]
 		public int TotalRows
 		{
 			get;
 			internal set;
 		}
-		[JsonProperty("offset")]
+		[JsonProperty(Constants.OFFSET)]
 		public int OffSet
 		{
 			get;
@@ -27,7 +27,7 @@ namespace DreamSeat
 	}
 	public class ViewResult<TKey, TValue> : BaseViewResult, IViewResult<TKey, TValue>
 	{
-		[JsonProperty("rows")]
+		[JsonProperty(Constants.ROWS)]
 		public IEnumerable<ViewResultRow<TKey,TValue>> Rows
 		{
 			get;
@@ -36,7 +36,7 @@ namespace DreamSeat
 	}
 	public class ViewResult<TKey, TValue, TDocument> : BaseViewResult, IViewResult<TKey, TValue, TDocument> where TDocument : ICouchDocument
 	{
-		[JsonProperty("rows")]
+		[JsonProperty(Constants.ROWS)]
 		public IEnumerable<ViewResultRow<TKey, TValue,TDocument>> Rows
 		{
 			get;

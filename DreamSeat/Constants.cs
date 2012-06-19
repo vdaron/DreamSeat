@@ -72,6 +72,10 @@
 		public const string OK = "ok";
 		public const string STARTKEY_DOCID = "startkey_docid";
 		public const string ENDKEY_DOCID = "endkey_docid";
+		public const string VALUE = "value";
+		public const string TOTAL_ROWS = "total_rows";
+		public const string OFFSET = "offset";
+		public const string ROWS = "rows";
 
 		public const string COMPACT = "_compact";
 		public const string TEMP_VIEW = "_temp_view";
@@ -86,6 +90,7 @@
 		public const string LAST_SEQUENCE = "last_seq";
 		public const string RESULTS = "results";
 		public const string SEQUENCE = "seq";
+		public const string DOC = "doc";
 
 		public const string HEARTBEAT = "heartbeat";
 		public const string SINCE = "since";

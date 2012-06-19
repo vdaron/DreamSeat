@@ -30,11 +30,11 @@ namespace DreamSeat
 		public CouchChangeResult<T>[] Results { get; internal set; }
 		[JsonProperty(Constants.LAST_SEQUENCE)]
 		public int LastSeq { get; internal set; }
-
 	}
 
 	public class CouchChangeResult<T> : CouchChangeResult where T : ICouchDocument
 	{
+		[JsonProperty(Constants.DOC)]
 		public T Doc { get; private set; }
 	}
 }

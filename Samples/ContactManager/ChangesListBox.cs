@@ -1,21 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using DreamSeat;
 using MindTouch.Tasking;
-using Newtonsoft.Json.Linq;
 
 namespace ContactManager
 {
-	using Yield = IEnumerator<IYield>;
-	using System.Runtime.CompilerServices;
-
 	public delegate void ContactChangedDelegate(object aSender, Contact aContact);
 
 	public delegate void ContactDeletedDelegate(object aSender, string id);

@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using DreamSeat;
 using MindTouch.Tasking;
-using Newtonsoft.Json.Linq;
 using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace ContactManager
 {

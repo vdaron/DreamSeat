@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Net;
-using DreamSeat;
 using MindTouch.Tasking;
-using Newtonsoft.Json.Linq;
 using System.Text;
 using MindTouch.Dream;
 using System.Collections.Generic;
 using DreamSeat.Interfaces;
 using DreamSeat.Support;
-using System.Diagnostics;
-
 #if NUNIT
 using NUnit.Framework;
+using JObject = Newtonsoft.Json.Linq.JObject;
+
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -178,7 +174,7 @@ namespace DreamSeat.IntegrationTest
 			var result = db.CreateDocument(obj);
 
 			Assert.IsNotNull(result.Id);
-			Assert.IsNotNull("prop",result["test"].Value<string>());
+			Assert.AreEqual("prop", result.Value<string>("test"));
 		}
 		[Test]
 		public void Should_Save_Existing_Document()
@@ -375,6 +371,8 @@ namespace DreamSeat.IntegrationTest
 			{
 				Assert.IsNotNull(row.Doc);
 				Assert.IsNotNull(row.Key);
+				Assert.IsNotNull(row.Id);
+				Assert.IsNotNull(row.Value);
 			}
 		}
 		[Test]
@@ -442,7 +440,7 @@ namespace DreamSeat.IntegrationTest
 			var db = client.GetDatabase("test_changes");
 			db.CreateDocument(null, "{}", new Result<string>()).Wait();
 
-			CouchChanges<JDocument> changes = db.GetChanges<JDocument>(new ChangeOptions(), new Result<CouchChanges<JDocument>>()).Wait();
+			CouchChanges<JDocument> changes = db.GetChanges(new ChangeOptions(), new Result<CouchChanges<JDocument>>()).Wait();
 			Assert.AreEqual(1,changes.Results.Length);
 			Assert.IsNotNull(changes.Results[0].Doc);
 			Assert.IsNotNull(changes.Results[0].Changes);
@@ -557,7 +555,7 @@ namespace DreamSeat.IntegrationTest
 			db.CreateDocument(doc);
 
 			JDocument jd = db.GetDocument<JDocument>(doc.Id);
-			Assert.AreEqual(validationFunction, jd["validate_doc_update"].Value<string>());
+			Assert.AreEqual(validationFunction, jd.Value<string>("validate_doc_update"));
 
 			db.DeleteDocument(jd);
 		}

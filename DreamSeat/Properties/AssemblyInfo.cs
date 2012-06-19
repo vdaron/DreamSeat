@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("DreamSeat")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("DreamSeat is a CouchDB client for the .NET plateform. The library is based on Mindtouch Dream to allow synchronous and asynchroous calls")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Vincent Daron")]
 [assembly: AssemblyProduct("DreamSeat")]
-[assembly: AssemblyCopyright("Copyright ©  2010")]
+[assembly: AssemblyCopyright("Copyright © Vincent Daron 2010-2012")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

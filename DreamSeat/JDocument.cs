@@ -12,18 +12,18 @@ namespace DreamSeat
 			get
 			{
 				JToken rev;
-				return TryGetValue("_id", out rev) ? rev.Value<string>() : null;
+				return TryGetValue(Constants._ID, out rev) ? rev.Value<string>() : null;
 			}
-			set { this["_id"] = value; }
+			set { this[Constants._ID] = value; }
 		}
 		public string Rev
 		{
 			get
 			{
 				JToken rev;
-				return TryGetValue("_rev", out rev) ? rev.Value<string>() : null;
+				return TryGetValue(Constants._REV, out rev) ? rev.Value<string>() : null;
 			}
-			set { this["_rev"] = value; }
+			set { this[Constants._REV] = value; }
 		}
 		public JDocument()
 		{
@@ -39,12 +39,12 @@ namespace DreamSeat
 
 		public bool HasAttachment
 		{
-			get { return this["_attachments"] != null; }
+			get { return this[Constants.ATTACHMENTS] != null; }
 		}
 
 		public IEnumerable<string> GetAttachmentNames()
 		{
-			var attachment = this["_attachments"];
+			var attachment = this[Constants.ATTACHMENTS];
 			return attachment == null ? null : attachment.Select(x => x.Value<JProperty>().Name);
 		}
 	}
