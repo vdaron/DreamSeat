@@ -7,10 +7,9 @@ using MindTouch.Dream;
 using System.Collections.Generic;
 using DreamSeat.Interfaces;
 using DreamSeat.Support;
+using Newtonsoft.Json.Linq;
 #if NUNIT
 using NUnit.Framework;
-using JObject = Newtonsoft.Json.Linq.JObject;
-
 #else
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TestAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -353,7 +352,7 @@ namespace DreamSeat.IntegrationTest
 			db.CreateDocument(new JDocument());
 			db.CreateDocument(new JDocument());
 
-			ViewResult<string, JObject> result = db.GetView<string, JObject>("testviewitem", "testview", new Result<ViewResult<string, JObject>>()).Wait();
+			ViewResult<string, JObject> result = db.GetView("testviewitem", "testview", new Result<ViewResult<string, JObject>>()).Wait();
 			Assert.IsNotNull(result);
 			Assert.IsTrue(result.TotalRows > 0);
 		}
