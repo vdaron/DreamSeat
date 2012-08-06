@@ -33,6 +33,7 @@
 		public const string ALL_DOCS = "_all_docs";
 		public const string DESIGN = "_design";
 		public const string VIEW = "_view";
+		public const string VIEW_PARAMETER = "view";
 
 		public const string TYPE = "type";
 		public const string NAME = "name";
