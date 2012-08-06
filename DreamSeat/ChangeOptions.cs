@@ -23,6 +23,14 @@
 		/// Filter function from a design document to get updates
 		/// </summary>
 		public string Filter { get; set; }
+
+		/// <summary>
+		/// Use specified CouchDB Views (in form of $database_name/$view_name) as the filter function.
+		/// </summary>
+		/// <value>
+		/// The view.
+		/// </value>
+		public string View { get; set; }
 		
 		/// <summary>
 		/// Period (in milliseconds) after which an empty line is sent during longpoll or continuous
