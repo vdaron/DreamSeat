@@ -74,6 +74,10 @@ namespace DreamSeat.Support
 			{
 				aPlug = aPlug.With(Constants.FILTER, XUri.Encode(aChangeOptions.Filter));
 			}
+			if (!String.IsNullOrEmpty (aChangeOptions.View)) {
+				aPlug = aPlug.With(Constants.FILTER, XUri.Encode (Constants.VIEW));
+				aPlug = aPlug.With(Constants.VIEW_PARAMETER, aChangeOptions.View);
+			}
 			if (aChangeOptions.Heartbeat.HasValue)
 			{
 				aPlug = aPlug.With(Constants.HEARTBEAT, aChangeOptions.Heartbeat.Value);
