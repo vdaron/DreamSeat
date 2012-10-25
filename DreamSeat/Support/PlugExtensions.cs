@@ -23,15 +23,15 @@ namespace DreamSeat.Support
 			if (aViewOptions.Reduce.HasValue)
 				aPlug = aPlug.With(Constants.REDUCE, aViewOptions.Reduce.Value ? "true" : "false");
 			if (aViewOptions.Group.HasValue)
-				aPlug = aPlug.With(Constants.GROUP, aViewOptions.Group.Value);
+                aPlug = aPlug.With(Constants.GROUP, aViewOptions.Group.Value ? "true" : "false");
 			if (aViewOptions.InclusiveEnd.HasValue)
-				aPlug = aPlug.With(Constants.INCLUSIVE_END, aViewOptions.InclusiveEnd.Value);
+                aPlug = aPlug.With(Constants.INCLUSIVE_END, aViewOptions.InclusiveEnd.Value ? "true" : "false");
 			if (aViewOptions.IncludeDocs.HasValue)
-				aPlug = aPlug.With(Constants.INCLUDE_DOCS, aViewOptions.IncludeDocs.Value);
+                aPlug = aPlug.With(Constants.INCLUDE_DOCS, aViewOptions.IncludeDocs.Value ? "true" : "false");
 			if (aViewOptions.GroupLevel.HasValue)
 				aPlug = aPlug.With(Constants.GROUP_LEVEL, aViewOptions.GroupLevel.Value);
 			if (aViewOptions.Descending.HasValue)
-				aPlug = aPlug.With(Constants.DESCENDING, aViewOptions.Descending.Value);
+                aPlug = aPlug.With(Constants.DESCENDING, aViewOptions.Descending.Value ? "true" : "false");
 			if (aViewOptions.Stale.HasValue)
 			{
 				switch (aViewOptions.Stale.Value)
