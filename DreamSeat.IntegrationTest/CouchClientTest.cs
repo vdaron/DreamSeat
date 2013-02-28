@@ -44,7 +44,7 @@ namespace DreamSeat.IntegrationTest
 		public static void Setup(TestContext o)
 #endif
 		{
-			client = new CouchClient();
+			client = new CouchClient("testcs");
 
 			if (client.HasDatabase(baseDatabase))
 			{
@@ -217,14 +217,7 @@ namespace DreamSeat.IntegrationTest
 			var bdoc = db.GetDocument<CouchDocument>("upload");
 			Assert.IsTrue(bdoc.GetAttachmentNames().Contains("martin.txt"));
 		}
-		[Test]
-		public void Should_Create_And_Read_ConfigValue()
-		{
-			client.SetConfigValue("coucou", "key", "value");
-			Assert.AreEqual("value",client.GetConfigValue("coucou","key"));
-			client.DeleteConfigValue("coucou", "key");
-			Assert.IsNull(client.GetConfigValue("coucou", "key"));
-		}
+		
 		[Test]
 		public void Should_Read_ConfigSection()
 		{
@@ -562,5 +555,19 @@ namespace DreamSeat.IntegrationTest
 			Plug p2 = Plug.New("http://localhost").With(viewOptions);
 			Assert.AreEqual("http://localhost?stale=update_after", p2.ToString());
 		}
+        [Test]
+        public void ParseConnectionStringConstructor()
+        {
+            var conStringName = "testcs";
+
+            CouchClient clnt = new CouchClient(conStringName);
+            CouchDatabase db = clnt.GetDatabase(ConnectionSettings.Database);
+
+            CouchDesignDocument cdd = new CouchDesignDocument("wilbytest");
+            cdd.Views.Add("testAll", new CouchView("function(doc) { emit(null, doc) }"));
+            db.CreateDocument(cdd);
+
+            Assert.IsNotNull(cdd.Rev);
+        }
 	}
 }

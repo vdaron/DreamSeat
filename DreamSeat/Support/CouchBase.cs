@@ -2,6 +2,7 @@ using System;
 using MindTouch.Dream;
 using MindTouch.Tasking;
 using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace DreamSeat.Support
 {
@@ -21,6 +22,24 @@ namespace DreamSeat.Support
 
 			BasePlug = Plug.New(aBaseUri).WithCredentials(aUserName, aPassword);
 		}
+
+        protected CouchBase(string connectionStringName)
+        {
+            ConnectionSettings cs = new ConnectionSettings(
+                ConfigurationManager.ConnectionStrings[connectionStringName].ConnectionString);
+            var aBaseUri = new XUri(String.Format("http://{0}:{1}", cs.Host, cs.Port));
+            
+            IntPtr ptr = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(cs.Password);
+            try
+            {
+                BasePlug = Plug.New(aBaseUri).WithCredentials(cs.UserName, 
+                 System.Runtime.InteropServices.Marshal.PtrToStringBSTR(ptr));
+            }
+            finally
+            {
+                System.Runtime.InteropServices.Marshal.ZeroFreeBSTR(ptr);
+            }            
+        }
 
 		/// <summary>
 		/// Perform Cookie base authentication with given username and password

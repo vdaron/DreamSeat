@@ -55,6 +55,7 @@
       <HintPath>..\Libraries\mindtouch.dream.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -95,6 +96,7 @@
     <Compile Include="ObjectSerializer.cs" />
     <Compile Include="PagingHelper.cs" />
     <Compile Include="Support\AsyncStreamReader.cs" />
+    <Compile Include="Support\ConnectionSettings.cs" />
     <Compile Include="Support\CouchBase.cs" />
     <Compile Include="CouchClient.cs" />
     <Compile Include="CouchDatabase.cs" />
