@@ -1,4 +1,6 @@
 using System;
+using System.Configuration;
+using System.Data.SqlClient;
 using MindTouch.Dream;
 using MindTouch.Tasking;
 using Newtonsoft.Json.Linq;
@@ -20,6 +22,18 @@ namespace DreamSeat.Support
 				throw new ArgumentNullException("aBaseUri");
 
 			BasePlug = Plug.New(aBaseUri).WithCredentials(aUserName, aPassword);
+		}
+
+		protected CouchBase(string connectionStringName)
+		{
+			ConnectionStringSettings connectionString = ConfigurationManager.ConnectionStrings[connectionStringName];
+			if(connectionString == null)
+				throw new ArgumentException("Invalid connection string name");
+
+			CouchDbConnectionStringBuilder cs = new CouchDbConnectionStringBuilder(connectionString.ConnectionString);
+
+			BasePlug = Plug.New(String.Format("{0}://{1}:{2}",cs.SslEnabled ? "https" : "http", cs.Host, cs.Port))
+				.WithCredentials(cs.UserName,cs.Password);
 		}
 
 		/// <summary>

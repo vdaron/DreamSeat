@@ -30,6 +30,17 @@ namespace DreamSeat
 		{
 		}
 
+
+		/// <summary>
+		/// Constructs the CouchClient and gets an authentication cookie (10 min).
+		/// </summary>
+		/// <param name="connectionStringName">The name of the connection string in the Web.Config or App.Config</param>
+		/// <example>
+		/// The connection string should be in this format:
+		/// "Host=localhost;Port=5984;Database=ExampleDB;UserName=admin;Password=adminPass;SslEnabled=true"
+		/// </example>
+		public CouchClient(string connectionStringName) : base(connectionStringName) { }
+
 		#region Asynchronous Methods
 		/// <summary>
 		/// Triggers one way replication from the source to target.  If bidirection is needed call this method twice with the source and target args reversed.
