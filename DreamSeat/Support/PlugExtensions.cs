@@ -72,7 +72,7 @@ namespace DreamSeat.Support
 
 			if (!String.IsNullOrEmpty(aChangeOptions.Filter))
 			{
-				aPlug = aPlug.With(Constants.FILTER, XUri.Encode(aChangeOptions.Filter));
+				aPlug = aPlug.With(Constants.FILTER, aChangeOptions.Filter);
 			}
 			if (!String.IsNullOrEmpty (aChangeOptions.View)) {
 				aPlug = aPlug.With(Constants.FILTER, XUri.Encode (Constants.VIEW));
@@ -98,6 +98,13 @@ namespace DreamSeat.Support
 			{
 				aPlug = aPlug.With(Constants.TIMEOUT, aChangeOptions.Timeout.Value);
 			}
+            if (aChangeOptions.AdditionalParams != null)
+            {
+                foreach (var pair in aChangeOptions.AdditionalParams)
+                {
+                    aPlug = aPlug.With(pair.Key, pair.Value);
+                }
+            }
 
 			return aPlug;
 		}

@@ -44,6 +44,7 @@
 		public const string JAVASCRIPT = "javascript";
 		public const string LANGUAGE = "language";
 		public const string VIEWS = "views";
+        public const string FILTERS = "filters";
 		public const string SHOWS = "shows";
 		public const string LISTS = "lists";
 		public const string VALIDATE_DOC_UPDATE = "validate_doc_update";

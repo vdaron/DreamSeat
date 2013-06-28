@@ -31,7 +31,7 @@ namespace DreamSeat.IntegrationTest
 		private static CouchClient client;
 		private const string baseDatabase = "dream-seat-test-base";
 		private const string replicateDatabase = "dream-seat-test-repli";
-		private const string couchdbHostName = "192.168.56.1";
+		private const string couchdbHostName = "localhost";
 
 		[TestFixtureSetUp]
 #if NUNIT
@@ -461,6 +461,30 @@ namespace DreamSeat.IntegrationTest
 			Assert.IsNotNull(changes.Results[0].Id);
 			Assert.IsNotNull(changes.Results[0].Sequence);
 		}
+        [Test]
+        public void GetChangesByType()
+        {
+            if (client.HasDatabase("test_changes"))
+                client.DeleteDatabase("test_changes");
+
+            var db = client.GetDatabase("test_changes");
+            CouchDesignDocument doc = new CouchDesignDocument("showdoc");
+            doc.Filters.Add("bytype", "function(doc, req) { if(doc.type == req.query.type) { return true; } else { return false; }}");
+            db.CreateDocument(doc);
+
+            db.CreateDocument(null, "{type:1}", new Result<string>()).Wait();
+            db.CreateDocument(null, "{type:2}", new Result<string>()).Wait();
+
+            CouchChanges changes = db.GetChanges(new ChangeOptions()
+            {
+                Filter = @"showdoc/bytype",
+                AdditionalParams = new Dictionary<string, string>() { { "type", "1" } }
+            }, new Result<CouchChanges>()).Wait();
+            Assert.AreEqual(1, changes.Results.Length);
+            Assert.IsNotNull(changes.Results[0].Changes);
+            Assert.IsNotNull(changes.Results[0].Id);
+            Assert.IsNotNull(changes.Results[0].Sequence);
+        }
 		[Test]
 		public void GetContinuousChanges()
 		{

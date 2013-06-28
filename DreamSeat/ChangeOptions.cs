@@ -1,4 +1,6 @@
-﻿namespace DreamSeat
+﻿using System.Collections.Generic;
+
+namespace DreamSeat
 {
 	internal enum ChangeFeed
 	{
@@ -51,5 +53,10 @@
 		/// Maximum period to wait before the response is sent
 		/// </summary>
 		public int? Timeout { get; set; }
+
+        /// <summary>
+        /// Additional request params
+        /// </summary>
+        public Dictionary<string, string> AdditionalParams { get; set; }
 	}
 }
