@@ -34,3 +34,6 @@ _ReSharper*/
 /LoveSeat.IntegrationTest/test-results
 *.testsettings
 LoveSeat.vsmdi
+
+#NuGet
+packages/
