@@ -57,14 +57,14 @@ namespace ContactManager
 			}
 		}
 
-		private int GetSequence()
+		private long GetSequence()
 		{
-			int seqNumber = 1;
+			long seqNumber = 1;
 			try
 			{
 				if (File.Exists("sequence.txt"))
 				{
-					seqNumber = Int32.Parse(File.ReadAllText("sequence.txt"));
+					seqNumber = long.Parse(File.ReadAllText("sequence.txt"));
 					return seqNumber;
 				}
 			}
@@ -75,7 +75,7 @@ namespace ContactManager
 			}
 			return seqNumber;
 		}
-		private void SetSequence(int seq)
+		private void SetSequence(long seq)
 		{
 			try
 			{

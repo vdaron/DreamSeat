@@ -17,7 +17,7 @@ namespace DreamSeat
 		[JsonProperty(Constants.ID)]
 		public string Id { get; protected set; }
 		[JsonProperty(Constants.SEQUENCE)]
-		public int Sequence { get; protected set; }
+		public long Sequence { get; protected set; }
 		[JsonProperty(Constants.CHANGES)]
 		public JObject[] Changes { get; protected set; }
 		[JsonProperty(Constants.DELETED)]

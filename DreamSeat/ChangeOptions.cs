@@ -47,7 +47,7 @@ namespace DreamSeat
 		/// <summary>
 		/// Start the results from the specified sequence number
 		/// </summary>
-		public int? Since { get; set; }
+		public long? Since { get; set; }
 
 		/// <summary>
 		/// Maximum period to wait before the response is sent
