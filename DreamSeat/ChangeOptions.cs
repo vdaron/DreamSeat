@@ -1,4 +1,6 @@
-﻿namespace DreamSeat
+﻿using System.Collections.Generic;
+
+namespace DreamSeat
 {
 	internal enum ChangeFeed
 	{
@@ -45,11 +47,16 @@
 		/// <summary>
 		/// Start the results from the specified sequence number
 		/// </summary>
-		public int? Since { get; set; }
+		public long? Since { get; set; }
 
 		/// <summary>
 		/// Maximum period to wait before the response is sent
 		/// </summary>
 		public int? Timeout { get; set; }
+
+        /// <summary>
+        /// Additional request params
+        /// </summary>
+        public Dictionary<string, string> AdditionalParams { get; set; }
 	}
 }

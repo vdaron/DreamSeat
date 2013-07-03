@@ -9,6 +9,7 @@ namespace DreamSeat
 		{
 			Language = Constants.JAVASCRIPT;
 			Views = new Dictionary<string, CouchView>();
+            Filters = new Dictionary<string, string>();
 			Shows = new Dictionary<string, string>();
 			Lists = new Dictionary<string, string>();
 		}
@@ -23,6 +24,9 @@ namespace DreamSeat
 
 		[JsonProperty(Constants.VIEWS)]
 		public Dictionary<string, CouchView> Views { get; internal set; }
+
+        [JsonProperty(Constants.FILTERS)]
+        public Dictionary<string, string> Filters { get; internal set; }
 
 		[JsonProperty(Constants.SHOWS)]
 		public Dictionary<string,string> Shows { get; private set; }
